@@ -2,12 +2,15 @@
 
 import datetime
 from flask_sqlalchemy import SQLAlchemy
-
-from memomemo import db
-
+from memomemo import app
 from sqlalchemy import exc
 from sqlalchemy import event
 from sqlalchemy.pool import Pool
+
+
+db = SQLAlchemy(app)
+db_session = db.session
+
 
 @event.listens_for(Pool, "checkout")
 def ping_connection(dbapi_connection, connection_record, connection_proxy):
@@ -27,9 +30,9 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
 
 class User(db.Model):
     __tablename__ = 'users'
-    id = db.Column(db.Integer, primary_key = True)
-    name = db.Column(db.String(50), unique = True)
-    password = db.Column(db.String(50), unique = True)
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(50), unique=True)
+    password = db.Column(db.String(50))
     
     def __init__(self, name, password):
         self.name = name
@@ -38,11 +41,11 @@ class User(db.Model):
 
 class Memo(db.Model):
     __tablename__ = 'memos'
-    id = db.Column(db.Integer, primary_key = True)
-    title = db.Column(db.String(200), nullable = False, unique = True)
-    text = db.Column(db.Text, nullable = False)
-    tag = db.Column(db.String(100), nullable = False)
-    date_time = db.Column(db.DateTime(), unique = True)
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), nullable=False, unique=True)
+    text = db.Column(db.Text, nullable=False)
+    tag = db.Column(db.String(100), nullable=False)
+    date_time = db.Column(db.DateTime(), unique=True)
 
     def __init__(self, title, text, tag, date_time):
         self.title = title
@@ -51,16 +54,19 @@ class Memo(db.Model):
         self.date_time = date_time
 
 
-def init_db(app):
-    db.init_app(app)
-    db.app = app
+def init_db():
     db.create_all()
 
 
 def add_user(name, password):
-    u = User(name, password)
-    db.session.add(u)
-    db.session.commit()
+    user = User.query.filter_by(name=name).first()
+
+    if user:
+        u = User(name, password)
+        db.session.add(u)
+        db.session.commit()
+
+    return user
 
 
 def delete_user(user):
@@ -170,10 +176,3 @@ def varify_user(name, password):
             return False, "Invalid password"
     else:
         return False, "Invalid username"
-
-
-def debug(breakpoint):
-    '''引数なしで呼び出すとTypeErrorでWerkzeugデバッカが拾ってくれる
-    "DON'T PANIK"
-    '''
-    pass

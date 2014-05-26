@@ -3,13 +3,9 @@
 import os
 import json
 import datetime
-
 from flask import Flask, render_template, session, \
                   Markup, request, redirect, url_for
-
-#from flask_sockets import Sockets
-from flask_sqlalchemy import SQLAlchemy
-
+from flask_sockets import Sockets
 from docutils.core import publish_parts
 from sphinx.directives.other import *
 from sphinx.directives.code import *
@@ -19,49 +15,29 @@ import rst_directive
 
 app = Flask(__name__)
 app.config.from_pyfile('memomemo.cfg')
-#sockets = Sockets(app)
-db = SQLAlchemy(app)
-
-import database
+sockets = Sockets(app)
 
 
-@app.route('/')
-def index():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
+@sockets.route("/memos")
+def show_memos(ws):
+    '''WebSocket'''
+    while True:
+        filter_json = ws.receive()
+        # 時々ValueErrorが出てる
+        filter_word = json.loads(unicode(filter_json))
 
-    error = None
+        # TODO: personal setting if possible generalized...
+        if len(filter_word['title']) == 0 and len(filter_word['tag']) == 0:
+            todo = database.filter_specific_tag('TODO')
+            if todo:
+                ws.send(dump_json_memo(todo));
 
-    tags = database.counting_tag()
+        memos = database.query_memo(filter_word)
 
-    # TODO: personal setting if possible generalized...
-    home = database.filter_specific_tag('bookmark')
-    if home:
-        home_html = parse_rst(home.text)
-
-    return render_template('index.html', **locals())
-
-
-#@sockets.route("/memos")
-#def show_memos(ws):
-    #'''WebSocket'''
-    #while True:
-        #filter_json = ws.receive()
-        ## 時々ValueErrorが出てる
-        #filter_word = json.loads(unicode(filter_json))
-
-        ## TODO: personal setting if possible generalized...
-        #if len(filter_word['title']) == 0 and len(filter_word['tag']) == 0:
-            #todo = database.filter_specific_tag('TODO')
-            #if todo:
-                #ws.send(dump_json_memo(todo));
-
-        #memos = database.query_memo(filter_word)
-
-        #import time
-        #for memo in memos:
-            #ws.send(dump_json_memo(memo))
-            #time.sleep(0.2)
+        import time
+        for memo in memos:
+            ws.send(dump_json_memo(memo))
+            time.sleep(0.2)
 
 
 @app.route("/memomemo", methods=['POST'])
