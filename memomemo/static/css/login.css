@@ -1,0 +1,119 @@
+#spacer{
+  height:20%;
+}
+
+.box{
+  border-radius:25px;
+  background:#000;
+  padding:3px 0px;
+  padding-left:14px;
+  width:45px;
+  height:45px;
+  margin:auto;
+  overflow:hidden;
+  white-space: nowrap;
+  transition:all .5s ease;
+  border:1px solid #000;
+}
+.text{
+  width: auto;
+  margin-left:15px;
+  margin-bottom: 10px;
+  background:#33ff99;
+  color:#000;
+  border:none;
+  outline:transparent;
+  padding:8px;
+  font-size:12pt;
+  border-radius: 5px;
+}
+.login-method {
+  text-align: center;
+  margin-bottom: 50px;
+}
+
+#form-container, #icon {
+  display:inline-block;
+  vertical-align:top;
+}
+#icon {
+  margin-top:10px;
+}
+
+.showbox {
+  background:#aaa;
+  color: #555;
+  width:100%;
+  transition-delay:0s;
+  border:1px solid #aaa;
+}
+
+.showpass {
+  height:90px;
+}
+
+/* OAUTH */
+
+.showoauth {
+  height:65px;
+  background:#aaa;
+  width:100%;
+  transition-delay:0s;
+  border:1px solid #aaa;
+  color: #555;
+}
+.iconfolder {
+	width: 48px;
+	height: 48px;
+	margin: 5px 12px 0px;
+	padding-top: -10px;
+	display: inline-block;
+	background-color: #FFF;
+	border-radius: 10px;
+	transition:all .5s ease;
+}
+.icon-4x {
+	position: relative;
+	top: -4px;
+}
+
+.bitbucket {
+	color: #205081;
+}
+.bitbucket:hover {
+	color: #FFF;
+}
+.bitbucket-folder:hover {
+	background-color: #205081;
+}
+
+.github {
+	margin-top: 10px;
+	color: #000;
+}
+.github:hover {
+	color: #FFF;
+}
+.github-folder:hover {
+	background-color: #000;
+}
+
+.twitter {
+	color: #33CCFF;
+}
+.twitter:hover {
+	color: #FFF;
+}
+.twitter-folder:hover {
+	background-color: #33CCFF;
+}
+
+.google {
+	color: #0000FF;
+}
+.google:hover {
+	color: #FFF;
+}
+.google-folder:hover {
+	background-color: #FF0000;
+}

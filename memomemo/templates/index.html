@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+
+
+{% block head %}
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/menu_ui.css') }}">
+{% endblock %}
+
+
+
+{% block body %}
+
+
+{% if session.logged_in %}
+<!--Cumulusjs-->
+<script type="text/javascript">
+	var tags = [];
+	{% for tag in tags %}
+	tags.push(new Tag("{{ tag['name'] }}", "{{ tag['size'] }}", "{{ tag['url'] }}"));
+	{% endfor %}
+	var tagCloud = new TagCloud(tags, 510, 510); 
+</script>
+
+
+<!--Error-->
+<div>
+	{% if error %}
+	<p class="error">
+	<strong>Error:</strong> {{ error }}
+	{% endif %}
+</div>
+
+
+<!--Side Menu-->
+<div class="menu-ui">
+	<!--addentry-div-->
+	<div class="addentry-div">
+   		<img src="{{ url_for('static', filename='img/brush.png') }}">
+		<form onsubmit="return false;">
+			<div class="lock-switch">
+				<input type="checkbox" id="lock-check"></input>
+				<label for="lock-check">
+					<div class="lock-label"></div>
+				</label>
+			</div>
+   			<dl>
+				<dd><input type="text" name="id" class="memo-input-id" style="display:none;">
+    		   	<dt>Title:
+    		   	<dd><input type="text" name="title" class="input-text memo-input-title" placeholder="Title">
+    		   	<dt>Text:
+				<dd><textarea name="text" class="memo-input-text" placeholder="Text ( Use reStructuredText, but do not use heading! )"></textarea>
+				<dt>Tag:
+				<dd><input type="text" name="tag" class="input-text memo-input-tag" placeholder="Tag">
+				<dd><input type="button" value="Commit" class="commit-button">
+	   		</dl>
+   		</form>
+	</div>
+	<!--search-div-->
+	<div class="search-div">
+		<img src="{{ url_for('static', filename='img/search.png') }}">
+		<form id="search-form" onsubmit="return false;">
+			<input type="text", name="title"  placeholder="Title"></input>
+			<input type="text", name="tag" placeholder="Tag"></input>
+			<input type="text", name="date" placeholder="Trem"></input>
+			<input type="button" value="Submit" id="submit-button"></input>
+		</form>
+	</div>
+	<!--cumulunimbus-div-->
+	<div class="cumulunimbus-div">
+		<img src="{{ url_for('static', filename='img/cumulonimbus.png') }}">
+		<div id="tagCloud"></div>
+		<script type="text/javascript">
+			tagCloud.Distribute(document.getElementById("tagCloud")).Animate(); 
+		</script>
+	</div>
+	<!--home-div-->
+	<div class="home-div">
+		<img src="{{ url_for('static', filename='img/home.png') }}">
+		<div>{{ home_html }}</div>
+	</div>
+</div>
+
+
+<!--Entry-->
+<div class="entries">
+    <div id="load" style="visibility: hidden;">
+        <div>G</div>
+        <div>N</div>
+        <div>I</div>
+        <div>D</div>
+        <div>A</div>
+        <div>O</div>
+        <div>L</div>
+    </div>
+	<dl class="memo"></dl>
+	<!--<em style="font-size:30px;">No memos here, Let's hover left pen-icon!</em>-->
+</div>
+{% endif %}
+
+
+{% endblock %}

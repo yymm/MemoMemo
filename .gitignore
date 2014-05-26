@@ -1,0 +1,6 @@
+*.pyc
+wiki
+.DS_Store
+*.stackdump
+*.db
+*.cfg

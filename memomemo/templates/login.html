@@ -1,0 +1,85 @@
+{% extends "layout.html" %}
+
+
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/login.css') }}">
+<link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+{% endblock %}
+
+
+
+{% block body %}
+
+
+    <div id="spacer"></div>
+
+    <div class="col-4">
+		{% if public_mode %}
+        <h1 class="login-method">Auth</h1>
+        <div id="oauthbox" class="box">
+            <i id="icon" class="icon-key icon-large"></i>
+            <div id="form-container">
+                <div class="iconfolder bitbucket-folder">
+                    <a class="bitbucket" href="#" style="text-decoration:none;">
+                        <div class="icon-bitbucket-sign icon-4x"></div>
+                    </a>
+                </div>
+                <div class="iconfolder github-folder">
+                    <a class="github" href="#" style="text-decoration:none;">
+                        <div class="icon-github-sign icon-4x"></div>
+                    </a>
+                </div>
+                <div class="iconfolder google-folder">
+                    <a class="google" href="#" style="text-decoration:none;">
+                        <div class="icon-google-plus-sign icon-4x"></div>
+                    </a>
+                </div>
+                <div class="iconfolder twitter-folder">
+                    <a class="twitter" href="#" style="text-decoration:none;">
+                        <div class="icon-twitter-sign icon-4x"></div>
+                    </a>
+                </div>
+            </div>
+        </div>
+		{% endif %}
+    </div>
+
+
+    <div class="col-4">
+        <h1 class="login-method">Login</h1>
+        <div id="login">
+            <div id="loginbox" class="box">
+                <i id="icon" class="icon-power-off icon-large"></i>
+                <form id="form-container" action="{{ url_for('login') }}" method=post>
+                    <input name='username' class="text" id="logintext" type="text" placeholder="Name" size="33"></input>
+                    <br />
+                    <input name='password' class="text" id="loginpass" type="password" placeholder="Password" size="33"></input>
+					<input type='submit' style='visibility:hidden;'></input>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-4">
+		{% if public_mode %}
+        <h1 class="login-method">Sign up</h1>
+        <div id="login">
+            <div id="box" class="box">
+                <i id="icon" class="icon-plus icon-large"></i>
+                <form id="form-container" action="" method=post>
+                    <input name='username' class="text" id="signuptext" type="text" placeholder="Name" size="33"></input>
+                    <br />
+                    <input name='password' class="text" id="signuppass" type="password" placeholder="Password" size="33"></input>
+					<input type='submit' style='visibility:hidden;'></input>
+                </form>
+            </div>
+        </div>
+		{% endif %}
+    </div>
+
+    <script src="{{ url_for('static', filename='js/login.js') }}"></script>
+	<script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
+
+{% endblock %}

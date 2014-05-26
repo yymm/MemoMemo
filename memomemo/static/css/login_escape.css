@@ -1,0 +1,57 @@
+/************/
+/* login UI */
+/************/
+
+.login {
+	margin: 0em auto; 
+	margin-top: 1em;
+	width: 25em; 
+	border: 5px solid #ccc; 
+    padding: 0.8em; 
+	background: white;
+}
+
+.login h1 {
+	color: #377BAB;
+	text-align: center;
+}
+
+.login .login-info {
+	margin: 0em auto;
+	margin-top: 1em;
+	width: 20em;
+    font-size: 1.0em;
+	border-radius: 5px;
+	background: #e1e1e1;
+    -moz-transition:all 1s ease;
+    -webkit-transition:all 1s ease;
+    -o-transition:all 1s ease;
+    -ms-transition:all 1s ease;
+}
+
+.login .login-info:focus {
+	background: #fcfcfc;
+	box-shadow: 0px 0px 5px 3px #377BAB;
+}
+
+.login .login-button {
+	margin: 0em auto;
+	margin-top: 1em;
+	width: 20em;
+	height: 2.5em;
+	background: #4d4d4d;
+	border-color: #ccc;
+	border-style: groove;
+	border-radius: 10px;
+    font-size: 1.0em;
+	font-weight: bold;
+	color: #fff;
+    -moz-transition:all 1s ease;
+    -webkit-transition:all 1s ease;
+    -o-transition:all 1s ease;
+    -ms-transition:all 1s ease;
+}
+
+.login .login-button:hover {
+	background: #377BAB;
+}
