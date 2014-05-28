@@ -6,6 +6,7 @@ from memomemo import app
 from sqlalchemy import exc
 from sqlalchemy import event
 from sqlalchemy.pool import Pool
+from sqlalchemy.dialects.mysql import LONGTEXT
 
 
 db = SQLAlchemy(app)
@@ -14,6 +15,9 @@ db_session = db.session
 
 @event.listens_for(Pool, "checkout")
 def ping_connection(dbapi_connection, connection_record, connection_proxy):
+    '''
+    MySQL Connection forced wake up, before connect to mysql server.
+    '''
     cursor = dbapi_connection.cursor()
     try:
         cursor.execute("SELECT 1")
@@ -29,23 +33,26 @@ def ping_connection(dbapi_connection, connection_record, connection_proxy):
 
 
 class User(db.Model):
-    __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(50))
+    memos = db.relationship('Memo', backref='user')
     
     def __init__(self, name, password):
         self.name = name
         self.password = password
 
+    def add_memo(self, json_data):
+        return None
+
 
 class Memo(db.Model):
-    __tablename__ = 'memos'
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False, unique=True)
-    text = db.Column(db.Text, nullable=False)
+    text = db.Column(LONGTEXT, nullable=False)
     tag = db.Column(db.String(100), nullable=False)
     date_time = db.Column(db.DateTime(), unique=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self, title, text, tag, date_time):
         self.title = title
@@ -74,19 +81,7 @@ def delete_user(user):
     db.session.commit()
 
 
-def close_db():
-    db.session.remove()
-
-
 def add_memo(memo_id, title, text, tag):
-    # Input check
-    if len(title) == 0:
-        title = "Non Title"
-    if len(text) == 0:
-        text = "Non"
-    if len(tag) == 0:
-        tag = "memo"
-
     now = datetime.datetime.today()
 
     # update or add
