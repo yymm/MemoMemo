@@ -1,82 +1,97 @@
 {% extends "layout.html" %}
 
 
-
 {% block head %}
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/login.css') }}">
 {% endblock %}
 
 
-
 {% block body %}
-
-
-    <div id="spacer"></div>
-
-    <div class="col-4">
-		{% if public_mode %}
-        <h1 class="login-method">Auth</h1>
-        <div id="oauthbox" class="box">
-            <i id="icon" class="icon-key icon-large"></i>
-            <div id="form-container">
-                <div class="iconfolder bitbucket-folder">
-                    <a class="bitbucket" href="#" style="text-decoration:none;">
-                        <div class="icon-bitbucket-sign icon-4x"></div>
-                    </a>
-                </div>
-                <div class="iconfolder github-folder">
-                    <a class="github" href="#" style="text-decoration:none;">
-                        <div class="icon-github-sign icon-4x"></div>
-                    </a>
-                </div>
-                <div class="iconfolder google-folder">
-                    <a class="google" href="#" style="text-decoration:none;">
-                        <div class="icon-google-plus-sign icon-4x"></div>
-                    </a>
-                </div>
-                <div class="iconfolder twitter-folder">
-                    <a class="twitter" href="#" style="text-decoration:none;">
-                        <div class="icon-twitter-sign icon-4x"></div>
-                    </a>
-                </div>
-            </div>
-        </div>
-		{% endif %}
-    </div>
-
-
-    <div class="col-4">
-        <h1 class="login-method">Login</h1>
-        <div id="login">
-            <div id="loginbox" class="box">
-                <i id="icon" class="icon-power-off icon-large"></i>
-                <form id="form-container" action="{{ url_for('login') }}" method=post>
-                    <input name='username' class="text" id="logintext" type="text" placeholder="Name" size="33"></input>
-                    <br />
-                    <input name='password' class="text" id="loginpass" type="password" placeholder="Password" size="33"></input>
-					<input type='submit' style='visibility:hidden;'></input>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-4">
-		{% if public_mode %}
-        <h1 class="login-method">Sign up</h1>
-        <div id="login">
-            <div id="box" class="box">
-                <i id="icon" class="icon-plus icon-large"></i>
-                <form id="form-container" action="" method=post>
-                    <input name='username' class="text" id="signuptext" type="text" placeholder="Name" size="33"></input>
-                    <br />
-                    <input name='password' class="text" id="signuppass" type="password" placeholder="Password" size="33"></input>
-					<input type='submit' style='visibility:hidden;'></input>
-                </form>
-            </div>
-        </div>
-		{% endif %}
-    </div>
-
+	<article>
+		<section>
+			<div class="title">
+				<div id="particle-slider">
+					<div class="slides">
+						<div id="first-slide" class="slide" data-src="{{ url_for('static', filename='img/logo.png') }}?inline"></div>
+					</div>
+					<canvas class='draw'></canvas>
+				</div>
+			</div>
+		</section>
+		<section id='login-section'>
+		    <div class="login-div">
+		        <h1 class="login-method">Auth</h1>
+		        <div id="oauthbox" class="box">
+		            <i id="icon" class="fa fa-cloud fa-2x" style='left: 8px;'></i>
+		            <div id="form-container">
+		                <div class="iconfolder bitbucket-folder">
+		                    <a class="bitbucket fa fa-bitbucket-square fa-3x" href="#" style="text-decoration:none;"></a>
+		                </div>
+		                <div class="iconfolder github-folder">
+		                    <a class="github fa fa-github-square fa-3x" href="#" style="text-decoration:none;"></a>
+		                </div>
+		                <div class="iconfolder google-folder">
+		                    <a class="google fa fa-google-plus-square fa-3x" href="#" style="text-decoration:none;"></a>
+		                </div>
+		                <div class="iconfolder twitter-folder">
+		                    <a class="twitter fa fa-twitter-square fa-3x" href="#" style="text-decoration:none;"></a>
+		                </div>
+		            </div>
+		        </div>
+		    </div>
+		    <div class="login-div">
+		        <h1 class="login-method">Login</h1>
+		        <div id="login">
+		            <div id="loginbox" class="box">
+		        		<i id="icon" class="fa fa-lock fa-2x" style='left: 14px;'></i>
+		                <form id="form-container" action="{{ url_for('login') }}" method=post>
+		                    <input name='username' class="text" id="logintext" type="text" placeholder="Name" size="33"></input>
+		                    <br />
+		                    <input name='password' class="text" id="loginpass" type="password" placeholder="Password" size="33"></input>
+							<input type='submit' style='visibility:hidden;'></input>
+		                </form>
+		            </div>
+		        </div>
+		    </div>
+		    <div class="login-div">
+		        <h1 class="login-method">Sign up</h1>
+		        <div id="login">
+		            <div id="box" class="box">
+		        		<i id="icon" class="fa fa-plus fa-2x" style='left: 13px;'></i>
+		                <form id="form-container" action="" method=post>
+		                    <input name='username' class="text" id="signuptext" type="text" placeholder="Name" size="33"></input>
+		                    <br />
+		                    <input name='password' class="text" id="signuppass" type="password" placeholder="Password" size="33"></input>
+							<input type='submit' style='visibility:hidden;'></input>
+		                </form>
+		            </div>
+		        </div>
+		    </div>
+		</section>
+		<section>
+			<div class="flash-alert" id="information" style='margin-bottom: 40px; font-size: 2em;'>
+				MemoMemo is a private memo tool.
+			</div>
+			<div class="flash-alert" id="error" style='margin-bottom: 40px; font-size: 2em;'>
+				So, those login gadget above don't work...
+			</div>
+			<div class="flash-alert" id="important" style='margin-bottom: 40px; font-size: 2em;'>
+				But, you can try MemoMemo by user for test!
+			</div>
+			<div class="flash-alert" id="warning" style='margin-bottom: 40px; font-size: 2em;'>
+				Logged in name:'test', password:'test'.
+			</div>
+		</section>
+	<article>
+	<footer>
+		<div id='author'>
+			<div>Author: yuya yano &copy; 2014<div>
+			<a class='fa fa-twitter fa-3x' href='https://twitter.com/yymm6666/' style='color: #55acee;'></a>
+			<a class='fa fa-facebook fa-3x' href='' style='color: #8b9dc3;'></a>
+			<a class='fa fa-github fa-3x' href='https://github.com/yymm/MemoMemo' style='color: #eee;'></a>
+		</div>
+	</footer>
     <script src="{{ url_for('static', filename='js/login.js') }}"></script>
-
+	<script type="text/javascript" src="{{ url_for('static', filename='js/particleslider.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/partislide_title.js') }}"></script>
 {% endblock %}

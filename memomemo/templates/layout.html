@@ -5,52 +5,25 @@
 	<title>MemoMemo</title>
 	<link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/pygments.css') }}">
 	<link rel="shortcut icon" href="{{ url_for('static', filename='ico/favicon.ico') }}">
-	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
-	<script type="text/javascript" src="{{ url_for('static', filename='js/cumulus.js') }}"></script>
+	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
 	<script type="text/javascript" src="{{ url_for('static', filename='js/script_head.js') }}"></script>
+	<link rel='stylesheet' href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
+	<link rel='stylesheet' href="{{ url_for('static', filename='css/pygments.css') }}">
+	<link rel='stylesheet' href="{{ url_for('static', filename='css/layout.css') }}">
 	{% block head %}
 	{% endblock %}
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/style.css') }}">
 </head>
-
 <body>
 	<!--Login Info-->
-	<div class="space"></div>
-	<div class=metanav>
+	<header  class=metanav>
 		<span class="small-title">MemoMemo</span>
-	{% if not session.logged_in %}
-	 	<a href="{{ url_for('login') }}">log in</a>
-	{% else %}
-	 	<a href="{{ url_for('logout') }}">log out</a>
-		<span class="click-here">Click here! Toggle title!</span>
-	{% endif %}
-	</div>
-	<!--Title-->
-	<div class="title">
-		<div id="particle-slider">
-			<div class="slides">
-				<div id="first-slide" class="slide" data-src="{{ url_for('static', filename='img/logo.png') }}?inline"></div>
-			</div>
-			<canvas class="draw" style="display: none;"></canvas>
-			<div id="title-img">
-				<img src="{{ url_for('static', filename='img/logo3.png') }}">
-			</div>
-		</div>
-		<div id="toggle-title">
-			<div class="toggle">
-			  <input type="checkbox" class="particle-switch" />
-			  <span class="btn"></span>
-			  <span class="labels"></span>
-			  <span class="bg"></span>
-			</div>
-		</div>
-	</div>
+		{% if session.logged_in %}
+	 		<a class='fa fa-power-off fa-2x' href="{{ url_for('logout') }}"></a>
+		{% endif %}
+	</header>
 	{% block body %}
 	{% endblock %}
 	<script type="text/javascript" src="{{ url_for('static', filename='js/script_body.js') }}"></script>
 </body>
-
 </html>
-

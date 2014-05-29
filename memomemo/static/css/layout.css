@@ -1,0 +1,194 @@
+/***************/
+/* all setting */
+/***************/
+
+* {
+	margin: 0;
+	padding: 0;
+	font-family: "Ubuntu Mono", sans-serif;
+}
+*, *:before, *:after {
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
+}
+body {
+	margin: 0;
+	color: #fff; 
+	background: url('../img/light-noise.png') repeat scroll 0 0 #000;
+}
+.reference {
+	color: #3BBC46;
+}
+/* flash alert */
+.flash-alert {
+	font-size: 1.2em;
+	margin: 0 auto;
+	padding: 40px;
+	text-align: center;
+	opacity: 0.8;
+	border: 2px solid;
+	width: 80%;
+}
+#important {
+    background-color: #DFF0D8;
+    border-color: #D6E9C6;
+    color: #3C763D;
+}
+#information {
+    background-color: #D9EDF7;
+    border-color: #BCE8F1;
+    color: #31708F;
+}
+#warning {
+    background-color: #FCF8E3;
+    border-color: #FAEBCC;
+    color: #8A6D3B;
+}
+#error {
+    background-color: #F2DEDE;
+    border-color: #EBCCD1;
+    color: #A94442;
+}
+.close-btn {
+	font-size: 2em;
+	position: absolute;
+	top: 0px;
+	left: 10px;
+	float: left;
+	font-weight: bold;
+	line-height: 1;
+	opacity: 0.6;
+	text-shahow: 0 1px 0 #FFFFFF;
+	border: 0 none;
+	color: inherit;
+	cursor: pointer;
+}
+/*******************/
+/* error / metanav */
+/*******************/
+.metanav {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 40px;
+	text-align: right; 
+	font-size: 20px; 
+	padding: 5px; 
+	background: #000;
+	opacity: 0.6;
+	z-index: 100;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	line-height: 1.42857;
+}
+.small-title {
+	position: absolute;
+	left: 2%;
+	color: #87CEEB;
+}
+.metanav:hover .click-here{
+	color: #bbb;
+}
+.error { 
+	text-align: center; 
+	background: #F0D6D6; 
+	padding: 0.5em; 
+}
+
+/***********/
+/* Memo UI */
+/***********/
+
+.entries {
+	margin-top: 0;
+	margin-left: 3.5%;
+	width: 90%;
+}
+
+.memo {
+	text-align: left;
+	position: relative;
+	z-index: 10;
+}
+
+.memo .memo-dd {
+	font-size: 16px; 
+	padding: 0.5em;
+	margin-top: .5em;
+	border-radius: 5px;
+	display: block;
+}
+
+.memo .memo-tag {
+    font-size: 20px;
+	font-weight: italic;
+	float: right; 
+	display: none; 
+}
+
+.memo .memo-dd:hover .memo-tag {
+	margin-right: 10px;
+	display: inline; 
+}
+
+.memo .memo-date {
+	margin-left: 1em;
+    font-size: 16px;
+	color: #ff9c77;
+}
+
+.memo .memo-edit,
+.memo .memo-delete {
+    font-size: 14px;
+	float: right;
+	margin: 0em 0em 0em 2em;
+	border: solid 2px;
+	border-radius: 10px;
+	padding: 2px;
+	text-decoration: none;
+}
+
+.memo .memo-dd:nth-child(2n) .memo-delete {
+	color: #333;
+}
+
+.memo .memo-dd:nth-child(2n) .memo-delete:hover {
+	color: #87CEEB;
+}
+
+.memo .memo-dd:nth-child(2n) .memo-edit{
+	color: #333;
+}
+
+.memo .memo-dd:nth-child(2n) .memo-edit:hover {
+	color: #87CEEB;
+}
+
+.memo .memo-dd:nth-child(2n+1) .memo-delete{
+	color: #555; 
+}
+
+.memo .memo-dd:nth-child(2n+1) .memo-delete:hover {
+	color: #87CEEB; 
+}
+
+.memo .memo-dd:nth-child(2n+1) .memo-edit{
+	color: #555; 
+}
+
+.memo .memo-dd:nth-child(2n+1) .memo-edit:hover {
+	color: #87CEEB; 
+}
+
+.memo .memo-dd:nth-child(2n) {
+	border: 5px solid #555; 
+	background-color: #555;
+}
+
+.memo .memo-dd:nth-child(2n+1) {
+	border: 5px solid #333; 
+	background-color: #333;
+}
