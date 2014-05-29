@@ -1,18 +1,16 @@
 {% extends "layout.html" %}
 
 
-
 {% block head %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/cumulus.js') }}"></script>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/menu_ui.css') }}">
 {% endblock %}
 
 
-
 {% block body %}
 
 
-{% if session.logged_in %}
+{% if session.user_id %}
 <!--Cumulusjs-->
 <script type="text/javascript">
 	var tags = [];
@@ -21,22 +19,11 @@
 	{% endfor %}
 	var tagCloud = new TagCloud(tags, 510, 510); 
 </script>
-
-
-<!--Error-->
-<div>
-	{% if error %}
-	<p class="error">
-	<strong>Error:</strong> {{ error }}
-	{% endif %}
-</div>
-
-
 <!--Side Menu-->
 <div class="menu-ui">
 	<!--addentry-div-->
 	<div class="addentry-div">
-   		<img src="{{ url_for('static', filename='img/brush.png') }}">
+		<div class="icon fa fa-pencil fa-2x"></div>
 		<form onsubmit="return false;">
 			<div class="lock-switch">
 				<input type="checkbox" id="lock-check"></input>
@@ -58,7 +45,7 @@
 	</div>
 	<!--search-div-->
 	<div class="search-div">
-		<img src="{{ url_for('static', filename='img/search.png') }}">
+		<div class="icon fa fa-search fa-2x"></div>
 		<form id="search-form" onsubmit="return false;">
 			<input type="text", name="title"  placeholder="Title"></input>
 			<input type="text", name="tag" placeholder="Tag"></input>
@@ -68,7 +55,7 @@
 	</div>
 	<!--cumulunimbus-div-->
 	<div class="cumulunimbus-div">
-		<img src="{{ url_for('static', filename='img/cumulonimbus.png') }}">
+		<div class="icon fa fa-cloud fa-2x"></div>
 		<div id="tagCloud"></div>
 		<script type="text/javascript">
 			tagCloud.Distribute(document.getElementById("tagCloud")).Animate(); 
@@ -76,7 +63,7 @@
 	</div>
 	<!--home-div-->
 	<div class="home-div">
-		<img src="{{ url_for('static', filename='img/home.png') }}">
+		<div class="icon fa fa-home fa-2x"></div>
 		<div>{{ home_html }}</div>
 	</div>
 </div>
@@ -84,15 +71,6 @@
 
 <!--Entry-->
 <div class="entries">
-    <div id="load" style="visibility: hidden;">
-        <div>G</div>
-        <div>N</div>
-        <div>I</div>
-        <div>D</div>
-        <div>A</div>
-        <div>O</div>
-        <div>L</div>
-    </div>
 	<dl class="memo"></dl>
 	<!--<em style="font-size:30px;">No memos here, Let's hover left pen-icon!</em>-->
 </div>

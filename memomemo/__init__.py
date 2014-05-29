@@ -17,7 +17,7 @@ app.config.from_object('config')
 sockets = Sockets(app)
 
 
-from memomemo.database import db_session, User
+from memomemo.database import db_session, User, varify_user
 
 
 @app.before_request
@@ -49,8 +49,6 @@ def login():
             session['user_id'] = user.id
             g.user = user
             return redirect(url_for('index'))
-        else:
-            flash()
 
     return render_template('login.html')
 

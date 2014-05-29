@@ -68,12 +68,23 @@ def init_db():
 def add_user(name, password):
     user = User.query.filter_by(name=name).first()
 
-    if user:
+    if not user:
         u = User(name, password)
         db.session.add(u)
         db.session.commit()
 
     return user
+
+
+def varify_user(name, password):
+    user = User.query.filter_by(name=name).first()
+    if user:
+        if user.password == password:
+            return user
+        else:
+            return None
+    else:
+        return None
 
 
 def delete_user(user):
@@ -159,15 +170,3 @@ def counting_tag():
         tags.append(tag_dic)
 
     return tags
-
-
-def varify_user(name, password):
-    exist_user = False
-    user = User.query.filter_by(name = name).first()
-    if user:
-        if user.password == password:
-            return True, "ok"
-        else:
-            return False, "Invalid password"
-    else:
-        return False, "Invalid username"
