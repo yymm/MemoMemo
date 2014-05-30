@@ -1,12 +1,13 @@
 /*************/
 /* Head Word */
 /*************/
-h1 { 
+.headline { 
 	color: #87CEEB; 
 	border-bottom: 2px solid #eee; 
-	font-size: 1.8em; 
+	font-size: 2.0em; 
+	font-weight: bold;
 }
-a, h2, h3, h4 { 
+a, h1, h2, h3, h4 { 
 	color: #87ceeb; 
 	/*color: #da784b; */
 }
@@ -67,11 +68,11 @@ a, h2, h3, h4 {
 /* menu UI : addentry-div */
 /**************************/
 .addentry-div {
-	top: 20%;
+	top: 10%;
 	z-index: 5; 
 }
 .show-addentry-div {
-	top: 15%;
+	top: 10%;
 	width: 700px;
 	height: 700px;
 	border-radius: 20px;
@@ -115,7 +116,7 @@ a, h2, h3, h4 {
 /* menu UI : search-div */
 /************************/
 .search-div {
-	top: 40%;
+	top: 30%;
 	z-index: 4; 
 }
 .search-div input {
@@ -128,7 +129,6 @@ a, h2, h3, h4 {
 	width: 300px; 
 	height: 300px; 
 	padding: 0.8em; 
-	position: fixed; 
 	border-radius: 20px;
 	z-index: 40; 
 }
@@ -143,7 +143,7 @@ a, h2, h3, h4 {
 /* menu UI : cumulonimbus-div */
 /******************************/
 .cumulunimbus-div {
-	top: 60%;
+	top: 50%;
 	z-index: 3; 
 }
 .cumulunimbus-div div {
@@ -152,7 +152,7 @@ a, h2, h3, h4 {
 .cumulunimbus-div:hover {
 	width: 550px; 
 	height: 550px; 
-	top: 20%; 
+	top: 10%;
 	padding: 0.8em; 
 	border-radius: 20px;
 	z-index: 40; 
@@ -223,79 +223,81 @@ a, h2, h3, h4 {
 /* Memo UI */
 /***********/
 
-.entries {
-	margin-top: 0;
-	margin-left: 3.5%;
-	width: 90%;
-}
 .memo {
+	width: 100%;
 	text-align: left;
 	position: relative;
-	z-index: 10;
+	z-index: 2;
 }
-.memo .memo-dd {
+.memo-div {
+	width: 90%;
+	min-height: 100px;
+	margin-left: 100px;
 	font-size: 16px; 
 	padding: 0.5em;
 	margin-top: .5em;
 	border-radius: 5px;
 	display: block;
 }
-
-.memo .memo-tag {
+.memo-tag {
     font-size: 20px;
 	font-weight: italic;
 	float: right; 
 	display: none; 
 }
-.memo .memo-dd:hover .memo-tag {
+.memo-div:hover .memo-tag {
 	margin-right: 10px;
 	display: inline; 
 }
-.memo .memo-date {
+.memo-date {
 	margin-left: 1em;
     font-size: 16px;
 	color: #ff9c77;
 }
-.memo .memo-edit,
-.memo .memo-delete {
+.memo-edit,
+.memo-delete {
     font-size: 14px;
 	float: right;
-	margin: 0em 0em 0em 2em;
+	margin-left: 2em;
+	margin-top: 10px;
 	border: solid 2px;
 	border-radius: 10px;
 	padding: 2px;
 	text-decoration: none;
 }
-.memo .memo-dd:nth-child(2n) .memo-delete {
+.memo-inner {
+	padding-left: 20px;
+	padding-top: 20px;
+}
+.memo-div:nth-child(2n) .memo-delete {
 	color: #333;
 }
-.memo .memo-dd:nth-child(2n) .memo-delete:hover {
+.memo-div:nth-child(2n) .memo-delete:hover {
 	color: #87CEEB;
 }
-.memo .memo-dd:nth-child(2n) .memo-edit{
+.memo-div:nth-child(2n) .memo-edit{
 	color: #333;
 }
-.memo .memo-dd:nth-child(2n) .memo-edit:hover {
+.memo-div:nth-child(2n) .memo-edit:hover {
 	color: #87CEEB;
 }
-.memo .memo-dd:nth-child(2n+1) .memo-delete{
+.memo-div:nth-child(2n+1) .memo-delete{
 	color: #555; 
 }
-.memo .memo-dd:nth-child(2n+1) .memo-delete:hover {
+.memo-div:nth-child(2n+1) .memo-delete:hover {
 	color: #87CEEB; 
 }
-.memo .memo-dd:nth-child(2n+1) .memo-edit{
+.memo-div:nth-child(2n+1) .memo-edit{
 	color: #555; 
 }
-
-.memo .memo-dd:nth-child(2n+1) .memo-edit:hover {
+.memo-div:nth-child(2n+1) .memo-edit:hover {
 	color: #87CEEB; 
 }
-.memo .memo-dd:nth-child(2n) {
+.memo-div:nth-child(2n) {
 	border: 5px solid #555; 
 	background-color: #555;
 }
-.memo .memo-dd:nth-child(2n+1) {
+.memo-div:nth-child(2n+1) {
 	border: 5px solid #333; 
 	background-color: #333;
 }

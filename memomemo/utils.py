@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
 
+import datetime
+from flask import Markup
+from docutils.core import publish_parts
 
-def dump_json_memo(memo):
-    dic = {}
-    dic['id'] = memo.id
-    dic['title'] = memo.title
-    dic['basetext'] = memo.text
-    dic['text'] = parse_rst(memo.text)
-    dic['tag'] = memo.tag
-    dic['date_time'] = memo.date_time.strftime('%Y/%m/%d %H:%M:%S')
-    return json.dumps(dic)
+
+def datetime2str(d):
+    return d.strftime('%Y-%m-%d %H:%M:%S')
+
+
+def str2datetime(s):
+    return datetime.datetime.strptime(s, '%Y-%m-%d %H:%M:%S')
 
 
 def parse_rst(rst):
-    overrides = {'initial_header_level': 2}
+    #overrides = {'initial_header_level': 2}
+    #return Markup(publish_parts(rst,
+                                #writer_name='html',
+                                #settings_overrides=overrides)['body'])
     return Markup(publish_parts(rst,
-                                writer_name='html',
-                                settings_overrides=overrides)['body'])
+                                writer_name='html')['body'])
 
 
 """

@@ -54,7 +54,7 @@
 	</div>
 	<!--cumulunimbus-div-->
 	<div class="menu cumulunimbus-div">
-		<p class="icon fa fa-cloud fa-2x" style='top: 4px; left: 4px;'></p>
+		<p class="icon fa fa-cloud fa-2x" style='top: 4px; left: 3px;'></p>
 		<div id="tagCloud"></div>
 		<script type="text/javascript">
 			tagCloud.Distribute(document.getElementById("tagCloud")).Animate(); 
@@ -63,11 +63,11 @@
 </div>
 
 
-<!--Entry-->
-<div class="entries">
-	<dl class="memo"></dl>
-	<!--<em style="font-size:30px;">No memos here, Let's hover left pen-icon!</em>-->
+<div style='width: 100%; height: 50px;'></div>
+<div id="container">
 </div>
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endif %}
 
 

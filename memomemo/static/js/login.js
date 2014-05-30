@@ -13,7 +13,7 @@ $("#loginbox").mouseleave( function () {
   
 });
 
-$("#logintext,#loginpass").focusout( function () {
+$("#loginpass").focusout( function () {
    $("#loginbox").removeClass("showbox showpass");
 });
 
@@ -35,7 +35,7 @@ $("#box").mouseleave( function () {
   
 });
 
-$("#signuptext, #signuppass").focusout( function () {
+$("#signuppass").focusout( function () {
    $("#box").removeClass("showbox showpass");
 });
 

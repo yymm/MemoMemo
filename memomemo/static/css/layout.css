@@ -22,13 +22,16 @@ body {
 }
 /* flash alert */
 .flash-alert {
+	position: relative;
 	font-size: 1.2em;
 	margin: 0 auto;
+	margin-bottom: 20px;
 	padding: 40px;
 	text-align: center;
 	opacity: 0.8;
 	border: 2px solid;
-	width: 80%;
+	margin-left: 100px;
+	width: 90%;
 }
 #important {
     background-color: #DFF0D8;
@@ -88,4 +91,7 @@ body {
 	position: absolute;
 	left: 2%;
 	color: #87CEEB;
+}
+.metanav a {
+	text-decoration: none;
 }

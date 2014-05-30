@@ -7,7 +7,6 @@
 	<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
 	<link rel="shortcut icon" href="{{ url_for('static', filename='ico/favicon.ico') }}">
 	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
-	<script type="text/javascript" src="{{ url_for('static', filename='js/script_head.js') }}"></script>
 	<link rel='stylesheet' href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
 	<link rel='stylesheet' href="{{ url_for('static', filename='css/pygments.css') }}">
 	<link rel='stylesheet' href="{{ url_for('static', filename='css/layout.css') }}">
@@ -18,12 +17,14 @@
 	<!--Login Info-->
 	<header  class=metanav>
 		<span class="small-title">MemoMemo</span>
-		{% if session.logged_in %}
-	 		<a class='fa fa-power-off fa-2x' href="{{ url_for('logout') }}"></a>
+		{% if session.user_id %}
+			[<span id='user_id'>{{ id }}</span>:
+			<span>{{ name }}</span>]
+	 		<a class='fa fa-cog' href=""></a>
+	 		<a class='fa fa-power-off' href="{{ url_for('logout') }}" style='color: red; opacity: 0.8;'></a>
 		{% endif %}
 	</header>
 	{% block body %}
 	{% endblock %}
-	<script type="text/javascript" src="{{ url_for('static', filename='js/script_body.js') }}"></script>
 </body>
 </html>

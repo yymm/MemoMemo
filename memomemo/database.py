@@ -1,12 +1,12 @@
 # -*- encoding:utf-8 -*-
 
+import json
 import datetime
 from flask_sqlalchemy import SQLAlchemy
 from memomemo import app
-from sqlalchemy import exc
-from sqlalchemy import event
+from sqlalchemy import and_, exc, event
 from sqlalchemy.pool import Pool
-from sqlalchemy.dialects.mysql import LONGTEXT
+from memomemo.utils import datetime2str, str2datetime, parse_rst
 
 
 db = SQLAlchemy(app)
@@ -43,22 +43,55 @@ class User(db.Model):
         self.password = password
 
     def add_memo(self, json_data):
+        memo = Memo(self.id,
+                    json_data['title'],
+                    json_data['text'],
+                    json_data['tag'])
+        db_session.add(memo)
+        db_session.commit()
+        return memo
+
+    def update_memo(self, json_data):
+        date_time = str2datetime(json_data['date'])
+        memo = Memo.query.filter(and_(Memo.user_id == self.id,
+                                      Memo.date_time == date_time)).first()
+        if memo:
+            memo.title = json_data['title']
+            memo.text = json_data['text']
+            memo.tag = json_data['tag']
+            memo.date_time = datetime.datetime.today()
+            db_session.commit()
+
         return None
+
 
 
 class Memo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False, unique=True)
-    text = db.Column(LONGTEXT, nullable=False)
-    tag = db.Column(db.String(100), nullable=False)
+    title = db.Column(db.String(200), nullable=False)
+    text = db.Column(db.Text)
+    tag = db.Column(db.String(100))
     date_time = db.Column(db.DateTime(), unique=True)
+    publish = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __init__(self, title, text, tag, date_time):
+    def __init__(self, user_id, title, text, tag):
+        self.user_id = user_id
         self.title = title
         self.text = text
         self.tag = tag
-        self.date_time = date_time
+        self.date_time = datetime.datetime.today()
+        self.publish = 0
+
+    def dump_json(self):
+        dic = {}
+        dic['title'] = self.title
+        dic['basetext'] = self.text
+        dic['text'] = parse_rst(self.text)
+        dic['tag'] = self.tag
+        dic['date_time'] = datetime2str(self.date_time)
+        dic['publish'] = self.publish
+        return json.dumps(dic)
 
 
 def init_db():
@@ -90,27 +123,6 @@ def varify_user(name, password):
 def delete_user(user):
     db.session.delete(user)
     db.session.commit()
-
-
-def add_memo(memo_id, title, text, tag):
-    now = datetime.datetime.today()
-
-    # update or add
-    memo = Memo.query.filter(Memo.id == memo_id).first()
-    if memo:
-        # exised memo
-        memo.title     = title
-        memo.text      = text
-        memo.tag       = tag
-        memo.date_time = now
-        db.session.commit()
-    else:
-        # new memo 
-        memo = Memo(title, text, tag, now)
-        db.session.add(memo)
-        db.session.commit()
-
-    return memo
 
 
 def remove_memo(memo_id):

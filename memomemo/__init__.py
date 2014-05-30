@@ -3,13 +3,14 @@
 import os
 import json
 import datetime
+from functools import wraps
 from flask import Flask, render_template, session, g, \
                   Markup, request, redirect, url_for, flash
 from flask_sockets import Sockets
 from docutils.core import publish_parts
 from sphinx.directives.other import *
 from sphinx.directives.code import *
-import memomemo.utils as utils
+import utils
 
 
 app = Flask(__name__)
@@ -31,12 +32,24 @@ def remove_db_session(exception):
     db_session.remove()
 
 
-@app.route('/')
-def index():
-    if not 'user_id' in session:
-        return redirect(url_for('login'))
+def requires_login(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if g.user is None:
+            flash('You need to be signed in.')
+            return redirect(url_for('index'))
+        return f(*args, **kwargs)
+    return decorated_function
 
-    return render_template('index.html')
+
+@app.route('/')
+@requires_login
+def index():
+    name = g.user.name
+    id = g.user.id
+    # tag list
+    # date list
+    return render_template('index.html', **locals())
 
 
 @app.route('/login', methods=['POST', 'GET'])
@@ -61,59 +74,46 @@ def logout():
 
 @sockets.route("/memos")
 def show_memos(ws):
-    '''WebSocket'''
     while True:
-        filter_json = ws.receive()
-        # 時々ValueErrorが出てる
-        filter_word = json.loads(unicode(filter_json))
+        message = ws.receive()
 
-        # TODO: personal setting if possible generalized...
-        if len(filter_word['title']) == 0 and len(filter_word['tag']) == 0:
-            todo = database.filter_specific_tag('TODO')
-            if todo:
-                ws.send(dump_json_memo(todo));
+        json_data = json.loads(unicode(message))
 
-        memos = database.query_memo(filter_word)
+        user_id = json_data['user_id']
+        user = User.query.filter_by(id=user_id).first()
+
+        memos = user.memos
 
         import time
         for memo in memos:
-            ws.send(dump_json_memo(memo))
+            ws.send(memo.dump_json())
             time.sleep(0.2)
 
 
-@app.route("/memomemo", methods=['POST'])
-def return_memo_json():
-    if request.method == 'POST':
-        filter_word = request.json
-        memos = database.query_memo(filter_word)
-        list_memo = []
-
-        # TODO: personal setting if possible generalized...
-        if len(filter_word['title']) == 0 and len(filter_word['tag']) == 0:
-            todo = database.filter_specific_tag('TODO')
-            if todo:
-                list_memo.append(dump_json_memo(todo));
-
-        for memo in memos:
-            list_memo.append(dump_json_memo(memo))
-        return json.dumps(list_memo)
-
-
 @app.route('/add', methods=['POST'])
-def post_memo():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-
+@requires_login
+def add_memo():
     memo = None
+    user = g.user
+
     if request.method == 'POST':
         json_data = request.json
-        memo_id =json_data['id']
-        title = json_data['title']
-        text  = json_data['text']
-        tag   = json_data['tag']
-        memo = database.add_memo(memo_id, title, text, tag)
+        memo = user.add_memo(json_data)
 
-    return dump_json_memo(memo)
+    return json.dumps({'title': memo.title})
+
+
+@app.route('/update', methods=['POST'])
+@requires_login
+def update_memo():
+    memo = None
+    user = g.user
+
+    if request.method == 'POST':
+        json_data = request.json
+        memo = user.update_memo(json_data)
+
+    return json.dumps(memo)
 
 
 @app.route('/delete', methods=['POST'])
