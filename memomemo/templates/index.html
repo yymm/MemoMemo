@@ -22,9 +22,9 @@
 <!--Side Menu-->
 <div class="menu-ui">
 	<!--addentry-div-->
-	<div class="addentry-div">
-		<div class="icon fa fa-pencil fa-2x"></div>
-		<form onsubmit="return false;">
+	<div class="menu addentry-div">
+		<p class="icon fa fa-pencil fa-2x" style='top: 3px; left: 6px;'></p>
+		<form onsubmit="return false;" class='addentry-form'>
 			<div class="lock-switch">
 				<input type="checkbox" id="lock-check"></input>
 				<label for="lock-check">
@@ -32,39 +32,33 @@
 				</label>
 			</div>
    			<dl>
-				<dd><input type="text" name="id" class="memo-input-id" style="display:none;">
     		   	<dt>Title:
-    		   	<dd><input type="text" name="title" class="input-text memo-input-title" placeholder="Title">
+    		   	<dd><input type="text" name="title" class="menu-input memo-input-title" placeholder="Title">
     		   	<dt>Text:
-				<dd><textarea name="text" class="memo-input-text" placeholder="Text ( Use reStructuredText, but do not use heading! )"></textarea>
+				<dd><textarea name="text" class="menu-input memo-input-text" placeholder="Text ( Use reStructuredText, but do not use heading! )"></textarea>
 				<dt>Tag:
-				<dd><input type="text" name="tag" class="input-text memo-input-tag" placeholder="Tag">
-				<dd><input type="button" value="Commit" class="commit-button">
+				<dd><input type="text" name="tag" class="menu-input memo-input-tag" placeholder="Tag">
+				<dd><input type="button" value="Commit" class="menu-btn commit-button">
 	   		</dl>
    		</form>
 	</div>
 	<!--search-div-->
-	<div class="search-div">
-		<div class="icon fa fa-search fa-2x"></div>
+	<div class="menu search-div">
+		<p class="icon fa fa-search fa-2x" style='top: 3px;'></p>
 		<form id="search-form" onsubmit="return false;">
-			<input type="text", name="title"  placeholder="Title"></input>
-			<input type="text", name="tag" placeholder="Tag"></input>
-			<input type="text", name="date" placeholder="Trem"></input>
-			<input type="button" value="Submit" id="submit-button"></input>
+			<input type="text", name="title"  placeholder="Title" class='menu-input'></input>
+			<input type="text", name="tag" placeholder="Tag" class='menu-input'></input>
+			<input type="text", name="date" placeholder="Trem" class='menu-input'></input>
+			<input type="button" value="Submit" class="menu-btn submit-button"></input>
 		</form>
 	</div>
 	<!--cumulunimbus-div-->
-	<div class="cumulunimbus-div">
-		<div class="icon fa fa-cloud fa-2x"></div>
+	<div class="menu cumulunimbus-div">
+		<p class="icon fa fa-cloud fa-2x" style='top: 4px; left: 4px;'></p>
 		<div id="tagCloud"></div>
 		<script type="text/javascript">
 			tagCloud.Distribute(document.getElementById("tagCloud")).Animate(); 
 		</script>
-	</div>
-	<!--home-div-->
-	<div class="home-div">
-		<div class="icon fa fa-home fa-2x"></div>
-		<div>{{ home_html }}</div>
 	</div>
 </div>
 
