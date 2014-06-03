@@ -68,12 +68,12 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		Width : 400,             // Integer       => Tagcloud width in pixels;
 		Heigth : 400,            // Integer       => Tagcloud height in pixels;
 		Consistent : true,       // Boolean       => Devide tags evenly;
-		Rank : 30,               // Integer 0-100 => Tag importance in procents;
+		Rank : 50,               // Integer 0-100 => Tag importance in procents;
 		Url : "#",               // String URL    => Tag url;
 		OpenInNewWindow: false,  // Boolean       => Open tag url in new window or tab;
-		FontMin : 10,            // Float         => Font size for smallest tag in pixels;
-		FontMax : 24,            // Float         => Font size for biggest tag in pixels;
-		Depth : 150,             // Integer       => Perspective depth;
+		FontMin : 20,            // Float         => Font size for smallest tag in pixels;
+		FontMax : 50,            // Float         => Font size for biggest tag in pixels;
+		Depth : 230,             // Integer       => Perspective depth;
 		AnimationTime : 1,       // Integer       => Animation time and interval, the less it is, the faster the animation is;
 		HoverStop : 15,          // Integer 0-100 => Percent of decrease in animation speed when cursor is removed out of the tagcloud;
 		HoverTagStop : 95,       // Integer 0-100 => Percent of decrease in animation speed when tag is hovered;
@@ -251,8 +251,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					if(this.active && !this.activeTag){
 						this.Update();
 						this.mouse.set(
-							((-event.pageY + this.position.y) * 2 / this.size.height + 1) * 2.8,
-							((event.pageX - this.position.x) * 2 / this.size.width - 1) * 2.8
+							((-event.pageY + this.position.y + document.documentElement.scrollTop) * 2 / this.size.height + 1) * 3.8,
+							((event.pageX - this.position.x) * 2 / this.size.width - 1) * 3.8
 						);
 					}
 				}.call(self, event);

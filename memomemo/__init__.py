@@ -18,7 +18,7 @@ app.config.from_object('config')
 sockets = Sockets(app)
 
 
-from memomemo.database import db_session, User, varify_user
+from memomemo.database import db_session, User, Memo, varify_user
 
 
 @app.before_request
@@ -45,9 +45,10 @@ def requires_login(f):
 @app.route('/')
 @requires_login
 def index():
-    name = g.user.name
-    id = g.user.id
-    # tag list
+    user = g.user
+    name = user.name
+    id = user.id
+    tags = user.count_tags()
     # date list
     return render_template('index.html', **locals())
 
@@ -82,10 +83,20 @@ def show_memos(ws):
         user_id = json_data['user_id']
         user = User.query.filter_by(id=user_id).first()
 
-        memos = user.memos
+        max = -1
+        memos = None
+        if json_data['filter']:
+            memos = Memo.query.filter_by(user_id=user.id). \
+                order_by(Memo.date_time.desc()).all()
+        else:
+            memos = Memo.query.filter_by(user_id=user.id). \
+                order_by(Memo.date_time.desc()).all()
+            max = 3
 
         import time
-        for memo in memos:
+        for i, memo in enumerate(memos):
+            if i > max:
+                break
             ws.send(memo.dump_json())
             time.sleep(0.2)
 
@@ -100,7 +111,7 @@ def add_memo():
         json_data = request.json
         memo = user.add_memo(json_data)
 
-    return json.dumps({'title': memo.title})
+    return memo.dump_json()
 
 
 @app.route('/update', methods=['POST'])
@@ -112,19 +123,18 @@ def update_memo():
     if request.method == 'POST':
         json_data = request.json
         memo = user.update_memo(json_data)
+        if not memo:
+            return None
 
-    return json.dumps(memo)
+    return memo.dump_json()
 
 
 @app.route('/delete', methods=['POST'])
+@requires_login
 def delete_memo():
-    if not session.get('logged_in'):
-        return redirect(url_for('login'))
-
-    title = None
     if request.method == 'POST':
+        user = g.user
         json_data = request.json
-        memo_id = int(json_data['id'])
-        database.remove_memo(memo_id)
-    
-    return json.dumps({'title': title})
+        if user.delete_memo(json_data):
+            return json.dumps({'status': 'success'})
+    return None

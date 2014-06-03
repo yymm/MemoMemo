@@ -94,24 +94,25 @@ $(function(){
 			success: function(json_data){
 				var memo_json = $.parseJSON(json_data);
 				var memo_html = memo_dom_from_json(memo_json)
-				show_memo($(memo_html).prependTo('.memo'));
+				var memo = $(memo_html).prependTo($('#container'));
+				add_movement(memo);
 				if (update_flag)
 				{
 					update_memo.fadeOut('slow', function(){update_memo.remove();});
 					update_flag = false;
 					update_date = null;
 					update_memo = null;
+					alertFlash('Updated at ' + memo_json['date_time'], 'information');
 				}
-				alertFlash('OK!', 'information');
+				clear_addentry();
+				hide_addentry();
+				alertFlash('Added new post!', 'information');
 			},
-			error: function(json_data){
-				console.log(json_data);
+			error: function(){
 				alertFlash('Connection Error: Please retry.', 'error');
 			}
 		});
 
-		clear_addentry();
-		hide_addentry();
 	});
 
 	//
@@ -136,8 +137,10 @@ $(function(){
 	};
 
 	function send_to_websocket(filter){
+		$('#container').empty();
 		var json_data = {
-			'user_id': $('#user_id').html()
+			'user_id': $('#user_id').html(),
+			'filter': filter
 		}
 		socket.send(JSON.stringify(json_data));
 	};
@@ -164,8 +167,7 @@ $(function(){
 	{
 		memo.fadeIn(500);
 		// Add event when click this edit button
-		memo.find('.memo-edit').click( function()
-		{
+		memo.find('.memo-edit').click( function(){
 			var title = $(this).closest('div').find('.memo-title-only').text();
 			var text = $(this).closest('div').find('.memo-text').text();
 			var date = $(this).closest('div').find('.memo-date').text();
@@ -182,7 +184,7 @@ $(function(){
 		// Delete using Ajax
 		memo.find('.memo-delete').click(function(){
 			var delete_div = $(this).closest('div');
-			var memo_id = $(this).closest('div').find('.memo-id').text();
+			var memo_date = $(this).closest('div').find('.memo-date').text();
 			var memo_title = $(this).closest('div').find('.memo-title-only').text();
 			var ret = window.confirm("Are you sure you want to delete?\nTitle : " + memo_title)
 			if (ret == true)
@@ -190,10 +192,14 @@ $(function(){
 				$.ajax({
 					type: 'POST',
 					url: '/delete',
-					data: JSON.stringify({id: memo_id}),
+					data: JSON.stringify({'date_time': memo_date}),
 					contentType: 'application/json',
 					success: function(json_data){
 						delete_div.fadeOut('slow', function(){delete_div.remove();});
+						alertFlash('Deleted.', 'important');
+					},
+					error: function(){
+						alertFlash('Connection Error: Please retry.', 'error');
 					}
 				});
 			}
@@ -205,21 +211,18 @@ $(function(){
 		filter = {
 			title: $("#search-form [name=title]").val(),
 			tag: $("#search-form [name=tag]").val(),
-			days: empty_to_zero($("#search-form [name=date]").val())
+			year: $("#search-form [name=year]").val(),
+			month: $("#search-form [name=month]").val(),
+			day: $("#search-form [name=day]").val(),
 		};
-		//send_to_websocket(filter);
-		//ajax_filter_post(filter);
 		alertFlash('hi');
 	});
 
 	$('.jsCumulus').click(function(){
 		filter = {
-			title: "",
-			tag: $(this).text(),
-			days: 0
+			tag: $(this).text()
 		};
-		//send_to_websocket(filter);
-		ajax_filter_post(filter);
+		send_to_websocket(filter);
 	});
 
 	// html encoder / decoder

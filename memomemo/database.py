@@ -61,9 +61,42 @@ class User(db.Model):
             memo.tag = json_data['tag']
             memo.date_time = datetime.datetime.today()
             db_session.commit()
+            return memo
 
         return None
 
+    def delete_memo(self, json_data):
+        date_time = str2datetime(json_data['date_time'])
+        memo = Memo.query.filter(and_(Memo.user_id == self.id,
+                                      Memo.date_time == date_time)).first()
+        if memo:
+            db_session.delete(memo)
+            db_session.commit()
+            return True
+
+        return False
+
+    def count_tags(self):
+        memos = self.memos
+        countHash = {}
+        for memo in memos:
+            tags = memo.tag.split(',')
+            for tag in tags:
+                s = tag.strip()
+                if countHash.has_key(s):
+                    countHash[s] += 1
+                else:
+                    countHash[s] = 1
+        tag_list = []
+        max_val = max(countHash.values())
+        for key, val in countHash.items():
+            tag_dic = {}
+            tag_dic['name'] = key
+            tag_dic['size'] = (val / max_val) * 100
+            tag_dic['num'] = val
+            tag_list.append(tag_dic)
+
+        return tag_list
 
 
 class Memo(db.Model):
@@ -159,26 +192,3 @@ def query_memo(filter_word):
         memo = memo.filter(Memo.tag.like("%" + tag + "%"))
 
     return memo.order_by(Memo.date_time.desc()).all()
-
-
-def counting_tag():
-    # Reference counting hash
-    countHash = {}
-    for memo in Memo.query.all():
-        tags = memo.tag.split(',')
-        for tag in tags:
-            tag = tag.strip()
-            if countHash.has_key(tag):
-                countHash[tag] += 1
-            else:
-                countHash[tag] = 1
-
-    tags = []
-    max_value = max(countHash.values())
-    for key, value in countHash.items():
-        tag_dic = {}
-        tag_dic["name"] = key
-        tag_dic["size"] = (value / max_value) * 100
-        tags.append(tag_dic)
-
-    return tags

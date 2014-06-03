@@ -17,6 +17,18 @@ body {
 	color: #fff; 
 	background: url('../img/light-noise.png') repeat scroll 0 0 #000;
 }
+ul {
+	list-style-position: inside;
+}
+li ul {
+	margin-left: 1.5em;
+}
+ol {
+	list-style-position: inside;
+}
+li ol {
+	margin-left: 1.5em;
+}
 .reference {
 	color: #3BBC46;
 }

@@ -15,9 +15,9 @@
 <script type="text/javascript">
 	var tags = [];
 	{% for tag in tags %}
-	tags.push(new Tag("{{ tag['name'] }}", "{{ tag['size'] }}", "{{ tag['url'] }}"));
+	tags.push(new Tag("{{ tag['name'] }}", "{{ tag['size'] }}"));
 	{% endfor %}
-	var tagCloud = new TagCloud(tags, 510, 510); 
+	var tagCloud = new TagCloud(tags, 600, 600); 
 </script>
 <!--Side Menu-->
 <div class="menu-ui">
@@ -48,7 +48,14 @@
 		<form id="search-form" onsubmit="return false;">
 			<input type="text", name="title"  placeholder="Title" class='menu-input'></input>
 			<input type="text", name="tag" placeholder="Tag" class='menu-input'></input>
-			<input type="text", name="date" placeholder="Trem" class='menu-input'></input>
+			<div id='date-selector'>
+				<select name="year">
+				</select>
+				<select name="month">
+				</select>
+				<select name="day" style='margin-right: 0;'>
+				</select>
+			</div>
 			<input type="button" value="Submit" class="menu-btn submit-button"></input>
 		</form>
 	</div>
@@ -59,6 +66,16 @@
 		<script type="text/javascript">
 			tagCloud.Distribute(document.getElementById("tagCloud")).Animate(); 
 		</script>
+	</div>
+	<!--tagcloud-div-->
+	<div class="menu tagcloud-div">
+		<p class="icon fa fa-tags fa-2x"></p>
+		<div style='height: 5%;'></div>
+		<div>
+			{% for tag in tags %}
+			<span class='tag'>{{ tag['name'] }}:{{ tag['num'] }}</span>
+			{% endfor %}
+		</div>
 	</div>
 </div>
 
