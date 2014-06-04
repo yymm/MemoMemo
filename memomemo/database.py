@@ -78,6 +78,8 @@ class User(db.Model):
 
     def count_tags(self):
         memos = self.memos
+        if len(memos) <= 0:
+            return []
         countHash = {}
         for memo in memos:
             tags = memo.tag.split(',')
