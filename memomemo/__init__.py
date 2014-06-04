@@ -18,7 +18,7 @@ app.config.from_object('config')
 sockets = Sockets(app)
 
 
-from memomemo.database import db_session, User, Memo, varify_user
+from memomemo.database import db_session, User, filter_memo, varify_user
 
 
 @app.before_request
@@ -75,28 +75,17 @@ def logout():
 
 @sockets.route("/memos")
 def show_memos(ws):
+    json_data = None
     while True:
         message = ws.receive()
 
-        json_data = json.loads(unicode(message))
+        if message:
+            json_data = json.loads(message)
 
-        user_id = json_data['user_id']
-        user = User.query.filter_by(id=user_id).first()
-
-        max = -1
-        memos = None
-        if json_data['filter']:
-            memos = Memo.query.filter_by(user_id=user.id). \
-                order_by(Memo.date_time.desc()).all()
-        else:
-            memos = Memo.query.filter_by(user_id=user.id). \
-                order_by(Memo.date_time.desc()).all()
-            max = 3
+        memos = filter_memo(json_data)
 
         import time
         for i, memo in enumerate(memos):
-            if i > max:
-                break
             ws.send(memo.dump_json())
             time.sleep(0.2)
 

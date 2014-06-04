@@ -103,6 +103,7 @@ $(function(){
 					update_date = null;
 					update_memo = null;
 					alertFlash('Updated at ' + memo_json['date_time'], 'information');
+					return;
 				}
 				clear_addentry();
 				hide_addentry();
@@ -211,17 +212,17 @@ $(function(){
 		filter = {
 			title: $("#search-form [name=title]").val(),
 			tag: $("#search-form [name=tag]").val(),
-			year: $("#search-form [name=year]").val(),
-			month: $("#search-form [name=month]").val(),
-			day: $("#search-form [name=day]").val(),
 		};
-		alertFlash('hi');
+		//alertFlash('hi');
+		send_to_websocket(filter);
 	});
 
 	$('.jsCumulus').click(function(){
 		filter = {
-			tag: $(this).text()
+			title: '',
+			tag: $(this).text(),
 		};
+		//alertFlash('hi');
 		send_to_websocket(filter);
 	});
 

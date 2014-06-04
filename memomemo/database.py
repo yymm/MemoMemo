@@ -1,7 +1,9 @@
 # -*- encoding:utf-8 -*-
 
 import json
+import zlib
 import datetime
+from colour import Color
 from flask_sqlalchemy import SQLAlchemy
 from memomemo import app
 from sqlalchemy import and_, exc, event
@@ -90,12 +92,20 @@ class User(db.Model):
                 else:
                     countHash[s] = 1
         tag_list = []
+        s = Color('#d16b16')
+        e = Color('#87ceed')
+        color_list = list(s.range_to(e, len(countHash)))
+        color_cnt = 0
         max_val = max(countHash.values())
-        for key, val in countHash.items():
+        for key, val in sorted(countHash.items(),
+                               key=lambda x:x[1],
+                               reverse=True):
             tag_dic = {}
             tag_dic['name'] = key
             tag_dic['size'] = (val / max_val) * 100
             tag_dic['num'] = val
+            tag_dic['color'] = color_list[color_cnt]
+            color_cnt += 1
             tag_list.append(tag_dic)
 
         return tag_list
@@ -160,37 +170,50 @@ def delete_user(user):
     db.session.commit()
 
 
-def remove_memo(memo_id):
-    memo = Memo.query.filter(Memo.id == memo_id).first()
-    db.session.delete(memo)
-    db.session.commit()
+def filter_memo(json_data):
+    '''
+    Example: json_data
+    {'user_id': 1,
+     'filter': {
+        'title': 'hoge',
+        'tag': 'hige',
+        'year': '',
+        'month': '',
+        'day': ''
+     }
+    }
+    '''
+    user_id = json_data['user_id']
+    now = datetime.datetime.now()
 
+    if not json_data['filter']:
+        # default time gap: 24 hours
+        ago = now - datetime.timedelta(hours=24)
+        memos = Memo.query.filter_by(user_id=user_id). \
+            filter(Memo.title != 'TODO'). \
+            filter(Memo.date_time >= datetime2str(ago)). \
+            order_by(Memo.date_time.desc()).all()
+        # Especially TODO title
+        todo = Memo.query.filter_by(user_id=user_id). \
+            filter_by(title='TODO').first()
+        if todo:
+            memos.insert(0, todo)
+        return memos
 
-def filter_specific_tag(tag):
-    todo = Memo.query.filter(Memo.tag == tag)
-    if todo:
-        return todo.first()
-    else:
-        return None
+    title = json_data['filter']['title']
+    tag = json_data['filter']['tag']
 
+    # Query of memo table
+    mq = Memo.query.filter_by(user_id=user_id)
 
-def query_memo(filter_word):
-    title = filter_word['title']
-    tag = filter_word['tag']
-    days = int(filter_word['days'])
+    if len(title) != 0:
+        mq = mq.filter(Memo.title.like('%'+title+'%'))
+    if len(tag) != 0:
+        if tag.find(',') >= 0:
+            tags = tag.split(',')
+            for t in tags:
+                mq = mq.filter(Memo.tag.like('%'+t.strip()+'%'))
+        else:
+            mq = mq.filter(Memo.tag.like('%'+tag+'%'))
 
-    memo = Memo.query
-
-    if days is not 0:
-        until_now = u"date_time<='" + str(datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S'))+"'"
-        time_delta = datetime.datetime.today() - datetime.timedelta(days)
-        time_filter = u"date_time>='" + str(time_delta.strftime('%Y-%m-%d %H:%M:%S'))+"'"
-        memo = memo.filter(until_now).filter(time_filter)
-    
-    if len(title) is not 0:
-        memo = memo.filter(Memo.title.like("%" + title + "%"))
-
-    if len(tag) is not 0:
-        memo = memo.filter(Memo.tag.like("%" + tag + "%"))
-
-    return memo.order_by(Memo.date_time.desc()).all()
+    return mq.order_by(Memo.date_time.desc()).all()

@@ -15,7 +15,7 @@
 <script type="text/javascript">
 	var tags = [];
 	{% for tag in tags %}
-	tags.push(new Tag("{{ tag['name'] }}", "{{ tag['size'] }}"));
+	tags.push(new Tag("{{ tag['name'] }}", "{{ tag['size'] }}", {color: "{{ tag['color'] }}"}));
 	{% endfor %}
 	var tagCloud = new TagCloud(tags, 600, 600); 
 </script>
