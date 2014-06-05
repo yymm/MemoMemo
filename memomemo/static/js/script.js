@@ -38,6 +38,7 @@ $(function(){
 			hide_addentry();
 		}
 	});
+	clear_addentry();
 
 	/*
 	 *
@@ -103,6 +104,8 @@ $(function(){
 					update_date = null;
 					update_memo = null;
 					alertFlash('Updated at ' + memo_json['date_time'], 'information');
+					clear_addentry();
+					hide_addentry();
 					return;
 				}
 				clear_addentry();
@@ -122,28 +125,22 @@ $(function(){
 	// * Search
 
 
-	var host = 'ws://' + document.domain + ':' + location.port + '/memos';
-	var socket = new WebSocket(host);
+	var socket = io.connect('http://' + document.domain + ':' + location.port + '/memomemo');
 
-
-	socket.onopen = function(){
+	socket.on('connect', function() {
 		send_to_websocket(null);
-	};
+	});
 
-	socket.onmessage = function(message){
-		var data = $.parseJSON(message.data);
+	socket.on('memo response', function(message){
+		var data = $.parseJSON(message);
 		var memo_html = memo_dom_from_json(data);
 		var memo = $(memo_html).appendTo($('#container'));
 		add_movement(memo);
-	};
+	});
 
 	function send_to_websocket(filter){
 		$('#container').empty();
-		var json_data = {
-			'user_id': $('#user_id').html(),
-			'filter': filter
-		}
-		socket.send(JSON.stringify(json_data));
+		socket.emit('memo event', filter);
 	};
 
 	function memo_dom_from_json(memo)

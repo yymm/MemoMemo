@@ -1,3 +1,3 @@
-from memomemo import app
+from memomemo import app, socketio
 
-app.run()
+socketio.run(app)

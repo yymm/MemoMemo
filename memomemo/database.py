@@ -120,12 +120,13 @@ class Memo(db.Model):
     publish = db.Column(db.Integer)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __init__(self, user_id, title, text, tag):
+    def __init__(self, user_id, title, text, tag, date_time=None):
         self.user_id = user_id
         self.title = title
         self.text = text
         self.tag = tag
-        self.date_time = datetime.datetime.today()
+        self.date_time = str2datetime(date_time) \
+            if date_time else datetime.datetime.today()
         self.publish = 0
 
     def dump_json(self):
@@ -170,23 +171,16 @@ def delete_user(user):
     db.session.commit()
 
 
-def filter_memo(json_data):
+def filter_memo(user_id, json_data):
     '''
     Example: json_data
-    {'user_id': 1,
-     'filter': {
-        'title': 'hoge',
-        'tag': 'hige',
-        'year': '',
-        'month': '',
-        'day': ''
-     }
+    {'title': 'hoge',
+     'tag': 'hige',\}
     }
     '''
-    user_id = json_data['user_id']
     now = datetime.datetime.now()
 
-    if not json_data['filter']:
+    if not json_data:
         # default time gap: 24 hours
         ago = now - datetime.timedelta(hours=24)
         memos = Memo.query.filter_by(user_id=user_id). \
@@ -200,8 +194,8 @@ def filter_memo(json_data):
             memos.insert(0, todo)
         return memos
 
-    title = json_data['filter']['title']
-    tag = json_data['filter']['tag']
+    title = json_data['title']
+    tag = json_data['tag']
 
     # Query of memo table
     mq = Memo.query.filter_by(user_id=user_id)

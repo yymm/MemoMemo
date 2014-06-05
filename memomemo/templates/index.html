@@ -3,6 +3,7 @@
 
 {% block head %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/cumulus.js') }}"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/menu_ui.css') }}">
 {% endblock %}
 
@@ -15,7 +16,7 @@
 <script type="text/javascript">
 	var tags = [];
 	{% for tag in tags %}
-	tags.push(new Tag("{{ tag['name'] }}", "{{ tag['size'] }}", {color: "{{ tag['color'] }}"}));
+	tags.push(new Tag("{{ tag['name'] }}", "{{ tag['size'] }}", "", {color: "{{ tag['color'] }}"}));
 	{% endfor %}
 	var tagCloud = new TagCloud(tags, 600, 600); 
 </script>
@@ -73,7 +74,7 @@
 		<div style='height: 5%;'></div>
 		<div>
 			{% for tag in tags %}
-			<span class='tag'>{{ tag['name'] }}:{{ tag['num'] }}</span>
+			<span class='tag' style='border: 2px solid {{ tag['color'] }};'>{{ tag['name'] }}:{{ tag['num'] }}</span>
 			{% endfor %}
 		</div>
 	</div>

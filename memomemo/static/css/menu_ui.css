@@ -206,7 +206,7 @@ a, h1, h2, h3, h4 {
 	background-color: #fff;
 	border: 1px solid #fff;
 	border-radius: 5px;
-	margin: 5px;
+	margin: 3px;
 	padding: 1px;
 }
 /**********************/
@@ -259,7 +259,7 @@ a, h1, h2, h3, h4 {
 }
 .tagCloud .tagClass a:hover
 {
-	border: solid 1px #87ceeb;
+	border: 2px solid #87ceeb;
 	text-decoration: none;
 }
 
@@ -310,7 +310,7 @@ a, h1, h2, h3, h4 {
 	text-decoration: none;
 }
 .memo-inner {
-	padding-left: 20px;
+	padding-left: 10px;
 	padding-top: 20px;
 }
 .memo-div:nth-child(2n) .memo-delete {
