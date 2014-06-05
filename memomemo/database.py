@@ -94,7 +94,8 @@ class User(db.Model):
         tag_list = []
         s = Color('#d16b16')
         e = Color('#87ceed')
-        color_list = list(s.range_to(e, len(countHash)))
+        l = len(countHash) if len(countHash) > 1 else 2
+        color_list = list(s.range_to(e, l))
         color_cnt = 0
         max_val = max(countHash.values())
         for key, val in sorted(countHash.items(),
