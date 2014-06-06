@@ -4,3 +4,4 @@ wiki
 *.stackdump
 *.db
 *.cfg
+*.sh

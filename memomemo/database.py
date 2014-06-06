@@ -182,7 +182,7 @@ def filter_memo(json_data):
     user_id = json_data['user_id']
     now = datetime.datetime.now()
 
-    if not json_data['title']:
+    if not json_data['title'] and not json_data['tag']:
         # default time gap: 24 hours
         ago = now - datetime.timedelta(hours=24)
         memos = Memo.query.filter_by(user_id=user_id). \

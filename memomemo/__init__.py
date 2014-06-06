@@ -37,7 +37,7 @@ def requires_login(f):
     def decorated_function(*args, **kwargs):
         if g.user is None:
             flash('You need to be signed in.')
-            return redirect(url_for('index'))
+            return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
 
