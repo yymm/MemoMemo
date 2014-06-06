@@ -216,7 +216,6 @@ $(function(){
 			title: $("#search-form [name=title]").val(),
 			tag: $("#search-form [name=tag]").val(),
 		};
-		//alertFlash('hi');
 		send_to_websocket(filter);
 	});
 
@@ -226,8 +225,19 @@ $(function(){
 			title: '',
 			tag: $(this).text(),
 		};
-		//alertFlash('hi');
 		send_to_websocket(filter);
+	});
+	$('.tag').click(function(){
+		filter = {
+			user_id: $('#user_id').html(),
+			title: '',
+			tag: $(this).children('i').text(),
+		};
+		send_to_websocket(filter);
+	});
+	$('#setting').click(function(){
+		$('.metanav').toggleClass('open-metanav');
+		$('.setting').toggleClass('open');
 	});
 
 	// html encoder / decoder

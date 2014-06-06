@@ -72,7 +72,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 		Url : "#",               // String URL    => Tag url;
 		OpenInNewWindow: false,  // Boolean       => Open tag url in new window or tab;
 		FontMin : 20,            // Float         => Font size for smallest tag in pixels;
-		FontMax : 50,            // Float         => Font size for biggest tag in pixels;
+		FontMax : 20,            // Float         => Font size for biggest tag in pixels;
 		Depth : 230,             // Integer       => Perspective depth;
 		AnimationTime : 1,       // Integer       => Animation time and interval, the less it is, the faster the animation is;
 		HoverStop : 15,          // Integer 0-100 => Percent of decrease in animation speed when cursor is removed out of the tagcloud;

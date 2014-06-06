@@ -209,6 +209,9 @@ a, h1, h2, h3, h4 {
 	margin: 3px;
 	padding: 1px;
 }
+.tag:hover {
+	cursor: pointer;
+}
 /**********************/
 /* add-memo lock icon */
 /**********************/
@@ -344,4 +347,59 @@ a, h1, h2, h3, h4 {
 .memo-div:nth-child(2n+1) {
 	border: 5px solid #333; 
 	background-color: #333;
+}
+/* admonition derective */
+.admonition-title {
+	color: #555;
+	font-size: 120%;
+	font-weight: bold;
+}
+.attention {
+	border: 1px solid #D43F3A;
+	background-color: #D9534F;
+	border-radius: 2px;
+	margin: 10px;
+	padding: 10px;
+}
+.caution {
+	border: 1px solid #EEA236;
+	background-color: #F0AD4E;
+	border-radius: 2px;
+	margin: 10px;
+	padding: 10px;
+}
+.error {
+	border: 1px solid #D43F3A;
+	background-color: #D9534F;
+	border-radius: 2px;
+	margin: 10px;
+	padding: 10px;
+}
+.hint {
+	border: 1px solid #357EBD;
+	background-color: #428BCA;
+	border-radius: 2px;
+	margin: 10px;
+	padding: 10px;
+}
+.important {
+	border: 1px solid #4CAE4C;
+	background-color: #5CB85C;
+	border-radius: 2px;
+	margin: 10px;
+	padding: 10px;
+}
+.note {
+	border: 1px solid #FFF7CC;
+	background-color: #FFF7CC;
+	border-radius: 2px;
+	margin: 10px;
+	padding: 10px;
+}
+.warning {
+	border: 1px solid #EEA236;
+	background-color: #F0AD4E;
+	border-radius: 2px;
+	margin: 10px;
+	padding: 10px;
 }
