@@ -172,16 +172,17 @@ def delete_user(user):
     db.session.commit()
 
 
-def filter_memo(user_id, json_data):
+def filter_memo(json_data):
     '''
     Example: json_data
     {'title': 'hoge',
      'tag': 'hige',\}
     }
     '''
+    user_id = json_data['user_id']
     now = datetime.datetime.now()
 
-    if not json_data:
+    if not json_data['title']:
         # default time gap: 24 hours
         ago = now - datetime.timedelta(hours=24)
         memos = Memo.query.filter_by(user_id=user_id). \

@@ -6,7 +6,7 @@ import datetime
 from functools import wraps
 from flask import Flask, render_template, session, g, \
                   Markup, request, redirect, url_for, flash
-from flask.ext.socketio import SocketIO, emit
+from flask_sockets import Sockets
 from docutils.core import publish_parts
 from sphinx.directives.other import *
 from sphinx.directives.code import *
@@ -15,7 +15,7 @@ import utils
 
 app = Flask(__name__)
 app.config.from_object('config')
-socketio = SocketIO(app)
+sockets = Sockets(app)
 
 
 from memomemo.database import db_session, User, filter_memo, varify_user
@@ -73,14 +73,18 @@ def logout():
     return redirect(url_for('login'))
 
 
-@socketio.on("memo event")
-def show_memos(message):
-    memos = filter_memo(session['user_id'], message)
-
-    import time
-    for i, memo in enumerate(memos):
-        emit('memo response', memo.dump_json())
-        time.sleep(0.1)
+@sockets.route("/memos")
+def show_memos(ws):
+    json_data = None
+    while True:
+        message = ws.receive()
+        if message:
+            json_data = json.loads(message)
+        memos = filter_memo(json_data)
+        import time
+        for i, memo in enumerate(memos):
+            ws.send(memo.dump_json())
+            time.sleep(0.2)
 
 
 @app.route('/add', methods=['POST'])

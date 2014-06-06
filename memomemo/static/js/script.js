@@ -124,23 +124,28 @@ $(function(){
 	// * Ready to websocket
 	// * Search
 
+	var host = 'ws://' + document.domain + ':' + location.port + '/memos';
+	var socket = new WebSocket(host);
 
-	var socket = io.connect('http://' + document.domain + ':' + location.port);
+	socket.onopen = function(){
+		filter = {
+			user_id: $('#user_id').html(),
+			title: null,
+			tag: null
+		};
+		send_to_websocket(filter);
+	};
 
-	socket.on('connect', function() {
-		send_to_websocket(null);
-	});
-
-	socket.on('memo response', function(message){
-		var data = $.parseJSON(message);
-		var memo_html = memo_dom_from_json(data);
+	socket.onmessage = function(message){
+		var data = $.parseJSON(message.data);
+ 		var memo_html = memo_dom_from_json(data);
 		var memo = $(memo_html).appendTo($('#container'));
 		add_movement(memo);
-	});
+	};
 
 	function send_to_websocket(filter){
 		$('#container').empty();
-		socket.emit('memo event', filter);
+		socket.send(JSON.stringify(filter));
 	};
 
 	function memo_dom_from_json(memo)
@@ -207,6 +212,7 @@ $(function(){
 	$('.submit-button').click(function(){
 		var empty_to_zero = function(str){if(str){return str;}else{return 0;}};
 		filter = {
+			user_id: $('#user_id').html(),
 			title: $("#search-form [name=title]").val(),
 			tag: $("#search-form [name=tag]").val(),
 		};
@@ -216,6 +222,7 @@ $(function(){
 
 	$('.jsCumulus').click(function(){
 		filter = {
+			user_id: $('#user_id').html(),
 			title: '',
 			tag: $(this).text(),
 		};
