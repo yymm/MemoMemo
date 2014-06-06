@@ -125,7 +125,7 @@ $(function(){
 	// * Search
 
 
-	var socket = io.connect('http://' + document.domain + ':' + location.port + '/socket.io');
+	var socket = io.connect('http://' + document.domain + ':' + location.port);
 
 	socket.on('connect', function() {
 		send_to_websocket(null);

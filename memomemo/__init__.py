@@ -73,7 +73,7 @@ def logout():
     return redirect(url_for('login'))
 
 
-@socketio.on("memo event", namespace="/socket.io")
+@socketio.on("memo event")
 def show_memos(message):
     memos = filter_memo(session['user_id'], message)
 
