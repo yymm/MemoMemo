@@ -182,7 +182,6 @@ a, h1, h2, h3, h4 {
 .tagcloud-div {
 	top: 40%;
 	z-index: 3; 
-	overflow: scroll;
 }
 .tagcloud-div div {
 	display: none;
@@ -194,6 +193,7 @@ a, h1, h2, h3, h4 {
 	padding: 0.8em; 
 	border-radius: 20px;
 	z-index: 40; 
+	overflow: scroll;
 }
 .tagcloud-div:hover div {
 	position: relative;
