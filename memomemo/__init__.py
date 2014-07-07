@@ -50,7 +50,7 @@ def index():
     id = user.id
     tags = user.count_tags()
     memo_num = len(user.memos)
-    tad_num = len(tags)
+    tag_num = len(tags)
     # date list
     return render_template('index.html', **locals())
 
