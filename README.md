@@ -22,7 +22,7 @@ gunicorn -b localhost:5050 flask_sockets.worker memomemo:app
 
 Using MySQL(default). => Table: memomemo
 
-If you want to use other database, you export MEMOMEMO\_DATABASE\_URI.
+If you want to use other database, you export "MEMOMEMO\_DATABASE\_URI".
 
 example: SQLite
 
