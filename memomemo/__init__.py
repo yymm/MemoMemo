@@ -11,11 +11,13 @@ from docutils.core import publish_parts
 from sphinx.directives.other import *
 from sphinx.directives.code import *
 import utils
+from flask.ext.socketio import SocketIO, emit
 
 
 app = Flask(__name__)
 app.config.from_object('config')
 sockets = Sockets(app)
+socketio = SocketIO(app)
 
 
 from memomemo.database import db_session, User, filter_memo, varify_user
@@ -87,6 +89,35 @@ def show_memos(ws):
         for i, memo in enumerate(memos):
             ws.send(memo.dump_json())
             time.sleep(0.2)
+
+
+def show_memos(json_filter):
+    memos = filter_memo(json_filter)
+    import time
+    for i, memo in enumerate(memos):
+        ws.send(memo.dump_json())
+        time.sleep(0.2)
+
+
+@socketio.on('filter memo', namespace='/memo')
+def filter(msg):
+    show_memos(msg)
+
+
+@socketio.on('connect', namespace='/memo')
+def memo_connect():
+    emit('response log', {'log': 'Connected'})
+
+
+@socketio.on('disconnect', namespace='/memo')
+def memo_disconnect():
+    print('Client disconnected')
+
+
+@socketio.on('recieve log')
+def memo_recieve_log(msg):
+    print(msg.log)
+
 
 
 @app.route('/add', methods=['POST'])
