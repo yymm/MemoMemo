@@ -6,7 +6,6 @@ import datetime
 from functools import wraps
 from flask import Flask, render_template, session, g, \
                   Markup, request, redirect, url_for, flash
-from flask_sockets import Sockets
 from docutils.core import publish_parts
 from sphinx.directives.other import *
 from sphinx.directives.code import *
@@ -16,11 +15,41 @@ from flask.ext.socketio import SocketIO, emit
 
 app = Flask(__name__)
 app.config.from_object('config')
-sockets = Sockets(app)
 socketio = SocketIO(app)
 
 
 from memomemo.database import db_session, User, filter_memo, varify_user
+
+
+def show_memos(json_filter):
+    memos = filter_memo(json_filter)
+    import time
+    for i, memo in enumerate(memos):
+        emit('memo response', memo.dump_json(), namespace='/memo')
+        time.sleep(0.2)
+
+
+@socketio.on('filter memo', namespace='/memo')
+def filter(msg):
+    show_memos(json.loads(msg))
+
+
+@socketio.on('recieve log', namespace='/memo')
+def memo_recieve_log(msg):
+    print(msg['log'])
+    emit('log response', {'log': msg['log']})
+
+
+@socketio.on('connect', namespace='/memo')
+def connect():
+    print('Client connected')
+    f = {'user_id': session['user_id'], 'title': None, 'tag': None}
+    show_memos(f)
+
+
+@socketio.on('disconnect', namespace='/memo')
+def disconnect():
+    print('Client disconnected')
 
 
 @app.before_request
@@ -77,49 +106,6 @@ def logout():
     return redirect(url_for('login'))
 
 
-@sockets.route("/memos")
-def show_memos(ws):
-    json_data = None
-    while True:
-        message = ws.receive()
-        if message:
-            json_data = json.loads(message)
-        memos = filter_memo(json_data)
-        import time
-        for i, memo in enumerate(memos):
-            ws.send(memo.dump_json())
-            time.sleep(0.2)
-
-
-def show_memos(json_filter):
-    memos = filter_memo(json_filter)
-    import time
-    for i, memo in enumerate(memos):
-        ws.send(memo.dump_json())
-        time.sleep(0.2)
-
-
-@socketio.on('filter memo', namespace='/memo')
-def filter(msg):
-    show_memos(msg)
-
-
-@socketio.on('connect', namespace='/memo')
-def memo_connect():
-    emit('response log', {'log': 'Connected'})
-
-
-@socketio.on('disconnect', namespace='/memo')
-def memo_disconnect():
-    print('Client disconnected')
-
-
-@socketio.on('recieve log')
-def memo_recieve_log(msg):
-    print(msg.log)
-
-
-
 @app.route('/add', methods=['POST'])
 @requires_login
 def add_memo():
@@ -157,3 +143,4 @@ def delete_memo():
         if user.delete_memo(json_data):
             return json.dumps({'status': 'success'})
     return None
+
