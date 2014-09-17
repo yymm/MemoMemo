@@ -271,16 +271,14 @@ a, h1, h2, h3, h4 {
 /* Memo UI */
 /***********/
 
-.memo {
-	width: 100%;
-	text-align: left;
-	position: relative;
-	z-index: 2;
+#container {
+	margin: 0 auto;
+	padding-left: 90px;
+	padding-right: 10px;
 }
 .memo-div {
-	width: 90%;
+	width: 100%;
 	min-height: 100px;
-	margin-left: 100px;
 	font-size: 16px; 
 	padding: 0.5em;
 	margin-top: .5em;
