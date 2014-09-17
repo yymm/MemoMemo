@@ -5,12 +5,12 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/cumulus.js') }}"></script>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/menu_ui.css') }}">
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
 {% endblock %}
 
 
 {% block body %}
 
+<script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
 
 {% if session.user_id %}
 <!--Cumulusjs-->

@@ -29,6 +29,35 @@ $(document).ready(function(){
 	var update_date = null;
 	var update_memo = null;
 
+	var show_addentry = function()
+	{
+		$('.addentry-div').addClass('show-addentry-div');
+		$('.addentry-form').css('display', 'inline-block');
+	};
+	var hide_addentry = function()
+	{
+		$('.addentry-div').removeClass('show-addentry-div');
+		$('.addentry-form').css('display', 'none');
+	};
+	var clear_addentry = function()
+	{
+		$('.memo-input-title').val("");
+		$('.memo-input-text').val("");
+		$('.memo-input-tag').val("");
+		$('#lock-check').attr('checked', false);
+		global_lock_check_status = false;
+	};
+	$('.addentry-div').hover( function() {
+			show_addentry();
+		}, function () {
+			if (global_lock_check_status === false)
+			{
+				hide_addentry();
+			}
+		}
+	);
+	clear_addentry();
+
 	$('.submit-button').click(function(){
 		var empty_to_zero = function(str){if(str){return str;}else{return 0;}};
 		filter = {
@@ -81,11 +110,13 @@ $(document).ready(function(){
 				display_memos(json_memo);
 				if (update_flag)
 				{
-					update_memo.fadeOut('slow', function(){update_memo.remove();});
+					update_memo.fadeOut('slow', function(){
+						update_memo.remove();
+						update_memo = null;
+					});
 					update_flag = false;
 					update_date = null;
-					update_memo = null;
-					alertFlash('Updated at ' + memo_json.date_time, 'information');
+					alertFlash('Updated at ' + json_memo.date_time, 'information');
 					clear_addentry();
 					hide_addentry();
 					return;
@@ -116,34 +147,6 @@ $(document).ready(function(){
 			show_addentry();
 		}
 	});
-	show_addentry = function()
-	{
-		$('.addentry-div').addClass('show-addentry-div');
-		$('.addentry-form').css('display', 'inline-block');
-	};
-	hide_addentry = function()
-	{
-		$('.addentry-div').removeClass('show-addentry-div');
-		$('.addentry-form').css('display', 'none');
-	};
-	clear_addentry = function()
-	{
-		$('.memo-input-title').val("");
-		$('.memo-input-text').val("");
-		$('.memo-input-tag').val("");
-		$('#lock-check').attr('checked', false);
-		global_lock_check_status = false;
-	};
-	$('.addentry-div').hover( function() {
-			show_addentry();
-		}, function () {
-			if (global_lock_check_status === false)
-			{
-				hide_addentry();
-			}
-		}
-	);
-	clear_addentry();
 
 
 	//
@@ -179,9 +182,14 @@ $(document).ready(function(){
 	// 4. Set attribute(edit, delete)
 	//
 	function display_memos(json_memo){
-		var data = $.parseJSON(json_memo);	// TODO: いらんかも(jsonだし)
+		var data = $.parseJSON(json_memo);
  		var memo_html = create_dom_from_memo(data);
-		var memo = $(memo_html).appendTo($('#container'));
+		var memo;
+		if (update_flag) {
+			memo = $(memo_html).prependTo($('#container'));
+		} else {
+			memo = $(memo_html).appendTo($('#container'));
+		}
 		set_attr(memo);
 	}
 

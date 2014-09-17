@@ -143,4 +143,3 @@ def delete_memo():
         if user.delete_memo(json_data):
             return json.dumps({'status': 'success'})
     return None
-
