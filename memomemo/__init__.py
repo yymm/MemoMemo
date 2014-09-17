@@ -18,7 +18,8 @@ app.config.from_object('config')
 socketio = SocketIO(app)
 
 
-from memomemo.database import db_session, User, filter_memo, varify_user
+from memomemo.database import db_session, User, filter_memo, \
+                              varify_user, add_user
 
 
 def show_memos(json_filter):
@@ -84,6 +85,14 @@ def index():
     tag_num = len(tags)
     # date list
     return render_template('index.html', **locals())
+
+
+@app.route('/signup', methods=['POST'])
+def signup():
+    name = request.form['username']
+    password = request.form['password']
+    user = add_user(name, password)
+    return redirect(url_for('login'))
 
 
 @app.route('/login', methods=['POST', 'GET'])

@@ -149,8 +149,8 @@ def add_user(name, password):
     user = User.query.filter_by(name=name).first()
 
     if not user:
-        u = User(name, password)
-        db.session.add(u)
+        user = User(name, password)
+        db.session.add(user)
         db.session.commit()
 
     return user

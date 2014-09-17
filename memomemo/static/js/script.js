@@ -165,7 +165,7 @@ $(document).ready(function(){
 			closest_div.fadeOut('normal', function(){closest_div.remove();});
 		};
 		prnt.appendChild(child);
-		var container = document.getElementById('container');
+		var container = document.getElementById('alert-container');
 		container.insertBefore(prnt, container.firstChild);
 		setTimeout(function(){
 			$('.flash-alert').fadeOut('normal', function(){
