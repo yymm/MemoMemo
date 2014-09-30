@@ -34,16 +34,19 @@ li ol {
 }
 /* flash alert */
 .flash-alert {
-	position: relative;
+	position: fixed;
+	top: 30px;
 	font-size: 1.2em;
 	margin: 0 auto;
 	margin-bottom: 20px;
 	padding: 40px;
 	text-align: center;
-	opacity: 0.8;
+	opacity: 0.7;
 	border: 2px solid;
 	margin-left: 100px;
 	width: 90%;
+	z-index: 999;
+	border-radius: 5px;
 }
 #important {
     background-color: #DFF0D8;

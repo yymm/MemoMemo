@@ -107,7 +107,7 @@ $(document).ready(function(){
 			data: send_data,
 			contentType: 'application/json',
 			success: function(json_memo){
-				display_memos(json_memo);
+				display_memos(json_memo, true);
 				if (update_flag)
 				{
 					update_memo.fadeOut('slow', function(){
@@ -148,32 +148,6 @@ $(document).ready(function(){
 		}
 	});
 
-
-	//
-	// Flash alert
-	//
-	function alertFlash(message, category){
-		var prnt = document.createElement('div');	// {{{
-		var child = document.createElement('button');
-		prnt.className = 'flash-alert';
-		prnt.id = category === undefined ? 'important' : category;
-		prnt.textContent = message;
-		child.className = 'close-btn';
-		child.textContent = 'x';
-		child.onclick = function(){
-			var closest_div = $(this).closest("div");
-			closest_div.fadeOut('normal', function(){closest_div.remove();});
-		};
-		prnt.appendChild(child);
-		var container = document.getElementById('alert-container');
-		container.insertBefore(prnt, container.firstChild);
-		setTimeout(function(){
-			$('.flash-alert').fadeOut('normal', function(){
-					$(this).remove();
-			});
-		}, 5000);
-	}	// }}}
-
 	//
 	// Display memo
 	// 1. Get json_data, it include one memo(title, text, tag) from database.
@@ -181,11 +155,12 @@ $(document).ready(function(){
 	// 3. Append this DOM
 	// 4. Set attribute(edit, delete)
 	//
-	function display_memos(json_memo){
+	function display_memos(json_memo, prepend){
+		if (prepend === 'undefined') prepend = false; 
 		var data = $.parseJSON(json_memo);
  		var memo_html = create_dom_from_memo(data);
 		var memo;
-		if (update_flag) {
+		if (prepend) {
 			memo = $(memo_html).prependTo($('#container'));
 		} else {
 			memo = $(memo_html).appendTo($('#container'));
