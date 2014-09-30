@@ -32,7 +32,9 @@ li ol {
 .reference {
 	color: #3BBC46;
 }
+/***************/
 /* flash alert */
+/***************/
 .flash-alert {
 	position: fixed;
 	top: 30px;
@@ -138,4 +140,95 @@ li ol {
 }
 .open {
 	display: inline-block;
+}
+/****************/
+/* Modal dialog */
+/****************/
+#over {
+	display: none;
+	background: #000;
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0.4;
+	z-index: 999;
+}
+.dialogbtn {
+  position: relative;
+  border-radius: 25px;
+  background: #000;
+  width: 50px;
+  height: 50px;
+  margin: 0 auto;
+  overflow: hidden;
+  white-space: nowrap;
+  transition: all .5s ease;
+}
+.dialogbtn a {
+	position: absolute;
+	top: 10px;
+	left: 10px;
+	text-decoration: none;
+	color: #fff;
+}
+.dialog {
+	display: none;
+	position: fixed;
+	top: 60px;
+	right: 0;
+	left: 0;
+	margin: 0 auto;
+	overflow: hidden;
+	width: 50%;
+	height: 200px;
+	z-index: 1000;
+	background: #222;
+	border-radius: 10px;
+	opacity: 0.9;
+}
+.dialog .closedlg {
+	text-decoration: none;
+	position: absolute;
+	top: 2px;
+	right: 4px;
+	color: #dd0000;
+}
+.dialog h1 {
+	text-align: center;
+	font-size: 2.5em;
+	border-bottom: 1px solid;
+	padding-bottom: 10px;
+	padding-top: 10px;
+	color: #87ceeb;
+}
+/*******************/
+/* form input style*/
+/*******************/
+.menu-btn {
+	background: #555;
+	font-weight: bold;
+	color: #fff;
+	border-style: none;
+    -moz-transition:all 0.5s ease;
+    -webkit-transition:all 0.5s ease;
+    -o-transition:all 0.5s ease;
+    -ms-transition:all 0.5s ease;
+}
+.menu-btn:hover {
+	background: #377BAB;
+}
+.menu-input {
+	border-radius: 3px;
+	border-style: none;
+	background: #bbb;
+    -moz-transition:all 0.5s ease;
+    -webkit-transition:all 0.5s ease;
+    -o-transition:all 0.5s ease;
+    -ms-transition:all 0.5s ease;
+}
+.menu-input:focus {
+	background: #fcfcfc;
+	box-shadow: 0px 0px 5px 3px #377BAB;
 }

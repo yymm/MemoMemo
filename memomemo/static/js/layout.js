@@ -23,4 +23,24 @@ function alertFlash(message, category){
 	}, 5000);
 }	// }}}
 
+$(document).ready(function(){
+	$('a.showdlg').click(function(){
+		var dialog = $(this).attr('href');
+		$(dialog).fadeIn(200);
+		$('body').append('<div id="over">');
+		$('#over').fadeIn(200);
+		return false;
+	})
+});
+
+$(document).ready(function(){
+	$('a.closedlg').click(function(){
+		var dialog = $(this).attr('href');
+		$(dialog).fadeOut(200);
+		$('#over').fadeOut(200);
+		$('#over').remove();
+		return false;
+	})
+});
+
 /* vim:set foldmethod=marker: */

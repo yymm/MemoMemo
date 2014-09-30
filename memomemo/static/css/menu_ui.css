@@ -38,32 +38,7 @@ a, h1, h2, h3, h4 {
 	top: 5px;
 	left: 5px;
 }
-.menu-btn {
-	background: #555;
-	font-weight: bold;
-	color: #fff;
-	border-style: none;
-    -moz-transition:all 0.5s ease;
-    -webkit-transition:all 0.5s ease;
-    -o-transition:all 0.5s ease;
-    -ms-transition:all 0.5s ease;
-}
-.menu-btn:hover {
-	background: #377BAB;
-}
-.menu-input {
-	border-radius: 3px;
-	border-style: none;
-	background: #bbb;
-    -moz-transition:all 0.5s ease;
-    -webkit-transition:all 0.5s ease;
-    -o-transition:all 0.5s ease;
-    -ms-transition:all 0.5s ease;
-}
-.menu-input:focus {
-	background: #fcfcfc;
-	box-shadow: 0px 0px 5px 3px #377BAB;
-}
+
 /**************************/
 /* menu UI : addentry-div */
 /**************************/

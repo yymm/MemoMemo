@@ -36,17 +36,22 @@
 			<div style="height: 50px;"></div>
 		    <div class="login-div">
 		        <h1 class="login-method">Sign up</h1>
-		        <div id="login">
-		            <div id="box" class="box">
-		        		<i id="icon" class="fa fa-plus fa-2x" style='left: 12px;'></i>
-						<form id="form-container" action="{{ url_for('signup')  }}" method=post>
-		                    <input name='username' class="text" id="signuptext" type="text" placeholder="Name" size="33"></input>
-		                    <br />
-		                    <input name='password' class="text" id="signuppass" type="password" placeholder="Password" size="33"></input>
-							<input type='submit' style='visibility:hidden;'></input>
-		                </form>
-		            </div>
-		        </div>
+				<div id="login">
+					<div class="dialogbtn">
+						<a class="fa fa-plus fa-2x showdlg" style='left: 12px;' href="#signupdlg"></a>
+					</div>
+					<div id="signupdlg" class="dialog">
+						<a href="#signupdlg" class="fa fa-times fa-3x closedlg"></a>
+						<h1>Signup</h1>
+						<form action="{{ url_for('signup')  }}" method=post>
+							<div>User</div>
+							<input name='username' type="text" placeholder="Name" size="33" class="menu-input"></input></br>
+							<div>Password</div>
+							<input name='password' type="password" placeholder="Password" size="33" class="menu-input"></input></br>
+							<input type='submit' value="Submit" class="menu-btn"></input>
+						</form>
+					</div>
+				</div>
 		    </div>
 		</section>
 		<div style="height: 100px;"></div>

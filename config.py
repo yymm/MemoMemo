@@ -7,8 +7,8 @@ SECRET_KEY = os.environ['MEMOMEMO_SECRET_KEY'] \
 
 SQLALCHEMY_DATABASE_URI = os.environ['MEMOMEMO_DATABASE_URI'] \
     if 'MEMOMEMO_DATABASE_URI' in os.environ else \
-    'mysql+pymysql://root:root@localhost/memomemo'
-    #'sqlite:///../misc/memomemo.db'
+    'sqlite:///memomemo.db'
+    #'mysql+pymysql://root:root@localhost/memomemo'
 
 DEBUG = True
 

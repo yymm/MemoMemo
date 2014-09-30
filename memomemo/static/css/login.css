@@ -92,3 +92,28 @@ section {
 	width: 20%;
 	padding-top: 5px;
 }
+/**********/
+/* Signup */
+/**********/
+#signupdlg {
+	top: 40%;
+	height: 250px;
+	width: 400px;
+}
+#signupdlg form {
+	text-align: center;
+}
+#signupdlg div {
+	font-size: 150%;
+	padding-top: 10px;
+}
+#signupdlg input[type="text"], #signupdlg input[type="password"] {
+	padding: 5px 0;
+}
+#signupdlg input[type="submit"] {
+	margin-top: 20px;
+	padding: 10px;
+	font-size: 100%;
+	border-radius: 10px;
+	width: 180px;
+}
