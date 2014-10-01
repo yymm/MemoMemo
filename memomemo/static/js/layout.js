@@ -27,7 +27,7 @@ $(document).ready(function(){
 	$('a.showdlg').click(function(){
 		var dialog = $(this).attr('href');
 		$(dialog).fadeIn(200);
-		$('body').append('<div id="over">');
+		$('body').prepend('<div id="over">');
 		$('#over').fadeIn(200);
 		return false;
 	})

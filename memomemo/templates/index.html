@@ -46,60 +46,79 @@
 <!--Side Menu-->
 <div class="menu-ui">
 	<!--addentry-div-->
-	<div class="menu addentry-div">
-		<p class="icon fa fa-pencil fa-2x" style='top: 3px; left: 6px;'></p>
-		<form onsubmit="return false;" class='addentry-form'>
-			<div class="lock-switch">
-				<input type="checkbox" id="lock-check"></input>
-				<label for="lock-check">
-					<div class="lock-label"></div>
-				</label>
-			</div>
-   			<dl>
-    		   	<dt>Title:
-    		   	<dd><input type="text" name="title" class="menu-input memo-input-title" placeholder="Title">
-    		   	<dt>Text:
-				<dd><textarea name="text" class="menu-input memo-input-text" placeholder="Text ( Use reStructuredText, but do not use heading! )"></textarea>
-				<dt>Tag:
-				<dd><input type="text" name="tag" class="menu-input memo-input-tag" placeholder="Tag">
-				<dd><input type="button" value="Commit" class="menu-btn commit-button">
-	   		</dl>
-   		</form>
+	<div class="menu addentry-div dialogbtn">
+		<a class="icon fa fa-pencil fa-2x showdlg" style='top: 3px; left: 6px;' href="#entrydlg"></a>
 	</div>
 	<!--search-div-->
-	<div class="menu search-div">
-		<p class="icon fa fa-search fa-2x" style='top: 3px;'></p>
-		<form id="search-form" onsubmit="return false;">
-			<input type="text", name="title"  placeholder="Title" class='menu-input'></input>
-			<input type="text", name="tag" placeholder="Tag" class='menu-input'></input>
-			<div id='date-selector'>
-				<select name="year">
-				</select>
-				<select name="month">
-				</select>
-				<select name="day" style='margin-right: 0;'>
-				</select>
-			</div>
-			<input type="button" value="Submit" class="menu-btn submit-button"></input>
-		</form>
+	<div class="menu search-div dialogbtn">
+		<a class="icon fa fa-search fa-2x showdlg" style='top: 3px; left: 5px;' href="#searchdlg"></a>
 	</div>
 	<!--cumulunimbus-div-->
-	<div class="menu cumulunimbus-div">
-		<p class="icon fa fa-cloud fa-2x" style='top: 4px; left: 3px;'></p>
-		<div id="tagCloud"></div>
-		<script type="text/javascript">
-			tagCloud.Distribute(document.getElementById("tagCloud")).Animate(); 
-		</script>
+	<div class="menu cumulunimbus-div dialogbtn">
+		<a class="icon fa fa-cloud fa-2x showdlg" style='top: 4px; left: 3px;' href="#cumulusdlg"></a>
 	</div>
 	<!--tagcloud-div-->
-	<div class="menu tagcloud-div">
-		<p class="icon fa fa-tags fa-2x"></p>
-		<div style='height: 5%;'></div>
-		<div>
-			{% for tag in tags %}
-			<span class='tag' style='border: 2px solid {{ tag['color'] }};'><i>{{ tag['name'] }}</i>:{{ tag['num'] }}</span>
-			{% endfor %}
+	<div class="menu tagcloud-div dialogbtn">
+		<a class="icon fa fa-tags fa-2x showdlg" style='top: 5px; left: 4px;' href="#tagdlg"></a>
+	</div>
+</div>
+
+<!--Dialog-->
+<div id="entrydlg" class="dialog">
+	<a href="#entrydlg" class="fa fa-times fa-3x closedlg"></a>
+	<h1>Edit</h1>
+	<div id="edit-menu">
+		<div style="float: left;">
+			<div>Mkd/reST</div>
 		</div>
+		<div style="float: right;">
+			<div>Public</div>
+		</div>
+	</div>
+	<form onsubmit="return false;" class='addentry-form'>
+		<dl>
+		   	<dt>Title:
+		   	<dd><input type="text" name="title" class="menu-input memo-input-title" placeholder="Title">
+		   	<dt>Text:
+			<dd><textarea name="text" class="menu-input memo-input-text" placeholder="Text ( Use reStructuredText, but do not use heading! )"></textarea>
+			<dt>Tag:
+			<dd><input type="text" name="tag" class="menu-input memo-input-tag" placeholder="Tag">
+			<dd><input type="button" value="Submit" class="menu-btn commit-button">
+   		</dl>
+	</form>
+</div>
+<div id="searchdlg" class="dialog">
+	<a href="#searchdlg" class="fa fa-times fa-3x closedlg"></a>
+	<h1>Search</h1>
+	<form id="search-form" onsubmit="return false;">
+		<input type="text", name="title"  placeholder="Title" class='menu-input'></input>
+		<input type="text", name="tag" placeholder="Tag" class='menu-input'></input>
+		<div id='date-selector'>
+			<select name="year">
+			</select>
+			<select name="month">
+			</select>
+			<select name="day" style='margin-right: 0;'>
+			</select>
+		</div>
+		<input type="button" value="Submit" class="menu-btn submit-button"></input>
+	</form>
+</div>
+<div id="cumulusdlg" class="dialog">
+	<a href="#cumulusdlg" class="fa fa-times fa-3x closedlg"></a>
+	<h1>Cumulus</h1>
+	<div id="tagCloud"></div>
+	<script type="text/javascript">
+		tagCloud.Distribute(document.getElementById("tagCloud")).Animate(); 
+	</script>
+</div>
+<div id="tagdlg" class="dialog">
+	<a href="#tagdlg" class="fa fa-times fa-3x closedlg"></a>
+	<div style='height: 5%;'></div>
+	<div>
+		{% for tag in tags %}
+		<span class='tag' style='border: 2px solid {{ tag['color'] }};'><i>{{ tag['name'] }}</i>:{{ tag['num'] }}</span>
+		{% endfor %}
 	</div>
 </div>
 

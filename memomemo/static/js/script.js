@@ -29,7 +29,7 @@ $(document).ready(function(){
 	var update_date = null;
 	var update_memo = null;
 
-	var show_addentry = function()
+	/*var show_addentry = function()
 	{
 		$('.addentry-div').addClass('show-addentry-div');
 		$('.addentry-form').css('display', 'inline-block');
@@ -56,7 +56,7 @@ $(document).ready(function(){
 			}
 		}
 	);
-	clear_addentry();
+	clear_addentry();*/
 
 	$('.submit-button').click(function(){
 		var empty_to_zero = function(str){if(str){return str;}else{return 0;}};
