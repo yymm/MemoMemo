@@ -17,46 +17,13 @@ $(document).ready(function(){
 		console.log(msg);
 	});
 
+	//
+	// UI event (Websocket)
+	//
 	function send_to_websocket(filter){
 		$('#container').empty();
 		socket.emit('filter memo', JSON.stringify(filter));
 	}
-
-	//
-	// UI event
-	//
-	var update_flag = false;
-	var update_date = null;
-	var update_memo = null;
-
-	/*var show_addentry = function()
-	{
-		$('.addentry-div').addClass('show-addentry-div');
-		$('.addentry-form').css('display', 'inline-block');
-	};
-	var hide_addentry = function()
-	{
-		$('.addentry-div').removeClass('show-addentry-div');
-		$('.addentry-form').css('display', 'none');
-	};
-	var clear_addentry = function()
-	{
-		$('.memo-input-title').val("");
-		$('.memo-input-text').val("");
-		$('.memo-input-tag').val("");
-		$('#lock-check').attr('checked', false);
-		global_lock_check_status = false;
-	};
-	$('.addentry-div').hover( function() {
-			show_addentry();
-		}, function () {
-			if (global_lock_check_status === false)
-			{
-				hide_addentry();
-			}
-		}
-	);
-	clear_addentry();*/
 
 	$('.submit-button').click(function(){
 		var empty_to_zero = function(str){if(str){return str;}else{return 0;}};
@@ -85,6 +52,20 @@ $(document).ready(function(){
 		};
 		send_to_websocket(filter);
 	});
+
+	//
+	// UI event (Ajax)
+	//
+	var update_flag = false;
+	var update_date = null;
+	var update_memo = null;
+
+	function clear_addentry() {
+		$('.memo-input-title').val("");
+		$('.memo-input-text').val("");
+		$('.memo-input-tag').val("");
+	}
+	clear_addentry();
 
 	$('.commit-button').click( function(){
 		var url = '/add';	// {{{
@@ -118,11 +99,9 @@ $(document).ready(function(){
 					update_date = null;
 					alertFlash('Updated at ' + json_memo.date_time, 'information');
 					clear_addentry();
-					hide_addentry();
 					return;
 				}
 				clear_addentry();
-				hide_addentry();
 				alertFlash('Added new post!', 'information');
 			},
 			error: function(){
@@ -135,17 +114,6 @@ $(document).ready(function(){
 	$('#setting').click(function(){
 		$('.metanav').toggleClass('open-metanav');
 		$('.setting').toggleClass('open');
-	});
-
-	var global_lock_check_status = false;
-
-	$('#lock-check').click( function()
-	{
-		global_lock_check_status = this.checked;
-		if (this.checked)
-		{
-			show_addentry();
-		}
 	});
 
 	//
@@ -198,7 +166,6 @@ $(document).ready(function(){
 			$('.memo-input-title').val(spchar_decoder(title));
 			$('.memo-input-text').val(spchar_decoder(text));
 			$('.memo-input-tag').val(spchar_decoder(tag));
-			show_addentry();
 			// Update Info
 			update_memo = $(this).closest('div');
 			update_flag = true;

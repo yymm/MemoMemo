@@ -23,6 +23,9 @@ function alertFlash(message, category){
 	}, 5000);
 }	// }}}
 
+//
+// Toggle Dialog
+//
 $(document).ready(function(){
 	$('a.showdlg').click(function(){
 		var dialog = $(this).attr('href');
