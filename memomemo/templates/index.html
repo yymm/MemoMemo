@@ -68,14 +68,18 @@
 	<a href="#entrydlg" class="fa fa-times fa-3x closedlg"></a>
 	<h1>Edit</h1>
 	<div id="edit-menu">
-		<div style="float: left;">
-			<div>Mkd/reST</div>
+		<div class="paser-switch">
+			<input type="radio" id="rest" name="paser" checked="" />
+			<label for="rest">ReST</label>
+			<input type="radio" id="mkd" name="paser" />
+			<label for="mkd">Markdown</label>
 		</div>
-		<div style="float: right;">
-			<div>Public</div>
+		<div class="clear-btn">
+			<span class="fa fa-times"></span><span>Clear</span>
 		</div>
-		<div style="float: right;">
-			<div>Clear</div>
+		<div class="public-btn">
+			<input type="checkbox" id="public" name="public-btn" />
+			<label for="public">Public</label>
 		</div>
 	</div>
 	<form onsubmit="return false;" class='addentry-form'>

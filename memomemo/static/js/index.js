@@ -89,6 +89,7 @@ $(document).ready(function(){
 			contentType: 'application/json',
 			success: function(json_memo){
 				display_memos(json_memo, true);
+				var msg = 'Added new post!';
 				if (update_flag)
 				{
 					update_memo.fadeOut('slow', function(){
@@ -97,20 +98,14 @@ $(document).ready(function(){
 					});
 					update_flag = false;
 					update_date = null;
-					clear_addentry();
-					var dialog = $('#entrydlg');
-					$(dialog).fadeOut(200);
-					$('#over').fadeOut(200);
-					$('#over').remove();
-					alertFlash('Updated at ' + json_memo.date_time, 'information');
-					return;
+					msg = 'Updated at ' + json_memo.date_time;
 				}
 				clear_addentry();
 				var dialog = $('#entrydlg');
 				$(dialog).fadeOut(200);
 				$('#over').fadeOut(200);
 				$('#over').remove();
-				alertFlash('Added new post!', 'information');
+				alertFlash(msg, 'information');
 			},
 			error: function(){
 				alertFlash('Connection Error: Please retry.', 'error');
@@ -226,5 +221,22 @@ $(document).ready(function(){
 			.replace(/&quot;/g, '"')
 			.replace(/&#039;/g, "'");
 	}	// }}}
+
+	//
+	// UI event(Edit form)
+	//
+	$('.clear-btn').click(function(){
+		clear_addentry();
+	});
+	$('.public-btn').click(function(){
+		console.log($('#public:checked').val());
+		if($('#public:checked').val() === undefined) {
+			$('.public-btn').css("background", "none");
+			$('.public-btn label').css("color", "#000");
+		}else{
+			$('.public-btn').css("background", "#ff8800");
+			$('.public-btn label').css("color", "#FFF");
+		}
+	});
 });
 /* vim:set foldmethod=marker: */
