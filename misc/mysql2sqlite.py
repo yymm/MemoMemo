@@ -1,5 +1,6 @@
 '''
-MySQL to SQLite Converter for memomemo
+CAUTION: Now, Can't use this script! Because database schema has changed...
+MySQL to SQLite Converter for memomemo for dev
 
 1. Fetch a database from mysql via MemoMemo App.
    (Then MemoMemo should connected to mysql database.)
