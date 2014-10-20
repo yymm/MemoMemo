@@ -97,11 +97,19 @@ $(document).ready(function(){
 					});
 					update_flag = false;
 					update_date = null;
-					alertFlash('Updated at ' + json_memo.date_time, 'information');
 					clear_addentry();
+					var dialog = $('#entrydlg');
+					$(dialog).fadeOut(200);
+					$('#over').fadeOut(200);
+					$('#over').remove();
+					alertFlash('Updated at ' + json_memo.date_time, 'information');
 					return;
 				}
 				clear_addentry();
+				var dialog = $('#entrydlg');
+				$(dialog).fadeOut(200);
+				$('#over').fadeOut(200);
+				$('#over').remove();
 				alertFlash('Added new post!', 'information');
 			},
 			error: function(){
@@ -170,6 +178,10 @@ $(document).ready(function(){
 			update_memo = $(this).closest('div');
 			update_flag = true;
 			update_date = spchar_decoder(date);
+			var dialog = $('#entrydlg');
+			$(dialog).fadeIn(200);
+			$('body').prepend('<div id="over">');
+			$('#over').fadeIn(200);
 		});
 		// Delete using Ajax
 		memo.find('.memo-delete').click(function(){
