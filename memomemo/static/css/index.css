@@ -111,25 +111,17 @@ a, h1, h2, h3, h4 {
 .search-div {
 	top: 20%;
 }
+#searchdlg {
+	width: 270px;
+	height: 300px;
+}
 #searchdlg input {
 	width: 200px;
 	margin: 1em 1em 0em 2em;
 	display: inline-block;
     font-size: 1.0em;
 	padding: 10px 0;
-}
-#searchdlg #date-selector {
-	position: relative;
-	width: 200px;
-	margin: 1em 1em 0em 2em;
-	display: inline-block;
-}
-#date-selector select {
-	float: left;
-	width: 60px;
-	margin-right: 10px;
-	font-size: 1.0em;
-	padding: 5px 0;
+	text-align: center;
 }
 /******************************/
 /* menu UI : cumulonimbus-div */
@@ -147,13 +139,23 @@ a, h1, h2, h3, h4 {
 .tagcloud-div {
 	top: 40%;
 }
+#tagdlg {
+	width: 500px;
+	height: auto;
+	max-height: 500px;
+	overflow: scroll;
+}
+#tag-container {
+	margin: 10px 20px 0px;
+	height: auto;
+}
 .tag {
 	float: left;
 	color: #333;
 	background-color: #fff;
 	border: 1px solid #fff;
 	border-radius: 5px;
-	margin: 3px;
+	margin: 0 3px 10px;
 	padding: 1px;
 }
 .tag:hover {

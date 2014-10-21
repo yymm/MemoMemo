@@ -99,6 +99,7 @@
 	<h1>Search</h1>
 	<form id="search-form" onsubmit="return false;">
 		<input type="text", name="title"  placeholder="Title" class='menu-input'></input>
+		<input type="text", name="text"  placeholder="Text" class='menu-input'></input>
 		<input type="text", name="tag" placeholder="Tag" class='menu-input'></input>
 		<input type="button" value="Submit" class="menu-btn submit-button"></input>
 	</form>
@@ -113,8 +114,8 @@
 </div>
 <div id="tagdlg" class="dialog">
 	<a href="#tagdlg" class="fa fa-times fa-3x closedlg"></a>
-	<div style='height: 5%;'></div>
-	<div>
+	<h1>TagCloud</h1>
+	<div id="tag-container">
 		{% for tag in tags %}
 		<span class='tag' style='border: 2px solid {{ tag['color'] }};'><i>{{ tag['name'] }}</i>:{{ tag['num'] }}</span>
 		{% endfor %}

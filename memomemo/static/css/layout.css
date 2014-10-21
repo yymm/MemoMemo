@@ -211,6 +211,7 @@ li ol {
 	font-weight: bold;
 	color: #fff;
 	border-style: none;
+	border-radius: 5px;
     -moz-transition:all 0.5s ease;
     -webkit-transition:all 0.5s ease;
     -o-transition:all 0.5s ease;
