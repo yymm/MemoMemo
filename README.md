@@ -1,5 +1,7 @@
 ![MemoMemo](memomemo.png)
 
+[![Build Status](https://drone.io/github.com/yymm/MemoMemo/status.png)](https://drone.io/github.com/yymm/MemoMemo/latest)
+
 # Version
 
 [Releases](https://github.com/yymm/MemoMemo/releases "Releases · yymm/MemoMemo")
