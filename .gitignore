@@ -8,3 +8,5 @@ wiki
 *.sql
 *.un~
 memo.json
+cover
+.coverage

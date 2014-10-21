@@ -5,3 +5,5 @@ Sphinx
 PyMySQL
 colour
 gunicorn
+nose
+coverage
