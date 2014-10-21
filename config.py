@@ -13,9 +13,11 @@ SQLALCHEMY_DATABASE_URI = os.environ['MEMOMEMO_DATABASE_URI'] \
 
 # Heroku(ClearDB)
 SQLALCHEMY_DATABASE_URI = os.environ['CLEARDB_DATABASE_URL'].replace("mysql://",
-        "mysql+pymysql://") \
+        "mysql+pymysql://").replace("?reconnect=true", "") \
     if 'CLEARDB_DATABASE_URL' in os.environ else \
     SQLALCHEMY_DATABASE_URI
+
+print SQLALCHEMY_DATABASE_URI
 
 DEBUG = True
 
