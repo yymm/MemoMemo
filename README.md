@@ -2,45 +2,22 @@
 
 # Version
 
-* v0.10 2014-07-07
+[Releases](https://github.com/yymm/MemoMemo/releases "Releases · yymm/MemoMemo")
 
-# Deployment
+# Try Heroku!
 
-Set secret key of Flask.
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
 
-```
-export MEMOMEMO_SECRET_KEY='dev key'
-```
+# Environmental variables
 
-Run through gunicorn.(on localhost:5050)
+"MEMOMEMO\_SECRET\_KEY" if you do not set 'dev key'
 
-```
-gunicorn -b localhost:5050 flask_sockets.worker memomemo:app
-```
-
-## Database
-
-Using MySQL(default). => Table: memomemo
-
-If you want to use other database, you export "MEMOMEMO\_DATABASE\_URI".
-
-example: SQLite
-
-```
-export MEMOMEMO_DATABASE_URI=sqlite:////home/hoge/MemoMemo/memo.db
-```
+"MEMOMEMO\_DATABASE\_URI" if you do not set 'mysql+pymysql://root:root@localhost/memomemo'
 
 # Python Requirements
 
-* Flask
-* Flask-SQLAlchemy
-* Flask-Sockets
-* Sphinx
-* PyMySQL
-* pytest
-* colour
-* gunicorn
+[requirements.txt at master](https://github.com/yymm/MemoMemo/blob/master/requirements.txt "MemoMemo/requirements.txt at master · yymm/MemoMemo")
 
 # Licence
 
-* GPLv3 
+[GPLv3](https://github.com/yymm/MemoMemo/blob/master/LICENSE.txt "MemoMemo/LICENSE.txt at master · yymm/MemoMemo")

@@ -1,0 +1,10 @@
+{
+	"name": "MemoMemo",
+	"description": "Advanced web memo tool.",
+	"website": "https://memo.muuny-blue.info/",
+	"repository": "https://github.com/yymm/MemoMemo",
+	"keywords": ["python", "flask", "javascript"],
+	"addons": [
+		"cleardb:ignite"
+	]
+}
