@@ -1,1 +1,1 @@
-web: python run.py
+web: gunicorn --worker-class socketio.sgunicorn.GeventSocketIOWorker module:memomemo
