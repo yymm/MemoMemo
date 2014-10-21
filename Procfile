@@ -1,1 +1,1 @@
-web: gunicorn --worker-class socketio.sgunicorn.GeventSocketIOWorker module:memomemo
+web: gunicorn --worker-class socketio.sgunicorn.GeventSocketIOWorker memomemo:app
