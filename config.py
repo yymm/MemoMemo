@@ -12,7 +12,8 @@ SQLALCHEMY_DATABASE_URI = os.environ['MEMOMEMO_DATABASE_URI'] \
     #'sqlite:///memomemo.db'
 
 # Heroku(ClearDB)
-SQLALCHEMY_DATABASE_URI = os.environ['CLEARDB_DATABASE_URL'] \
+SQLALCHEMY_DATABASE_URI = os.environ['CLEARDB_DATABASE_URL'].replace("mysql://",
+        "mysql+pymysql://") \
     if 'CLEARDB_DATABASE_URL' in os.environ else \
     SQLALCHEMY_DATABASE_URI
 
