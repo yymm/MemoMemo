@@ -4,6 +4,7 @@
 	"website": "https://memo.muuny-blue.info/",
 	"repository": "https://github.com/yymm/MemoMemo",
 	"keywords": ["python", "flask", "javascript"],
+	"logo": "https://avatars1.githubusercontent.com/u/1256685?v=2",
 	"addons": [
 		"cleardb:ignite"
 	]
