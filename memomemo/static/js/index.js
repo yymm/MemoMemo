@@ -64,8 +64,10 @@ $(document).ready(function(){
 		$('.memo-input-title').val("");
 		$('.memo-input-text').val("");
 		$('.memo-input-tag').val("");
+		update_flag = false;
+		update_date = null;
 	}
-	clear_addentry();
+	//clear_addentry();
 
 	$('.commit-button').click( function(){
 		var url = '/add';	// {{{
@@ -74,6 +76,10 @@ $(document).ready(function(){
 			text : $('.memo-input-text').val(),
 			tag : $('input[name="tag"]').val()
 		};
+		if (!memo.title || !memo.text) {
+			alertFlash("Nothing input...", 'warning');
+			return false;
+		}
 		// Update check
 		if (update_flag)
 		{
@@ -96,9 +102,7 @@ $(document).ready(function(){
 						update_memo.remove();
 						update_memo = null;
 					});
-					update_flag = false;
-					update_date = null;
-					msg = 'Updated at ' + json_memo.date_time;
+					msg = 'Updated at ' + $.parseJSON(json_memo).date_time;
 				}
 				clear_addentry();
 				var dialog = $('#entrydlg');

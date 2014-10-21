@@ -120,11 +120,9 @@ def logout():
 def add_memo():
     memo = None
     user = g.user
-
     if request.method == 'POST':
         json_data = request.json
         memo = user.add_memo(json_data)
-
     return memo.dump_json()
 
 
@@ -133,16 +131,11 @@ def add_memo():
 def update_memo():
     memo = None
     user = g.user
-
-    print request.method
     if request.method == 'POST':
         json_data = request.json
-        print json_data
         memo = user.update_memo(json_data)
-        print memo
         if not memo:
             return None
-
     return memo.dump_json()
 
 
