@@ -1,3 +1,4 @@
+import os
 from memomemo import app, socketio
 from memomemo.database import init_db
 
