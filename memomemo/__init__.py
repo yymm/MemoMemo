@@ -18,7 +18,8 @@ app.config.from_object('config')
 socketio = SocketIO(app)
 
 
-from memomemo.database import db_session, User, filter_memo, varify_user
+from memomemo.database import db_session, User, filter_memo, \
+                              varify_user, add_user
 
 
 def show_memos(json_filter):
@@ -86,6 +87,14 @@ def index():
     return render_template('index.html', **locals())
 
 
+@app.route('/signup', methods=['POST'])
+def signup():
+    name = request.form['username']
+    password = request.form['password']
+    user = add_user(name, password)
+    return redirect(url_for('login'))
+
+
 @app.route('/login', methods=['POST', 'GET'])
 def login():
     if request.method == 'POST':
@@ -111,11 +120,9 @@ def logout():
 def add_memo():
     memo = None
     user = g.user
-
     if request.method == 'POST':
         json_data = request.json
         memo = user.add_memo(json_data)
-
     return memo.dump_json()
 
 
@@ -124,13 +131,11 @@ def add_memo():
 def update_memo():
     memo = None
     user = g.user
-
     if request.method == 'POST':
         json_data = request.json
         memo = user.update_memo(json_data)
         if not memo:
             return None
-
     return memo.dump_json()
 
 

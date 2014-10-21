@@ -38,168 +38,116 @@ a, h1, h2, h3, h4 {
 	top: 5px;
 	left: 5px;
 }
-.menu-btn {
-	background: #555;
-	font-weight: bold;
-	color: #fff;
-	border-style: none;
-    -moz-transition:all 0.5s ease;
-    -webkit-transition:all 0.5s ease;
-    -o-transition:all 0.5s ease;
-    -ms-transition:all 0.5s ease;
-}
-.menu-btn:hover {
-	background: #377BAB;
-}
-.menu-input {
-	border-radius: 3px;
-	border-style: none;
-	background: #bbb;
-    -moz-transition:all 0.5s ease;
-    -webkit-transition:all 0.5s ease;
-    -o-transition:all 0.5s ease;
-    -ms-transition:all 0.5s ease;
-}
-.menu-input:focus {
-	background: #fcfcfc;
-	box-shadow: 0px 0px 5px 3px #377BAB;
-}
+
 /**************************/
 /* menu UI : addentry-div */
 /**************************/
 .addentry-div {
 	top: 10%;
-	z-index: 5; 
 }
-.show-addentry-div {
-	top: 10%;
+#entrydlg {
 	width: 700px;
-	height: 700px;
-	border-radius: 20px;
-	opacity: 0.9;
+	height: 830px;
 }
 .addentry-form {
-	display: none; 
 	width: 100%;
-	height: 95%;
-	margin-top: 5%;
+	height: 100%;
 }
-.addentry-div dl {
+#entrydlg dl {
 	width: 100%;
 	height: 100%;
 	margin-left: 35px;
 }
-.addentry-div dt { 
+#entrydlg dt { 
     font-size: 1.2em;
 	font-weight: bold; 
 	color: #377BAB;
-	margin-top: 10px;
+	margin-top: 5px;
 }
-.addentry-div input {
+#entrydlg input {
 	width: 90%;
     font-size: 1.0em;
 }
-.addentry-div textarea {
+#entrydlg textarea {
 	width: 90%;
-	height: 450px;
+	height: 500px;
     font-size: 1.0em;
 	background: #bbb;
 }
-.addentry-div .commit-button {
+#entrydlg textarea:focus {
+	background: #fcfcfc;
+}
+@media screen and (min-height : 1200px){
+	#entrydlg textarea {
+		height: 700px;
+	}
+	#entrydlg {
+		height: 1050px;
+	}
+}
+@media screen and (max-height : 460px){
+	#entrydlg textarea {
+		height: 50px;
+	}
+	#entrydlg {
+		height: 350px;
+	}
+}
+#entrydlg .commit-button {
 	margin-top: 1.5em;
 	width: 90%;
 	height: 2.5em;
 	border-radius: 10px;
 	font-size: 1.0em;
 }
+#edit-menu {
+	height: 40px;
+	margin-top: 20px;
+	padding: 0 35px;
+}
 /************************/
 /* menu UI : search-div */
 /************************/
 .search-div {
 	top: 20%;
-	z-index: 4; 
 }
-.search-div input {
-	display: none;
+#searchdlg {
+	width: 270px;
+	height: 300px;
 }
-.search-div #date-selector {
-	display: none;
-}
-.submit-button {
-	display: none;
-}
-.search-div:hover {
-	width: 300px; 
-	height: 250px; 
-	padding: 0.8em; 
-	border-radius: 20px;
-	z-index: 40; 
-}
-.search-div:hover input {
+#searchdlg input {
 	width: 200px;
 	margin: 1em 1em 0em 2em;
 	display: inline-block;
     font-size: 1.0em;
 	padding: 10px 0;
-}
-.search-div:hover #date-selector {
-	position: relative;
-	width: 200px;
-	margin: 1em 1em 0em 2em;
-	display: inline-block;
-}
-#date-selector select {
-	float: left;
-	width: 60px;
-	margin-right: 10px;
-	font-size: 1.0em;
-	padding: 5px 0;
+	text-align: center;
 }
 /******************************/
 /* menu UI : cumulonimbus-div */
 /******************************/
 .cumulunimbus-div {
 	top: 30%;
-	z-index: 3; 
 }
-.cumulunimbus-div div {
-	display: none;
-}
-.cumulunimbus-div:hover {
+#cumulusdlg {
 	width: 600px; 
-	height: 600px; 
-	top: 0%;
-	padding: 0.8em; 
-	border-radius: 20px;
-	z-index: 40; 
-}
-.cumulunimbus-div:hover div {
-	display: inline-block;
+	height: 700px; 
 }
 /**************************/
 /* menu UI : tagcloud-div */
 /**************************/
 .tagcloud-div {
 	top: 40%;
-	z-index: 3; 
 }
-.tagcloud-div div {
-	display: none;
-}
-.tagcloud-div:hover {
-	width: 550px; 
-	height: 550px; 
-	top: 10%;
-	padding: 0.8em; 
-	border-radius: 20px;
-	z-index: 40; 
+#tagdlg {
+	width: 500px;
+	height: auto;
+	max-height: 500px;
 	overflow: scroll;
 }
-.tagcloud-div:hover div {
-	position: relative;
-	width: 100%;
-	height: 100%;
-	display: inline-block;
+#tag-container {
+	margin: 10px 20px 0px;
+	height: auto;
 }
 .tag {
 	float: left;
@@ -207,47 +155,15 @@ a, h1, h2, h3, h4 {
 	background-color: #fff;
 	border: 1px solid #fff;
 	border-radius: 5px;
-	margin: 3px;
+	margin: 0 3px 10px;
 	padding: 1px;
 }
 .tag:hover {
 	cursor: pointer;
 }
-/**********************/
-/* add-memo lock icon */
-/**********************/
-#lock-check {
-  display: none; 
-}
-.lock-label {
-  position: absolute;
-  right: 20px;
-  top: 10px;
-  float: right;
-  width: 24px;
-  height: 24px;
-  border-radius: 3px;
-  background: #444;
-  background-size: contain;
-  background-image: url("../img/icon_key.png");
-  transform : rotate(-90deg);
-  transition : all 0.5s cubic-bezier(0.86, 0, 0.07, 1);
-}
-#lock-check:checked ~ label div{
-  background-size: contain;
-  background-image: url("../img/icon_lock.png");
-  transform : rotate(0deg);
-}
 /*************/
 /* Cumulusjs */
 /*************/
-#tagCloud
-{
-	position: absolute;
-	left: 0px;
-	top: 0px;
-	margin: 0 auto;
-}
 .tagCloud ul, .tagCloud li
 {
 	list-style: none;
@@ -271,16 +187,14 @@ a, h1, h2, h3, h4 {
 /* Memo UI */
 /***********/
 
-.memo {
-	width: 100%;
-	text-align: left;
-	position: relative;
-	z-index: 2;
+#container {
+	margin: 0 auto;
+	padding-left: 90px;
+	padding-right: 10px;
 }
 .memo-div {
-	width: 90%;
+	width: 100%;
 	min-height: 100px;
-	margin-left: 100px;
 	font-size: 16px; 
 	padding: 0.5em;
 	margin-top: .5em;
@@ -404,4 +318,78 @@ a, h1, h2, h3, h4 {
 	border-radius: 2px;
 	margin: 10px;
 	padding: 10px;
+}
+/*
+ *
+ */
+input[type="radio"] {
+  display: none;
+}
+.paser-switch {
+  width: 200px;
+  height: 30px;
+  padding: 5px;
+  background-color: #eee;
+  font-size: 0;
+  border-radius: 5px;
+  background: #377bab;
+  float: left;
+}
+label {
+  display: inline-block;
+  font-size: 16px;
+  width: 50%;
+  height: 21px;
+  color: #fff;
+  line-height: 21px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 5px;
+}
+input[type="radio"]:checked + label {
+  background: #ecf0f1;
+  color: #222;
+}
+/*
+ *
+ */
+#public {
+	display: none;
+}
+.public-btn {
+  float: right;
+  padding: 5px;
+  margin-right: 10px;
+  display: block;
+  border-radius: 5px;
+}
+.public-btn label {
+  height: 21px;
+  line-height: 21px;
+  cursor: pointer;
+  color: #000;
+  text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.0);
+  -moz-transition:all 1s;
+  -webkit-transition:all 1s;
+  -o-transition:all 1s;
+  -ms-transition:all 1s;
+}
+/*.public-btn label:hover {*/
+  /*color: #eee;*/
+  /*text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.0);*/
+/*}*/
+/*
+ *
+ */
+.clear-btn {
+  background: #F0AD4E;
+  padding: 5px;
+  width: 75px;
+  float: right;
+  border-radius: 5px;
+}
+.clear-btn span {
+  height: 21px;
+  line-height: 21px;
+  cursor: pointer;
 }

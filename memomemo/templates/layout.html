@@ -10,34 +10,18 @@
 	<link rel='stylesheet' href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
 	<link rel='stylesheet' href="{{ url_for('static', filename='css/pygments.css') }}">
 	<link rel='stylesheet' href="{{ url_for('static', filename='css/layout.css') }}">
+	<script type="text/javascript" src="{{ url_for('static', filename='js/layout.js') }}"></script>
 	{% block head %}
 	{% endblock %}
 </head>
 <body>
-	<!--Login Info-->
 	<header class='metanav'>
 		<span class="small-title">MemoMemo</span>
-		{% if session.user_id %}
-	 		<span class='fa fa-info-circle' id='setting'></span>
-	 		<a class='fa fa-power-off' href="{{ url_for('logout') }}" style='color: red; opacity: 0.8;'></a>
-			<div id='setting-container setting hidden'>
-				<div class='setting hidden'>
-					<h2>User</h2>
-					<ul>
-						<li><b>ID: </b><span id='user_id'>{{ id }}</span>
-						<li><b>Name: </b>{{ name }}
-					</ul>
-				</div>
-				<div class='setting hidden'>
-					<h2>Memo</h2>
-					<ul>
-						<li><b>Num: </b>{{ memo_num }}
-						<li><b>TagNum: </b>{{ tag_num }}
-				</div>
-			</div>
-		{% endif %}
+		{% block metanav%}
+		{% endblock %}
 	</header>
 	{% block body %}
 	{% endblock %}
+	<div id="alert-container"></div>
 </body>
 </html>

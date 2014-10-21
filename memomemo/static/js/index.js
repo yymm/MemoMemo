@@ -17,46 +17,13 @@ $(document).ready(function(){
 		console.log(msg);
 	});
 
+	//
+	// UI event (Websocket)
+	//
 	function send_to_websocket(filter){
 		$('#container').empty();
 		socket.emit('filter memo', JSON.stringify(filter));
 	}
-
-	//
-	// UI event
-	//
-	var update_flag = false;
-	var update_date = null;
-	var update_memo = null;
-
-	var show_addentry = function()
-	{
-		$('.addentry-div').addClass('show-addentry-div');
-		$('.addentry-form').css('display', 'inline-block');
-	};
-	var hide_addentry = function()
-	{
-		$('.addentry-div').removeClass('show-addentry-div');
-		$('.addentry-form').css('display', 'none');
-	};
-	var clear_addentry = function()
-	{
-		$('.memo-input-title').val("");
-		$('.memo-input-text').val("");
-		$('.memo-input-tag').val("");
-		$('#lock-check').attr('checked', false);
-		global_lock_check_status = false;
-	};
-	$('.addentry-div').hover( function() {
-			show_addentry();
-		}, function () {
-			if (global_lock_check_status === false)
-			{
-				hide_addentry();
-			}
-		}
-	);
-	clear_addentry();
 
 	$('.submit-button').click(function(){
 		var empty_to_zero = function(str){if(str){return str;}else{return 0;}};
@@ -86,6 +53,22 @@ $(document).ready(function(){
 		send_to_websocket(filter);
 	});
 
+	//
+	// UI event (Ajax)
+	//
+	var update_flag = false;
+	var update_date = null;
+	var update_memo = null;
+
+	function clear_addentry() {
+		$('.memo-input-title').val("");
+		$('.memo-input-text').val("");
+		$('.memo-input-tag').val("");
+		update_flag = false;
+		update_date = null;
+	}
+	//clear_addentry();
+
 	$('.commit-button').click( function(){
 		var url = '/add';	// {{{
 		var memo = {
@@ -93,6 +76,10 @@ $(document).ready(function(){
 			text : $('.memo-input-text').val(),
 			tag : $('input[name="tag"]').val()
 		};
+		if (!memo.title || !memo.text) {
+			alertFlash("Nothing input...", 'warning');
+			return false;
+		}
 		// Update check
 		if (update_flag)
 		{
@@ -107,23 +94,22 @@ $(document).ready(function(){
 			data: send_data,
 			contentType: 'application/json',
 			success: function(json_memo){
-				display_memos(json_memo);
+				display_memos(json_memo, true);
+				var msg = 'Added new post!';
 				if (update_flag)
 				{
 					update_memo.fadeOut('slow', function(){
 						update_memo.remove();
 						update_memo = null;
 					});
-					update_flag = false;
-					update_date = null;
-					alertFlash('Updated at ' + json_memo.date_time, 'information');
-					clear_addentry();
-					hide_addentry();
-					return;
+					msg = 'Updated at ' + $.parseJSON(json_memo).date_time;
 				}
 				clear_addentry();
-				hide_addentry();
-				alertFlash('Added new post!', 'information');
+				var dialog = $('#entrydlg');
+				$(dialog).fadeOut(200);
+				$('#over').fadeOut(200);
+				$('#over').remove();
+				alertFlash(msg, 'information');
 			},
 			error: function(){
 				alertFlash('Connection Error: Please retry.', 'error');
@@ -137,43 +123,6 @@ $(document).ready(function(){
 		$('.setting').toggleClass('open');
 	});
 
-	var global_lock_check_status = false;
-
-	$('#lock-check').click( function()
-	{
-		global_lock_check_status = this.checked;
-		if (this.checked)
-		{
-			show_addentry();
-		}
-	});
-
-
-	//
-	// Flash alert
-	//
-	function alertFlash(message, category){
-		var prnt = document.createElement('div');	// {{{
-		var child = document.createElement('button');
-		prnt.className = 'flash-alert';
-		prnt.id = category === undefined ? 'important' : category;
-		prnt.textContent = message;
-		child.className = 'close-btn';
-		child.textContent = 'x';
-		child.onclick = function(){
-			var closest_div = $(this).closest("div");
-			closest_div.fadeOut('normal', function(){closest_div.remove();});
-		};
-		prnt.appendChild(child);
-		var container = document.getElementById('container');
-		container.insertBefore(prnt, container.firstChild);
-		setTimeout(function(){
-			$('.flash-alert').fadeOut('normal', function(){
-					$(this).remove();
-			});
-		}, 5000);
-	}	// }}}
-
 	//
 	// Display memo
 	// 1. Get json_data, it include one memo(title, text, tag) from database.
@@ -181,11 +130,12 @@ $(document).ready(function(){
 	// 3. Append this DOM
 	// 4. Set attribute(edit, delete)
 	//
-	function display_memos(json_memo){
+	function display_memos(json_memo, prepend){
+		if (prepend === 'undefined') prepend = false; 
 		var data = $.parseJSON(json_memo);
  		var memo_html = create_dom_from_memo(data);
 		var memo;
-		if (update_flag) {
+		if (prepend) {
 			memo = $(memo_html).prependTo($('#container'));
 		} else {
 			memo = $(memo_html).appendTo($('#container'));
@@ -223,11 +173,14 @@ $(document).ready(function(){
 			$('.memo-input-title').val(spchar_decoder(title));
 			$('.memo-input-text').val(spchar_decoder(text));
 			$('.memo-input-tag').val(spchar_decoder(tag));
-			show_addentry();
 			// Update Info
 			update_memo = $(this).closest('div');
 			update_flag = true;
 			update_date = spchar_decoder(date);
+			var dialog = $('#entrydlg');
+			$(dialog).fadeIn(200);
+			$('body').prepend('<div id="over">');
+			$('#over').fadeIn(200);
 		});
 		// Delete using Ajax
 		memo.find('.memo-delete').click(function(){
@@ -272,5 +225,22 @@ $(document).ready(function(){
 			.replace(/&quot;/g, '"')
 			.replace(/&#039;/g, "'");
 	}	// }}}
+
+	//
+	// UI event(Edit form)
+	//
+	$('.clear-btn').click(function(){
+		clear_addentry();
+	});
+	$('.public-btn').click(function(){
+		console.log($('#public:checked').val());
+		if($('#public:checked').val() === undefined) {
+			$('.public-btn').css("background", "none");
+			$('.public-btn label').css("color", "#000");
+		}else{
+			$('.public-btn').css("background", "#ff8800");
+			$('.public-btn label').css("color", "#FFF");
+		}
+	});
 });
 /* vim:set foldmethod=marker: */

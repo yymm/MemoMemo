@@ -19,26 +19,7 @@
 			</div>
 		</section>
 		<section id='login-section'>
-		    <div class="login-div">
-		        <h1 class="login-method">Auth</h1>
-		        <div id="oauthbox" class="box">
-		            <i id="icon" class="fa fa-cloud fa-2x" style='left: 8px;'></i>
-		            <div id="form-container">
-		                <div class="iconfolder bitbucket-folder">
-		                    <a class="bitbucket fa fa-bitbucket-square fa-3x" href="#" style="text-decoration:none;"></a>
-		                </div>
-		                <div class="iconfolder github-folder">
-		                    <a class="github fa fa-github-square fa-3x" href="#" style="text-decoration:none;"></a>
-		                </div>
-		                <div class="iconfolder google-folder">
-		                    <a class="google fa fa-google-plus-square fa-3x" href="#" style="text-decoration:none;"></a>
-		                </div>
-		                <div class="iconfolder twitter-folder">
-		                    <a class="twitter fa fa-twitter-square fa-3x" href="#" style="text-decoration:none;"></a>
-		                </div>
-		            </div>
-		        </div>
-		    </div>
+			<div style="height: 100px;"></div>
 		    <div class="login-div">
 		        <h1 class="login-method">Login</h1>
 		        <div id="login">
@@ -53,45 +34,74 @@
 		            </div>
 		        </div>
 		    </div>
+			<div style="height: 100px;"></div>
 		    <div class="login-div">
 		        <h1 class="login-method">Sign up</h1>
-		        <div id="login">
-		            <div id="box" class="box">
-		        		<i id="icon" class="fa fa-plus fa-2x" style='left: 12px;'></i>
-		                <form id="form-container" action="" method=post>
-		                    <input name='username' class="text" id="signuptext" type="text" placeholder="Name" size="33"></input>
-		                    <br />
-		                    <input name='password' class="text" id="signuppass" type="password" placeholder="Password" size="33"></input>
-							<input type='submit' style='visibility:hidden;'></input>
-		                </form>
-		            </div>
-		        </div>
+				<div id="login">
+					<div class="dialogbtn">
+						<a class="fa fa-plus fa-2x showdlg" style='left: 12px;' href="#signupdlg"></a>
+					</div>
+					<div id="signupdlg" class="dialog">
+						<a href="#signupdlg" class="fa fa-times fa-3x closedlg"></a>
+						<h1>Signup</h1>
+						<form action="{{ url_for('signup') }}" method=post>
+							<div>User</div>
+							<input name='username' type="text" placeholder="Name" size="33" class="menu-input"></input></br>
+							<div>Password</div>
+							<input name='password' type="password" placeholder="Password" size="33" class="menu-input"></input></br>
+							<input type='submit' value="Submit" class="menu-btn"></input>
+						</form>
+					</div>
+				</div>
 		    </div>
+			<div style="height: 100px;"></div>
 		</section>
-		<section>
-			<div class="flash-alert" id="information" style='margin-bottom: 40px; font-size: 2em;'>
-				MemoMemo is a private memo tool.
+		<div style="height: 100px;"></div>
+		<!--<section>
+			<div class="message" style="font-size: 400%;">MemoMemo?</div>
+			<div class="message" id="information">
+				<h1 style="padding-bottom: 20px;">ブラウジングしていて、ふとメモをとりたくなることありませんか？</h1>
+				<h1 style="padding-bottom: 20px;">ふとアイデアが浮かんだけど、どこにメモとろうかと思ったことありませんか？</h1>
+				<h1>考えてることをまとめたいけど、ブログやWikiに書くのは恥ずかしいなんて思ったことありませんか？</h1>
 			</div>
-			<div class="flash-alert" id="error" style='margin-bottom: 40px; font-size: 2em;'>
-				So, those login gadget above don't work...
+			<div class="message" id="error">
+				<h1>日々このような情報やアイデアが保存されず頭の奥底へ消えています。</h1>
 			</div>
-			<div class="flash-alert" id="important" style='margin-bottom: 40px; font-size: 2em;'>
-				But, you can try MemoMemo by <a href='http://memomemo.herokuapp.com'>Heroku</a>!
+			<div class="message" id="important">
+				<div style="height: 30px;"></div>
+				<h1>そんなためのメモツールがMemoMemo</h1>
+				<div style="height: 30px;"></div>
 			</div>
-			<div class="flash-alert" id="warning" style='margin-bottom: 40px; font-size: 2em;'>
-				Logged in name:'test', password:'test'.
+			<div style="height: 100px;"></div>
+			<div class="message" style="font-size: 400%;">How to use?</div>
+			<div class="message" id="warning">
+				<h1>1. サインアップします</h1>
 			</div>
-			<div class="flash-alert" id="information" style='margin-bottom: 40px; font-size: 2em;'>
-				If you will try to use MemoMemo, deploy yourself!
+			<div class="message" id="important">
+				<h1>2. ログインします</h1>
 			</div>
-			<div class="flash-alert" id="important" style='margin-bottom: 40px; font-size: 2em;'>
-				You can see how to deploy on GitHub repos. <a href='https://github.com/yymm/MemoMemo'>Here</a>!
+			<div class="message" id="information">
+				<h1>3. reStructuredText or Markdownでメモをとります</h1>
 			</div>
-		</section>
+			<div class="message" id="error">
+				<h1>＿人人人人＿</h1>
+				<h1>＞　簡単　＜</h1>
+				<h1>￣Y^Y^Y￣</h1>
+			</div>
+			<div style="height: 100px;"></div>
+			<div class="message" style="font-size: 400%;">Else?</div>
+			<div class="message" id="important">
+				<h1>MemoMemoはタグ付け、検索ができます。</h1>
+			</div>
+			<div class="message" id="warning">
+				<h1>画像のアップロードとかできないことも多いよ。</h1>
+			</div>
+			<div style="height: 100px;"></div>
+		</section>-->
 	<article>
 	<footer>
 		<div id='author'>
-			<div>Author: yuya yano &copy; 2014<div>
+			<div>Author: yuya yano (@yymm) &copy; 2014<div>
 			<a class='fa fa-twitter fa-3x' href='https://twitter.com/yymm6666/' style='color: #55acee;'></a>
 			<a class='fa fa-facebook fa-3x' href='https://www.facebook.com/profile.php?id=100004267713034' style='color: #8b9dc3;'></a>
 			<a class='fa fa-github fa-3x' href='https://github.com/yymm/MemoMemo' style='color: #eee;'></a>

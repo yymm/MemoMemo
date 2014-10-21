@@ -251,8 +251,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 					if(this.active && !this.activeTag){
 						this.Update();
 						this.mouse.set(
-							((-event.pageY + this.position.y + document.documentElement.scrollTop) * 2 / this.size.height + 1) * 3.8,
-							((event.pageX - this.position.x) * 2 / this.size.width - 1) * 3.8
+							//((-event.pageY + this.position.y + document.documentElement.scrollTop) * 2 / this.size.height + 1) * 3.8,
+							//((event.pageX - this.position.x) * 2 / this.size.width - 1) * 3.8
+							((-event.pageY + this.position.y + document.documentElement.scrollTop) * 2 / this.size.height + 1) * 0.4,
+							((event.pageX - this.position.x) * 2 / this.size.width - 1) * 0.4
 						);
 					}
 				}.call(self, event);

@@ -6,3 +6,5 @@ wiki
 *.cfg
 *.sh
 *.sql
+*.un~
+*.json

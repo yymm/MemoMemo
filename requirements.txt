@@ -1,9 +1,6 @@
 Flask
 Flask-SQLAlchemy
 Flask-SocketIO
-Flask-Sockets
 Sphinx
 PyMySQL
-pytest
 colour
-gunicorn

@@ -14,7 +14,6 @@ from memomemo.utils import datetime2str, str2datetime, parse_rst
 db = SQLAlchemy(app)
 db_session = db.session
 
-
 @event.listens_for(Pool, "checkout")
 def ping_connection(dbapi_connection, connection_record, connection_proxy):
     '''
@@ -39,6 +38,7 @@ class User(db.Model):
     name = db.Column(db.String(50), unique=True)
     password = db.Column(db.String(50))
     memos = db.relationship('Memo', backref='user')
+    config = db.relationship('Config', uselist=False, backref='user')
     
     def __init__(self, name, password):
         self.name = name
@@ -119,6 +119,7 @@ class Memo(db.Model):
     tag = db.Column(db.String(100))
     date_time = db.Column(db.DateTime(), unique=True)
     publish = db.Column(db.Integer)
+    paser = db.Column(db.String(20))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
     def __init__(self, user_id, title, text, tag, date_time=None):
@@ -129,6 +130,7 @@ class Memo(db.Model):
         self.date_time = str2datetime(date_time) \
             if date_time else datetime.datetime.today()
         self.publish = 0
+        self.paser = 'ReST'
 
     def dump_json(self):
         dic = {}
@@ -141,6 +143,15 @@ class Memo(db.Model):
         return json.dumps(dic)
 
 
+class Config(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    json = db.Column(db.Text)
+
+    def __init__(self, user_id):
+        self.user_id = user_id
+
+
 def init_db():
     db.create_all()
 
@@ -149,8 +160,8 @@ def add_user(name, password):
     user = User.query.filter_by(name=name).first()
 
     if not user:
-        u = User(name, password)
-        db.session.add(u)
+        user = User(name, password)
+        db.session.add(user)
         db.session.commit()
 
     return user

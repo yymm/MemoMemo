@@ -3,14 +3,36 @@
 
 {% block head %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/cumulus.js') }}"></script>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/menu_ui.css') }}">
+<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/index.css') }}">
 <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/0.9.16/socket.io.min.js"></script>
 {% endblock %}
 
+{% if session.user_id %}
+{% block metanav%}
+	<span class='fa fa-bars fa-2x'></span>
+	<!--<span class='fa fa-info-circle fa-2x' id='setting'></span>-->
+	<!--<a class='fa fa-power-off fa-2x' href="{{ url_for('logout') }}" style='color: red; opacity: 0.8;'></a>-->
+	<div id='setting-container setting hidden'>
+		<div class='setting hidden'>
+			<h2>User</h2>
+			<ul>
+				<li><b>ID: </b><span id='user_id'>{{ id }}</span>
+				<li><b>Name: </b>{{ name }}
+			</ul>
+		</div>
+		<div class='setting hidden'>
+			<h2>Memo</h2>
+			<ul>
+				<li><b>Num: </b>{{ memo_num }}
+				<li><b>TagNum: </b>{{ tag_num }}
+		</div>
+	</div>
+{% endblock %}
+{% endif %}
 
 {% block body %}
 
-<script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/index.js') }}"></script>
 
 {% if session.user_id %}
 <!--Cumulusjs-->
@@ -24,70 +46,86 @@
 <!--Side Menu-->
 <div class="menu-ui">
 	<!--addentry-div-->
-	<div class="menu addentry-div">
-		<p class="icon fa fa-pencil fa-2x" style='top: 3px; left: 6px;'></p>
-		<form onsubmit="return false;" class='addentry-form'>
-			<div class="lock-switch">
-				<input type="checkbox" id="lock-check"></input>
-				<label for="lock-check">
-					<div class="lock-label"></div>
-				</label>
-			</div>
-   			<dl>
-    		   	<dt>Title:
-    		   	<dd><input type="text" name="title" class="menu-input memo-input-title" placeholder="Title">
-    		   	<dt>Text:
-				<dd><textarea name="text" class="menu-input memo-input-text" placeholder="Text ( Use reStructuredText, but do not use heading! )"></textarea>
-				<dt>Tag:
-				<dd><input type="text" name="tag" class="menu-input memo-input-tag" placeholder="Tag">
-				<dd><input type="button" value="Commit" class="menu-btn commit-button">
-	   		</dl>
-   		</form>
+	<div class="menu addentry-div dialogbtn">
+		<a class="icon fa fa-pencil fa-2x showdlg" style='top: 3px; left: 6px;' href="#entrydlg"></a>
 	</div>
 	<!--search-div-->
-	<div class="menu search-div">
-		<p class="icon fa fa-search fa-2x" style='top: 3px;'></p>
-		<form id="search-form" onsubmit="return false;">
-			<input type="text", name="title"  placeholder="Title" class='menu-input'></input>
-			<input type="text", name="tag" placeholder="Tag" class='menu-input'></input>
-			<div id='date-selector'>
-				<select name="year">
-				</select>
-				<select name="month">
-				</select>
-				<select name="day" style='margin-right: 0;'>
-				</select>
-			</div>
-			<input type="button" value="Submit" class="menu-btn submit-button"></input>
-		</form>
+	<div class="menu search-div dialogbtn">
+		<a class="icon fa fa-search fa-2x showdlg" style='top: 3px; left: 5px;' href="#searchdlg"></a>
 	</div>
 	<!--cumulunimbus-div-->
-	<div class="menu cumulunimbus-div">
-		<p class="icon fa fa-cloud fa-2x" style='top: 4px; left: 3px;'></p>
-		<div id="tagCloud"></div>
-		<script type="text/javascript">
-			tagCloud.Distribute(document.getElementById("tagCloud")).Animate(); 
-		</script>
+	<div class="menu cumulunimbus-div dialogbtn">
+		<a class="icon fa fa-cloud fa-2x showdlg" style='top: 4px; left: 3px;' href="#cumulusdlg"></a>
 	</div>
 	<!--tagcloud-div-->
-	<div class="menu tagcloud-div">
-		<p class="icon fa fa-tags fa-2x"></p>
-		<div style='height: 5%;'></div>
-		<div>
-			{% for tag in tags %}
-			<span class='tag' style='border: 2px solid {{ tag['color'] }};'><i>{{ tag['name'] }}</i>:{{ tag['num'] }}</span>
-			{% endfor %}
-		</div>
+	<div class="menu tagcloud-div dialogbtn">
+		<a class="icon fa fa-tags fa-2x showdlg" style='top: 5px; left: 4px;' href="#tagdlg"></a>
 	</div>
 </div>
 
-
-<div style='width: 100%; height: 50px;'></div>
-<div id="container">
+<!--Dialog-->
+<div id="entrydlg" class="dialog">
+	<a href="#entrydlg" class="fa fa-times fa-3x closedlg"></a>
+	<h1>Edit</h1>
+	<div id="edit-menu">
+		<div class="paser-switch">
+			<input type="radio" id="rest" name="paser" checked="" />
+			<label for="rest">ReST</label>
+			<input type="radio" id="mkd" name="paser" />
+			<label for="mkd">Markdown</label>
+		</div>
+		<div class="clear-btn">
+			<span class="fa fa-times"></span><span>Clear</span>
+		</div>
+		<div class="public-btn">
+			<input type="checkbox" id="public" name="public-btn" />
+			<label for="public">Public</label>
+		</div>
+	</div>
+	<form onsubmit="return false;" class='addentry-form'>
+		<dl>
+		   	<dt>Title:
+		   	<dd><input type="text" name="title" class="menu-input memo-input-title" placeholder="Title">
+		   	<dt>Text:
+			<dd><textarea name="text" class="menu-input memo-input-text" placeholder="Text ( Use reStructuredText, but do not use heading! )"></textarea>
+			<dt>Tag:
+			<dd><input type="text" name="tag" class="menu-input memo-input-tag" placeholder="Tag">
+			<dd><input type="button" value="Submit" class="menu-btn commit-button">
+   		</dl>
+	</form>
+</div>
+<div id="searchdlg" class="dialog">
+	<a href="#searchdlg" class="fa fa-times fa-3x closedlg"></a>
+	<h1>Search</h1>
+	<form id="search-form" onsubmit="return false;">
+		<input type="text", name="title"  placeholder="Title" class='menu-input'></input>
+		<input type="text", name="text"  placeholder="Text" class='menu-input'></input>
+		<input type="text", name="tag" placeholder="Tag" class='menu-input'></input>
+		<input type="button" value="Submit" class="menu-btn submit-button"></input>
+	</form>
+</div>
+<div id="cumulusdlg" class="dialog">
+	<a href="#cumulusdlg" class="fa fa-times fa-3x closedlg"></a>
+	<h1>Cumulus</h1>
+	<div id="tagCloud"></div>
+	<script type="text/javascript">
+		tagCloud.Distribute(document.getElementById("tagCloud")).Animate(); 
+	</script>
+</div>
+<div id="tagdlg" class="dialog">
+	<a href="#tagdlg" class="fa fa-times fa-3x closedlg"></a>
+	<h1>TagCloud</h1>
+	<div id="tag-container">
+		{% for tag in tags %}
+		<span class='tag' style='border: 2px solid {{ tag['color'] }};'><i>{{ tag['name'] }}</i>:{{ tag['num'] }}</span>
+		{% endfor %}
+	</div>
 </div>
 
-<!--<script type="text/javascript" src="{{ url_for('static', filename='js/script.js') }}"></script>-->
-{% endif %}
+<div style='width: 100%; height: 50px;'></div>
+<div id="container"></div>
+<div style='width: 100%; height: 50px;'></div>
 
+{% endif %}
 
 {% endblock %}
