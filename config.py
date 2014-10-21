@@ -8,7 +8,7 @@ SECRET_KEY = os.environ['MEMOMEMO_SECRET_KEY'] \
 # Deploy
 SQLALCHEMY_DATABASE_URI = os.environ['MEMOMEMO_DATABASE_URI'] \
     if 'MEMOMEMO_DATABASE_URI' in os.environ else \
-    'mysql+pymysql://root:root@localhost/memomemo'  # Local
+    'mysql+pymysql://root@localhost/memomemo'  # Local
     #'sqlite:///memomemo.db'
 
 # Heroku(ClearDB)
