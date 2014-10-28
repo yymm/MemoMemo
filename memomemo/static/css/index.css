@@ -7,17 +7,37 @@
 	font-size: 2.0em; 
 	font-weight: bold;
 }
-/*a, h1, h2, h3, h4, h5 { */
+a, h1, h2, h3, h4, h5 { 
 	/*color: #87ceeb; */
-	/*color: #da784b; */
-/*}*/
-h1:before, h2:before, h3:before, h4:before, h5:before {
-    content: "✘ ";
+	color: #e6dfcb;
 }
 h1, h2, h3, h4, h5 {
 	color: #e6dfcb;
 	margin: 20px 0 5px;
 	padding: 0 0 15px;
+}
+#memo-inner h1:before,
+#memo-inner h2:before,
+#memo-inner h3:before,
+#memo-inner h4:before,
+#memo-inner h5:before {
+    content: "✘ ";
+}
+/************/
+/* contents */
+/************/
+#contents {
+	border-bottom: 1px dotted #777;
+	margin: 15px;
+	padding-bottom: 30px;
+	}
+.topic-title {
+	color: #e6dfcb;
+	font-size: 120%;
+	padding-bottom: 10px;
+}
+.topic-title:before {
+	content: "✔ ";
 }
 /***********/
 /* menu UI */
