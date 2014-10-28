@@ -148,3 +148,12 @@ def delete_memo():
         if user.delete_memo(json_data):
             return json.dumps({'status': 'success'})
     return None
+
+@app.route('/<user>')
+def show_public(user):
+    u = User.query.filter_by(name=user)
+
+    if u:
+        return render_template('public.html', **locals())
+
+    return render_template('404.html')

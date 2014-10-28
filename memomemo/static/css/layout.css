@@ -32,6 +32,10 @@ li ol {
 .reference {
 	color: #3BBC46;
 }
+img {
+	max-width: 600px;
+	height: auto;
+}
 /***************/
 /* flash alert */
 /***************/
