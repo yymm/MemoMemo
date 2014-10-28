@@ -11,18 +11,30 @@ a, h1, h2, h3, h4, h5 {
 	/*color: #87ceeb; */
 	color: #e6dfcb;
 }
-h1, h2, h3, h4, h5 {
+.memo-inner h1:before,
+.memo-inner h2:before,
+.memo-inner h3:before,
+.memo-inner h4:before,
+.memo-inner h5:before {
+    content: "✘ ";
+}
+.memo-inner h1,
+.memo-inner h2,
+.memo-inner h3,
+.memo-inner h4,
+.memo-inner h5 {
 	color: #e6dfcb;
 	margin: 20px 0 5px;
 	padding: 0 0 15px;
 }
-#memo-inner h1:before,
-#memo-inner h2:before,
-#memo-inner h3:before,
-#memo-inner h4:before,
-#memo-inner h5:before {
-    content: "✘ ";
+.memo-inner h1 a,
+.memo-inner h2 a,
+.memo-inner h3 a,
+.memo-inner h4 a,
+.memo-inner h5 a {
+	text-decoration: none;
 }
+
 /************/
 /* contents */
 /************/
