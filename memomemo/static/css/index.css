@@ -228,6 +228,7 @@ a, h1, h2, h3, h4, h5 {
 /***********/
 
 #container {
+	line-height: 1.4;
 	margin: 0 auto;
 	padding-left: 90px;
 	padding-right: 10px;
