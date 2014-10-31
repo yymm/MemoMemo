@@ -36,6 +36,9 @@ img {
 	max-width: 600px;
 	height: auto;
 }
+pre {
+	line-height: 1.1;
+}
 /***************/
 /* flash alert */
 /***************/
