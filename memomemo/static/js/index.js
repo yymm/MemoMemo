@@ -1,4 +1,19 @@
 $(document).ready(function(){
+
+	marked.setOptions({
+	  renderer: new marked.Renderer(),
+	  gfm: true,
+	  tables: true,
+	  breaks: false,
+	  pedantic: false,
+	  sanitize: true,
+	  smartLists: true,
+	  smartypants: false,
+	  highlight: function (code) {
+	    return hljs.highlightAuto(code).value;
+	  }
+	});
+
 	//
 	// SocketIO event
 	//
@@ -69,20 +84,20 @@ $(document).ready(function(){
 	}
 	//clear_addentry();
 
-	$('.commit-button').click( function(){
+	$('.commit-button').click( function() {
 		var url = '/add';	// {{{
 		var memo = {
 			title : $('input[name="title"]').val(),
 			text : $('.memo-input-text').val(),
-			tag : $('input[name="tag"]').val()
+			tag : $('input[name="tag"]').val(),
+			paser: $("label[for='"+$("input:radio[name='paser']:checked").attr("id")+"']").text()
 		};
 		if (!memo.title || !memo.text) {
 			alertFlash("Nothing input...", 'warning');
 			return false;
 		}
 		// Update check
-		if (update_flag)
-		{
+		if (update_flag) {
 			url = '/update';
 			memo.date = update_date;
 		}
@@ -152,10 +167,14 @@ $(document).ready(function(){
 				        "</div>";
 		var a =         '<a class="memo-delete">delete</a>' + 
 				        '<a class="memo-edit">edit</a><div class="memo-inner">';
+		if (memo.paser == "Markdown") {
+			memo.text = marked(memo.basetext);
+		}
 		var text =      memo.text; // html
 		var meta =      '</div><p class="memo-title-only" style="display: none;">' + spchar_encoder(memo.title) + '</p>' +
 				        '<p class="memo-text" style="display: none;">' + spchar_encoder(memo.basetext) + '</p>' + 
-				        '<p class="memo-id" style="display: none;">' + memo.id + '</p>';
+				        '<p class="memo-id" style="display: none;">' + memo.id + '</p>' +
+						'<p class="memo-paser" style="display: none;">' + memo.paser + '</p>';
 		var div_end= '</div>';
 
 		return div + h1 + a + text + meta + div_end;
@@ -170,9 +189,25 @@ $(document).ready(function(){
 			var text = $(this).closest('div').find('.memo-text').text();
 			var date = $(this).closest('div').find('.memo-date').text();
 			var tag = $(this).closest('div').find('.memo-tag').text();
+			var paser = $(this).closest('div').find('.memo-paser').text();
 			$('.memo-input-title').val(spchar_decoder(title));
 			$('.memo-input-text').val(spchar_decoder(text));
 			$('.memo-input-tag').val(spchar_decoder(tag));
+			if (paser == "Markdown") {
+				$('#rest').attr("checked", false);
+				$('#mkd').attr("checked", "");
+				$('#mkd + label').css("background", "#ecf0f1");
+				$('#mkd + label').css("color", "#222");
+				$('#rest + label').css("background", "none");
+				$('#rest + label').css("color", "#fff");
+			} else {
+				$('#mkd').attr("checked", false);
+				$('#rest').attr("checked", "");
+				$('#rest + label').css("background", "#ecf0f1");
+				$('#rest + label').css("color", "#222");
+				$('#mkd + label').css("background", "none");
+				$('#mkd + label').css("color", "#fff");
+			}
 			// Update Info
 			update_memo = $(this).closest('div');
 			update_flag = true;
@@ -240,6 +275,24 @@ $(document).ready(function(){
 		}else{
 			$('.public-btn').css("background", "#ff8800");
 			$('.public-btn label').css("color", "#FFF");
+		}
+	});
+	$('.paser-label + label').click(function(){
+		var checked_id = $(this).attr("id");
+		if (checked_id == "lrest") {
+			$('#mkd').attr("checked", false);
+			$('#rest').attr("checked", "");
+			$('#rest + label').css("background", "#ecf0f1");
+			$('#rest + label').css("color", "#222");
+			$('#mkd + label').css("background", "none");
+			$('#mkd + label').css("color", "#fff");
+		} else {
+			$('#rest').attr("checked", false);
+			$('#mkd').attr("checked", "");
+			$('#mkd + label').css("background", "#ecf0f1");
+			$('#mkd + label').css("color", "#222");
+			$('#rest + label').css("background", "none");
+			$('#rest + label').css("color", "#fff");
 		}
 	});
 });

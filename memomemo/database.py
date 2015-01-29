@@ -48,7 +48,8 @@ class User(db.Model):
         memo = Memo(self.id,
                     json_data['title'],
                     json_data['text'],
-                    json_data['tag'])
+                    json_data['tag'],
+                    json_data['paser'])
         db_session.add(memo)
         db_session.commit()
         return memo
@@ -61,6 +62,7 @@ class User(db.Model):
             memo.title = json_data['title']
             memo.text = json_data['text']
             memo.tag = json_data['tag']
+            memo.paser = json_data['paser']
             memo.date_time = datetime.datetime.today()
             db_session.commit()
             return memo
@@ -122,7 +124,7 @@ class Memo(db.Model):
     paser = db.Column(db.String(20))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __init__(self, user_id, title, text, tag, date_time=None):
+    def __init__(self, user_id, title, text, tag, paser, date_time=None):
         self.user_id = user_id
         self.title = title
         self.text = text
@@ -130,14 +132,18 @@ class Memo(db.Model):
         self.date_time = str2datetime(date_time) \
             if date_time else datetime.datetime.today()
         self.publish = 0
-        self.paser = 'ReST'
+        self.paser = paser
 
     def dump_json(self):
         dic = {}
         dic['title'] = self.title
         dic['basetext'] = self.text
-        dic['text'] = parse_rst(self.text)
+        if self.paser == "Markdown":
+            dic['text'] = ""
+        else:
+            dic['text'] = parse_rst(self.text)
         dic['tag'] = self.tag
+        dic['paser'] = self.paser
         dic['date_time'] = datetime2str(self.date_time)
         dic['publish'] = self.publish
         return json.dumps(dic)

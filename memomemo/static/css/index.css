@@ -387,10 +387,10 @@ label {
   cursor: pointer;
   border-radius: 5px;
 }
-input[type="radio"]:checked + label {
-  background: #ecf0f1;
-  color: #222;
-}
+/*input[type="radio"]:checked + label {*/
+  /*background: #ecf0f1;*/
+  /*color: #222;*/
+/*}*/
 /*
  *
  */
