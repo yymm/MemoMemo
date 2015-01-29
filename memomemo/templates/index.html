@@ -90,8 +90,13 @@
 		   	<dt>Text:
 			<dd><textarea name="text" class="menu-input memo-input-text" placeholder="Text ( Use reStructuredText, but do not use heading! )"></textarea>
 			<dt>Tag:
-			<dd><input type="text" name="tag" class="menu-input memo-input-tag" placeholder="Tag">
+			<dd><input type="text" name="tag" class="menu-input memo-input-tag" placeholder="Tag" list="taglist">
 			<dd><input type="button" value="Submit" class="menu-btn commit-button">
+			<datalist id="taglist">
+				{% for tag in tags %}
+				<option value="{{ tag['name'] }}"></option>
+				{% endfor %}
+			</datalist>
    		</dl>
 	</form>
 </div>
