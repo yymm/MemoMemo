@@ -2,7 +2,7 @@
 // Flash alert
 //
 function alertFlash(message, category){
-	var prnt = document.createElement('div');	// {{{
+	var prnt = document.createElement('div');
 	var child = document.createElement('button');
 	prnt.className = 'flash-alert';
 	prnt.id = category === undefined ? 'important' : category;
@@ -21,29 +21,6 @@ function alertFlash(message, category){
 				$(this).remove();
 		});
 	}, 5000);
-}	// }}}
-
-//
-// Toggle Dialog
-//
-$(document).ready(function(){
-	$('a.showdlg').click(function(){
-		var dialog = $(this).attr('href');
-		$(dialog).fadeIn(200);
-		$('body').prepend('<div id="over">');
-		$('#over').fadeIn(200);
-		return false;
-	})
-});
-
-$(document).ready(function(){
-	$('a.closedlg').click(function(){
-		var dialog = $(this).attr('href');
-		$(dialog).fadeOut(200);
-		$('#over').fadeOut(200);
-		$('#over').remove();
-		return false;
-	})
-});
+}
 
 /* vim:set foldmethod=marker: */

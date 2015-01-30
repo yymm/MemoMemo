@@ -15,6 +15,30 @@ $(document).ready(function(){
 	});
 
 	//
+	// Toggle Dialog
+	//
+	$(document).ready(function(){
+		$('a.showdlg').click(function(){
+			clear_addentry();
+			var dialog = $(this).attr('href');
+			$(dialog).fadeIn(200);
+			$('body').prepend('<div id="over">');
+			$('#over').fadeIn(200);
+			return false;
+		})
+	});
+	
+	$(document).ready(function(){
+		$('a.closedlg').click(function(){
+			var dialog = $(this).attr('href');
+			$(dialog).fadeOut(200);
+			$('#over').fadeOut(200);
+			$('#over').remove();
+			return false;
+		})
+	});
+
+	//
 	// SocketIO event
 	//
 	namespace = '/memo';
@@ -82,7 +106,7 @@ $(document).ready(function(){
 		update_flag = false;
 		update_date = null;
 	}
-	//clear_addentry();
+	clear_addentry();
 
 	$('.commit-button').click( function() {
 		var url = '/add';	// {{{
