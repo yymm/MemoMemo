@@ -62,13 +62,14 @@ def filter(msg):
 def memo_recieve_log(msg):
     print(msg['log'])
     emit('log response', {'log': msg['log']})
+    f = {'user_id': session['user_id'], 'title': None, 'tag': None}
+    show_memos(f, '/public')
 
 
 @socketio.on('connect', namespace='/public')
 def connect():
     print('Client connected')
-    f = {'user_id': session['user_id'], 'title': None, 'tag': None}
-    show_memos(f, '/public')
+    emit('log response', {'log': msg['log']})
 
 
 @socketio.on('disconnect', namespace='/public')

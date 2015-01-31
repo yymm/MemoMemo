@@ -1,4 +1,3 @@
-
 ///////////// LOGIN ////////////////
 
 $("#loginbox").mouseenter( function () {
@@ -52,4 +51,30 @@ $("#oauthbox").mouseenter( function () {
 
 $("#oauthbox").mouseleave( function () {
    $("#oauthbox").removeClass("showoauth");
+});
+
+$(document).ready(function(){
+
+	//
+	// Toggle Dialog
+	//
+	$(document).ready(function(){
+		$('a.showdlg').click(function(){
+			var dialog = $(this).attr('href');
+			$(dialog).fadeIn(200);
+			$('body').prepend('<div id="over">');
+			$('#over').fadeIn(200);
+			return false;
+		})
+	});
+	
+	$(document).ready(function(){
+		$('a.closedlg').click(function(){
+			var dialog = $(this).attr('href');
+			$(dialog).fadeOut(200);
+			$('#over').fadeOut(200);
+			$('#over').remove();
+			return false;
+		})
+	});
 });

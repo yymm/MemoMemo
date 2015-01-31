@@ -19,13 +19,21 @@ $(document).ready(function(){
 	//
 	$(document).ready(function(){
 		$('a.showdlg').click(function(){
-			clear_addentry();
 			var dialog = $(this).attr('href');
+			if (dialog === "#entrydlg") {
+				$('#mkd').attr("checked", false);
+				$('#rest').attr("checked", "");
+				$('#rest + label').css("background", "#ecf0f1");
+				$('#rest + label').css("color", "#222");
+				$('#mkd + label').css("background", "none");
+				$('#mkd + label').css("color", "#fff");
+				clear_addentry();
+			}
 			$(dialog).fadeIn(200);
 			$('body').prepend('<div id="over">');
 			$('#over').fadeIn(200);
 			return false;
-		})
+		});
 	});
 	
 	$(document).ready(function(){
@@ -35,7 +43,7 @@ $(document).ready(function(){
 			$('#over').fadeOut(200);
 			$('#over').remove();
 			return false;
-		})
+		});
 	});
 
 	//
