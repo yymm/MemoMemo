@@ -257,6 +257,14 @@ a, h1, h2, h3, h4, h5 {
     font-size: 16px;
 	color: #ff9c77;
 }
+.memo-publish {
+	margin-left: 1em;
+	padding: 4px 8px;
+	border-radius: 5px;
+    font-size: 20px;
+	color: #FFF;
+	background-color: #ff8800;
+}
 .memo-edit,
 .memo-delete {
     font-size: 14px;
@@ -387,24 +395,20 @@ label {
   cursor: pointer;
   border-radius: 5px;
 }
-/*input[type="radio"]:checked + label {*/
-  /*background: #ecf0f1;*/
-  /*color: #222;*/
-/*}*/
 /*
  *
  */
-#public {
-	display: none;
+#publish {
+  display: none;
 }
-.public-btn {
+.publish-btn {
   float: right;
   padding: 5px;
   margin-right: 10px;
   display: block;
   border-radius: 5px;
 }
-.public-btn label {
+.publish-btn label {
   height: 21px;
   line-height: 21px;
   cursor: pointer;
@@ -415,10 +419,6 @@ label {
   -o-transition:all 1s;
   -ms-transition:all 1s;
 }
-/*.public-btn label:hover {*/
-  /*color: #eee;*/
-  /*text-shadow: 2px 2px 3px rgba(0, 0, 0, 0.0);*/
-/*}*/
 /*
  *
  */

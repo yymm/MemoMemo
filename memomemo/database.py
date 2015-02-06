@@ -49,7 +49,8 @@ class User(db.Model):
                     json_data['title'],
                     json_data['text'],
                     json_data['tag'],
-                    json_data['paser'])
+                    json_data['paser'],
+                    publish=json_data['publish'])
         db_session.add(memo)
         db_session.commit()
         return memo
@@ -63,6 +64,7 @@ class User(db.Model):
             memo.text = json_data['text']
             memo.tag = json_data['tag']
             memo.paser = json_data['paser']
+            memo.publish = json_data['publish']
             memo.date_time = datetime.datetime.today()
             db_session.commit()
             return memo
@@ -124,14 +126,15 @@ class Memo(db.Model):
     paser = db.Column(db.String(20))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
 
-    def __init__(self, user_id, title, text, tag, paser, date_time=None):
+    def __init__(self, user_id, title, text, tag, paser, date_time=None,
+            publish=0):
         self.user_id = user_id
         self.title = title
         self.text = text
         self.tag = tag
         self.date_time = str2datetime(date_time) \
             if date_time else datetime.datetime.today()
-        self.publish = 0
+        self.publish = publish
         self.paser = paser
 
     def dump_json(self):
@@ -189,7 +192,7 @@ def delete_user(user):
     db.session.commit()
 
 
-def filter_memo(json_data):
+def filter_memo(json_data, publish):
     '''
     Example: json_data
     {'title': 'hoge',
@@ -198,6 +201,12 @@ def filter_memo(json_data):
     '''
     user_id = json_data['user_id']
     now = datetime.datetime.now()
+
+    if publish:
+        memos = Memo.query.filter_by(user_id=user_id). \
+                filter_by(publish=1). \
+                order_by(Memo.date_time.desc()).all()
+        return memos
 
     if not json_data['title'] and not json_data['tag']:
         # default time gap: 24 hours
@@ -209,11 +218,11 @@ def filter_memo(json_data):
         # newest 10 memos
         memos  = Memo.query.filter_by(user_id=user_id). \
             order_by(Memo.date_time.desc()).limit(10).all()
-        # Especially TODO title
-        todo = Memo.query.filter_by(user_id=user_id). \
-            filter_by(title='TODO').first()
-        if todo:
-            memos.insert(0, todo)
+         #Especially TODO title
+        #todo = Memo.query.filter_by(user_id=user_id). \
+            #filter_by(title='TODO').first()
+        #if todo:
+            #memos.insert(0, todo)
         return memos
 
     title = json_data['title']

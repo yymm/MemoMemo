@@ -22,8 +22,8 @@ from memomemo.database import db_session, User, filter_memo, \
                               varify_user, add_user
 
 
-def show_memos(json_filter, namespace):
-    memos = filter_memo(json_filter)
+def show_memos(json_filter, namespace, publish=None):
+    memos = filter_memo(json_filter, publish=publish)
     import time
     for i, memo in enumerate(memos):
         emit('memo response', memo.dump_json(), namespace=namespace)
@@ -58,18 +58,17 @@ def filter(msg):
     show_memos(json.loads(msg), '/public')
 
 
-@socketio.on('recieve log', namespace='/public')
+@socketio.on('connection response', namespace='/public')
 def memo_recieve_log(msg):
-    print(msg['log'])
-    emit('log response', {'log': msg['log']})
-    f = {'user_id': session['user_id'], 'title': None, 'tag': None}
-    show_memos(f, '/public')
+    u = User.query.filter_by(name=msg['user']).first()
+    f = {'user_id': u.id, 'title': None, 'tag': None}
+    show_memos(f, '/public', publish=True)
 
 
 @socketio.on('connect', namespace='/public')
 def connect():
     print('Client connected')
-    emit('log response', {'log': msg['log']})
+    emit('log response', {'log': 'Connection'})
 
 
 @socketio.on('disconnect', namespace='/public')

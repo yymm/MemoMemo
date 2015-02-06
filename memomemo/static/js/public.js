@@ -46,7 +46,7 @@ $(document).ready(function(){
 	socket.on('connect', function() {
 		var path = location.pathname.substr(1);
 		console.log(path);
-		socket.emit('recieve log', {log: 'Success to connect!'});
+		socket.emit('connection response', {user: path});
 	});
 
 	socket.on('memo response', function(msg) {

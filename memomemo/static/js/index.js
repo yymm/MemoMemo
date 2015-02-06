@@ -27,6 +27,9 @@ $(document).ready(function(){
 				$('#rest + label').css("color", "#222");
 				$('#mkd + label').css("background", "none");
 				$('#mkd + label').css("color", "#fff");
+				$('.publish-btn').css("background", "none");
+				$('.publish-btn label').css("color", "#000");
+				$('#publish').attr('checked', false);
 				clear_addentry();
 			}
 			$(dialog).fadeIn(200);
@@ -122,7 +125,8 @@ $(document).ready(function(){
 			title : $('input[name="title"]').val(),
 			text : $('.memo-input-text').val(),
 			tag : $('input[name="tag"]').val(),
-			paser: $("label[for='"+$("input:radio[name='paser']:checked").attr("id")+"']").text()
+			paser: $("label[for='"+$("input:radio[name='paser']:checked").attr("id")+"']").text(),
+			publish: ($("#publish").attr("checked") === undefined)? 0 : 1
 		};
 		if (!memo.title || !memo.text) {
 			alertFlash("Nothing input...", 'warning');
@@ -195,21 +199,26 @@ $(document).ready(function(){
 		var div =    "<div class='memo-div' style='display: none;'>";
 		var h1 =        "<div class='headline memo-title'>" + spchar_encoder(memo.title) +
 				            "<var class='memo-date'>" + spchar_encoder(memo.date_time) + "</var>" +
-				            "<var class='memo-tag'>"  + spchar_encoder(memo.tag) + "</var>" +
-				        "</div>";
+				            "<var class='memo-tag'>"  + spchar_encoder(memo.tag) + "</var>";
+		var h1_c =   "</div>";
 		var a =         '<a class="memo-delete">delete</a>' + 
 				        '<a class="memo-edit">edit</a><div class="memo-inner">';
 		if (memo.paser == "Markdown") {
 			memo.text = marked(memo.basetext);
 		}
+		var pub = "";
+		if (memo.publish == 1) {
+			pub = "<var class='memo-publish'><span class='fa fa-check-square'></span>Publish</var>"
+		}
 		var text =      memo.text; // html
 		var meta =      '</div><p class="memo-title-only" style="display: none;">' + spchar_encoder(memo.title) + '</p>' +
 				        '<p class="memo-text" style="display: none;">' + spchar_encoder(memo.basetext) + '</p>' + 
 				        '<p class="memo-id" style="display: none;">' + memo.id + '</p>' +
-						'<p class="memo-paser" style="display: none;">' + memo.paser + '</p>';
+						'<p class="memo-paser" style="display: none;">' + memo.paser + '</p>' +
+						'<p class="memo-publish" style="display: none;">' + memo.publish + '</p>';
 		var div_end= '</div>';
 
-		return div + h1 + a + text + meta + div_end;
+		return div + h1 + pub + h1_c + a + text + meta + div_end;
 	}	// }}}
 
 	function set_attr(memo)
@@ -222,6 +231,7 @@ $(document).ready(function(){
 			var date = $(this).closest('div').find('.memo-date').text();
 			var tag = $(this).closest('div').find('.memo-tag').text();
 			var paser = $(this).closest('div').find('.memo-paser').text();
+			var publish = $(this).closest('div').find('.memo-publish').text();
 			$('.memo-input-title').val(spchar_decoder(title));
 			$('.memo-input-text').val(spchar_decoder(text));
 			$('.memo-input-tag').val(spchar_decoder(tag));
@@ -239,6 +249,15 @@ $(document).ready(function(){
 				$('#rest + label').css("color", "#222");
 				$('#mkd + label').css("background", "none");
 				$('#mkd + label').css("color", "#fff");
+			}
+			if(publish == 0) {
+				$('.publish-btn').css("background", "none");
+				$('.publish-btn label').css("color", "#000");
+				$('#publish').attr('checked', false);
+			}else{
+				$('.publish-btn').css("background", "#ff8800");
+				$('.publish-btn label').css("color", "#FFF");
+				$('#publish').attr('checked', true);
 			}
 			// Update Info
 			update_memo = $(this).closest('div');
@@ -299,14 +318,16 @@ $(document).ready(function(){
 	$('.clear-btn').click(function(){
 		clear_addentry();
 	});
-	$('.public-btn').click(function(){
-		console.log($('#public:checked').val());
-		if($('#public:checked').val() === undefined) {
-			$('.public-btn').css("background", "none");
-			$('.public-btn label').css("color", "#000");
+	$('#publish-label').click(function(){
+		var val = $('#publish').attr('checked');
+		if(val == undefined) {
+			$('.publish-btn').css("background", "#ff8800");
+			$('.publish-btn label').css("color", "#FFF");
+			$('#publish').attr('checked', true);
 		}else{
-			$('.public-btn').css("background", "#ff8800");
-			$('.public-btn label').css("color", "#FFF");
+			$('.publish-btn').css("background", "none");
+			$('.publish-btn label').css("color", "#000");
+			$('#publish').attr('checked', false);
 		}
 	});
 	$('.paser-label + label').click(function(){
