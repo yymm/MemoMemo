@@ -395,6 +395,14 @@ label {
   cursor: pointer;
   border-radius: 5px;
 }
+.paser-active {
+  background-color: #ecf0f1;
+  color: #222;
+}
+.paser-inactive {
+  background-color: none;
+  color: #fff;
+}
 /*
  *
  */

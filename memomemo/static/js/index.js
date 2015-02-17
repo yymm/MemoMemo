@@ -125,7 +125,7 @@ $(document).ready(function(){
 			title : $('input[name="title"]').val(),
 			text : $('.memo-input-text').val(),
 			tag : $('input[name="tag"]').val(),
-			paser: $("label[for='"+$("input:radio[name='paser']:checked").attr("id")+"']").text(),
+			paser: document.querySelector(".paser-active").innerHTML,
 			publish: ($("#publish").attr("checked") === undefined)? 0 : 1
 		};
 		if (!memo.title || !memo.text) {
@@ -236,19 +236,15 @@ $(document).ready(function(){
 			$('.memo-input-text').val(spchar_decoder(text));
 			$('.memo-input-tag').val(spchar_decoder(tag));
 			if (paser == "Markdown") {
-				$('#rest').attr("checked", false);
-				$('#mkd').attr("checked", "");
-				$('#mkd + label').css("background", "#ecf0f1");
-				$('#mkd + label').css("color", "#222");
-				$('#rest + label').css("background", "none");
-				$('#rest + label').css("color", "#fff");
+				document.querySelector('#mkd').classList.add('paser-active');
+				document.querySelector('#mkd').classList.remove('paser-inactive');
+				document.querySelector('#rest').classList.add('paser-inactive');
+				document.querySelector('#rest').classList.remove('paser-active');
 			} else {
-				$('#mkd').attr("checked", false);
-				$('#rest').attr("checked", "");
-				$('#rest + label').css("background", "#ecf0f1");
-				$('#rest + label').css("color", "#222");
-				$('#mkd + label').css("background", "none");
-				$('#mkd + label').css("color", "#fff");
+				document.querySelector('#rest').classList.add('paser-active');
+				document.querySelector('#rest').classList.remove('paser-inactive');
+				document.querySelector('#mkd').classList.add('paser-inactive');
+				document.querySelector('#mkd').classList.remove('paser-active');
 			}
 			if(publish == 0) {
 				$('.publish-btn').css("background", "none");
@@ -330,22 +326,18 @@ $(document).ready(function(){
 			$('#publish').attr('checked', false);
 		}
 	});
-	$('.paser-label + label').click(function(){
+	$('.paser-label').click(function(){
 		var checked_id = $(this).attr("id");
-		if (checked_id == "lrest") {
-			$('#mkd').attr("checked", false);
-			$('#rest').attr("checked", "");
-			$('#rest + label').css("background", "#ecf0f1");
-			$('#rest + label').css("color", "#222");
-			$('#mkd + label').css("background", "none");
-			$('#mkd + label').css("color", "#fff");
+		if (checked_id == "rest") {
+			document.querySelector('#rest').classList.add('paser-active');
+			document.querySelector('#rest').classList.remove('paser-inactive');
+			document.querySelector('#mkd').classList.add('paser-inactive');
+			document.querySelector('#mkd').classList.remove('paser-active');
 		} else {
-			$('#rest').attr("checked", false);
-			$('#mkd').attr("checked", "");
-			$('#mkd + label').css("background", "#ecf0f1");
-			$('#mkd + label').css("color", "#222");
-			$('#rest + label').css("background", "none");
-			$('#rest + label').css("color", "#fff");
+			document.querySelector('#mkd').classList.add('paser-active');
+			document.querySelector('#mkd').classList.remove('paser-inactive');
+			document.querySelector('#rest').classList.add('paser-inactive');
+			document.querySelector('#rest').classList.remove('paser-active');
 		}
 	});
 });
