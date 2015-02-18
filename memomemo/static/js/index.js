@@ -21,12 +21,10 @@ $(document).ready(function(){
 		$('a.showdlg').click(function(){
 			var dialog = $(this).attr('href');
 			if (dialog === "#entrydlg") {
-				$('#mkd').attr("checked", false);
-				$('#rest').attr("checked", "");
-				$('#rest + label').css("background", "#ecf0f1");
-				$('#rest + label').css("color", "#222");
-				$('#mkd + label').css("background", "none");
-				$('#mkd + label').css("color", "#fff");
+				document.querySelector('#rest').classList.add('paser-active');
+				document.querySelector('#rest').classList.remove('paser-inactive');
+				document.querySelector('#mkd').classList.add('paser-inactive');
+				document.querySelector('#mkd').classList.remove('paser-active');
 				$('.publish-btn').css("background", "none");
 				$('.publish-btn label').css("color", "#000");
 				$('#publish').attr('checked', false);

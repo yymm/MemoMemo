@@ -22,6 +22,32 @@ from memomemo.database import db_session, User, filter_memo, \
                               varify_user, add_user
 
 
+@app.before_request
+def load_current_user():
+    if session.get('user_id') is not None:
+        return
+
+    if request.path == '/login':
+        return
+
+    return redirect(url_for('login'))
+
+
+@app.teardown_request
+def remove_db_session(exception):
+    db_session.remove()
+
+
+def requires_login(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if session.get('user_id') is None:
+            flash('You need to be signed in.')
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 def show_memos(json_filter, namespace, publish=None):
     memos = filter_memo(json_filter, publish=publish)
     import time
@@ -54,53 +80,32 @@ def disconnect():
 
 
 @socketio.on('filter memo', namespace='/public')
-def filter(msg):
+def filter_pub(msg):
     show_memos(json.loads(msg), '/public')
 
 
 @socketio.on('connection response', namespace='/public')
-def memo_recieve_log(msg):
+def memo_recieve_log_pub(msg):
     u = User.query.filter_by(name=msg['user']).first()
     f = {'user_id': u.id, 'title': None, 'tag': None}
     show_memos(f, '/public', publish=True)
 
 
 @socketio.on('connect', namespace='/public')
-def connect():
+def connect_pub():
     print('Client connected')
     emit('log response', {'log': 'Connection'})
 
 
 @socketio.on('disconnect', namespace='/public')
-def disconnect():
+def disconnect_pub():
     print('Client disconnected')
-
-
-@app.before_request
-def load_current_user():
-    g.user = User.query.get(session['user_id']) \
-        if 'user_id' in session else None
-
-
-@app.teardown_request
-def remove_db_session(exception):
-    db_session.remove()
-
-
-def requires_login(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        if g.user is None:
-            flash('You need to be signed in.')
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
 
 
 @app.route('/')
 @requires_login
 def index():
-    user = g.user
+    user = User.query.get(session['user_id'])
     name = user.name
     id = user.id
     tags = user.count_tags()
@@ -126,7 +131,6 @@ def login():
         user = varify_user(name, password)
         if user:
             session['user_id'] = user.id
-            g.user = user
             return redirect(url_for('index'))
 
     return render_template('login.html')
@@ -142,7 +146,7 @@ def logout():
 @requires_login
 def add_memo():
     memo = None
-    user = g.user
+    user = User.query.get(session['user_id'])
     if request.method == 'POST':
         json_data = request.json
         memo = user.add_memo(json_data)
@@ -153,7 +157,7 @@ def add_memo():
 @requires_login
 def update_memo():
     memo = None
-    user = g.user
+    user = User.query.get(session['user_id'])
     if request.method == 'POST':
         json_data = request.json
         memo = user.update_memo(json_data)
@@ -166,7 +170,7 @@ def update_memo():
 @requires_login
 def delete_memo():
     if request.method == 'POST':
-        user = g.user
+        user = User.query.get(session['user_id'])
         json_data = request.json
         if user.delete_memo(json_data):
             return json.dumps({'status': 'success'})

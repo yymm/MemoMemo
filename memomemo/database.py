@@ -209,20 +209,8 @@ def filter_memo(json_data, publish):
         return memos
 
     if not json_data['title'] and not json_data['tag']:
-        # default time gap: 24 hours
-        #ago = now - datetime.timedelta(hours=24)
-        #memos = Memo.query.filter_by(user_id=user_id). \
-            #filter(Memo.title != 'TODO'). \
-            #filter(Memo.date_time >= datetime2str(ago)). \
-            #order_by(Memo.date_time.desc()).all()
-        # newest 10 memos
         memos  = Memo.query.filter_by(user_id=user_id). \
-            order_by(Memo.date_time.desc()).limit(10).all()
-         #Especially TODO title
-        #todo = Memo.query.filter_by(user_id=user_id). \
-            #filter_by(title='TODO').first()
-        #if todo:
-            #memos.insert(0, todo)
+            order_by(Memo.date_time.desc()).all()
         return memos
 
     title = json_data['title']
