@@ -112,7 +112,7 @@ def add_memo():
     if request.method == 'POST':
         json_data = request.json
         memo = user.add_memo(json_data)
-    return memo.dump_json()
+    return json.dumps(memo.dump_dic())
 
 
 @app.route('/update', methods=['POST'])
@@ -125,7 +125,7 @@ def update_memo():
         memo = user.update_memo(json_data)
         if not memo:
             return None
-    return memo.dump_json()
+    return json.dumps(memo.dump_dic())
 
 
 @app.route('/delete', methods=['POST'])

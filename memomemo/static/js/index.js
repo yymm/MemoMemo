@@ -39,10 +39,7 @@ $(document).ready(function(){
 	
 	$(document).ready(function(){
 		$('a.closedlg').click(function(){
-			var dialog = $(this).attr('href');
-			$(dialog).fadeOut(200);
-			$('#over').fadeOut(200);
-			$('#over').remove();
+			closedlg($(this).attr('href'));
 			return false;
 		});
 	});
@@ -53,7 +50,6 @@ $(document).ready(function(){
 	namespace = '/memo';
 	var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
 
-	var filter = null;
 	var old_filter = null;
 	var connecting = false;
 
@@ -63,6 +59,10 @@ $(document).ready(function(){
 
 	socket.on('memo response', function(msg) {
 		memos = $.parseJSON(msg);
+		if (memos.length == 0) {
+			old_filter = null;
+			return;
+		}
 		for (i = 0; i < memos.length; ++i) {
 			display_memo(memos[i]);
 		}
@@ -80,7 +80,7 @@ $(document).ready(function(){
 		if (typeof title === 'undefined') title = '';
 		if (typeof text === 'undefined') text = '';
 		if (typeof tag === 'undefined') tag = '';
-		filter = {
+		var filter = {
 			query: {
 				user_id: $('#user_id').html(),
 				title: title,
@@ -93,7 +93,9 @@ $(document).ready(function(){
 		if (old_filter &&
 			filter.query.title == old_filter.query.title &&
 			filter.query.text == old_filter.query.text &&
-			filter.query.tag == old_filter.query.tag) {
+			filter.query.tag == old_filter.query.tag &&
+			filter.offset == old_filter.offset &&
+			filter.limit == old_filter.limit) {
 			return;
 		}
 		old_filter = filter;
@@ -106,19 +108,29 @@ $(document).ready(function(){
 		text = $("#search-form [name=text]").val();
 		tag = $("#search-form [name=tag]").val();
 		send_to_websocket(title, text, tag);
+		closedlg($('#searchdlg'));
 	});
 
 	$('.jsCumulus').click(function(){
 		send_to_websocket('', '', $(this).text());
+		closedlg($('#cumulusdlg'));
 	});
 
 	$('.tag').click(function(){
 		send_to_websocket('', '', $(this).children('i').text());
+		closedlg($('#tagdlg'));
 	});
 
 	$(window).bind('scroll', function(e) {
 		if($(this).scrollTop() + $(this).height() >= $(document).height()) {
-			console.log('下端までスクロールされたよっ');
+			if (old_filter == null) {
+				return;
+			}
+			offset = old_filter['offset'];
+			limit = old_filter['limit'];
+			old_filter['offset'] = limit;
+			old_filter['limit'] = limit + 10;
+			socket.emit('fetch memo', JSON.stringify(old_filter));
 		}
 	});
 
@@ -128,6 +140,13 @@ $(document).ready(function(){
 	var update_flag = false;
 	var update_date = null;
 	var update_memo = null;
+
+	function closedlg(jquery_obj) {
+		var dialog = jquery_obj;
+		$(dialog).fadeOut(200);
+		$('#over').fadeOut(200);
+		$('#over').remove();
+	};
 
 	function clear_addentry() {
 		$('.memo-input-title').val("");
@@ -175,10 +194,7 @@ $(document).ready(function(){
 					msg = 'Updated at ' + $.parseJSON(json_memo).date_time;
 				}
 				clear_addentry();
-				var dialog = $('#entrydlg');
-				$(dialog).fadeOut(200);
-				$('#over').fadeOut(200);
-				$('#over').remove();
+				closedlg($('#entrydlg'));
 				alertFlash(msg, 'information');
 			},
 			error: function(){

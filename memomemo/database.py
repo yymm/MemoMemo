@@ -137,7 +137,7 @@ class Memo(db.Model):
         self.publish = publish
         self.paser = paser
 
-    def dump_json(self):
+    def dump_dic(self):
         dic = {}
         dic['title'] = self.title
         dic['basetext'] = self.text
@@ -232,11 +232,11 @@ def query_memo(data, publish=None):
         else:
             q = q.filter(Memo.tag.like('%'+tag+'%'))
 
-    print(q.count())
+    #print(q.count())
     memos = q.order_by(Memo.date_time.desc()).slice(offset, limit).all()
 
     l = []
     for memo in memos:
-        l.append(memo.dump_json())
+        l.append(memo.dump_dic())
 
     return json.dumps(l)
