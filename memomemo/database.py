@@ -149,7 +149,8 @@ class Memo(db.Model):
         dic['paser'] = self.paser
         dic['date_time'] = datetime2str(self.date_time)
         dic['publish'] = self.publish
-        return json.dumps(dic)
+        #return json.dumps(dic)
+        return dic
 
 
 class Config(db.Model):
@@ -192,41 +193,50 @@ def delete_user(user):
     db.session.commit()
 
 
-def filter_memo(json_data, publish):
+def query_memo(data, publish=None):
     '''
-    Example: json_data
-    {'title': 'hoge',
-     'tag': 'hige',\}
+    data = {
+        query: {
+            user_id: int,
+            title: string,
+            text: string,
+            tag: string
+        },
+        offset: int,
+        limit: int
     }
     '''
-    user_id = json_data['user_id']
-    now = datetime.datetime.now()
+    user_id = data['query']['user_id']
+    title = data['query']['title']
+    text = data['query']['text']
+    tag = data['query']['tag']
+    offset = data['offset']
+    limit = data['limit']
+
+    q = Memo.query.filter_by(user_id=user_id)
 
     if publish:
-        memos = Memo.query.filter_by(user_id=user_id). \
-                filter_by(publish=1). \
-                order_by(Memo.date_time.desc()).all()
-        return memos
-
-    if not json_data['title'] and not json_data['tag']:
-        memos  = Memo.query.filter_by(user_id=user_id). \
-            order_by(Memo.date_time.desc()).all()
-        return memos
-
-    title = json_data['title']
-    tag = json_data['tag']
-
-    # Query of memo table
-    mq = Memo.query.filter_by(user_id=user_id)
+        q = q.filter_by(publish=1)
 
     if len(title) != 0:
-        mq = mq.filter(Memo.title.like('%'+title+'%'))
+        q = q.filter(Memo.title.like('%'+title+'%'))
+
+    if len(text) != 0:
+        q = q.filter(Memo.text.like('%'+text+'%'))
+
     if len(tag) != 0:
         if tag.find(',') >= 0:
             tags = tag.split(',')
             for t in tags:
-                mq = mq.filter(Memo.tag.like('%'+t.strip()+'%'))
+                q = q.filter(Memo.tag.like('%'+t.strip()+'%'))
         else:
-            mq = mq.filter(Memo.tag.like('%'+tag+'%'))
+            q = q.filter(Memo.tag.like('%'+tag+'%'))
 
-    return mq.order_by(Memo.date_time.desc()).all()
+    print(q.count())
+    memos = q.order_by(Memo.date_time.desc()).slice(offset, limit).all()
+
+    l = []
+    for memo in memos:
+        l.append(memo.dump_json())
+
+    return json.dumps(l)

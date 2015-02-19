@@ -17,8 +17,7 @@ app = Flask(__name__)
 app.config.from_object('config')
 socketio = SocketIO(app)
 
-
-from memomemo.database import db_session, User, filter_memo, \
+from memomemo.database import db_session, User, query_memo, \
                               varify_user, add_user
 
 
@@ -48,57 +47,20 @@ def requires_login(f):
     return decorated_function
 
 
-def show_memos(json_filter, namespace, publish=None):
-    memos = filter_memo(json_filter, publish=publish)
-    import time
-    for i, memo in enumerate(memos):
-        emit('memo response', memo.dump_json(), namespace=namespace)
-        time.sleep(0.2)
-
-
-@socketio.on('filter memo', namespace='/memo')
+@socketio.on('fetch memo', namespace='/memo')
 def filter(msg):
-    show_memos(json.loads(msg), '/memo')
-
-
-@socketio.on('recieve log', namespace='/memo')
-def memo_recieve_log(msg):
-    print(msg['log'])
-    emit('log response', {'log': msg['log']})
+    data = query_memo(json.loads(msg))
+    emit('memo response', data, namespace='/memo')
 
 
 @socketio.on('connect', namespace='/memo')
 def connect():
     print('Client connected')
-    f = {'user_id': session['user_id'], 'title': None, 'tag': None}
-    show_memos(f, '/memo')
+    emit('log response', {'log': 'Connection'})
 
 
 @socketio.on('disconnect', namespace='/memo')
 def disconnect():
-    print('Client disconnected')
-
-
-@socketio.on('filter memo', namespace='/public')
-def filter_pub(msg):
-    show_memos(json.loads(msg), '/public')
-
-
-@socketio.on('connection response', namespace='/public')
-def memo_recieve_log_pub(msg):
-    u = User.query.filter_by(name=msg['user']).first()
-    f = {'user_id': u.id, 'title': None, 'tag': None}
-    show_memos(f, '/public', publish=True)
-
-
-@socketio.on('connect', namespace='/public')
-def connect_pub():
-    print('Client connected')
-    emit('log response', {'log': 'Connection'})
-
-
-@socketio.on('disconnect', namespace='/public')
-def disconnect_pub():
     print('Client disconnected')
 
 
@@ -175,13 +137,3 @@ def delete_memo():
         if user.delete_memo(json_data):
             return json.dumps({'status': 'success'})
     return None
-
-@app.route('/<user>')
-def show_public(user):
-    u = User.query.filter_by(name=user).first()
-
-    if u:
-        tags = u.count_tags()
-        return render_template('public.html', **locals())
-
-    return render_template('404.html')
