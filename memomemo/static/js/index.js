@@ -205,11 +205,6 @@ $(document).ready(function(){
 
 	});	// }}}
 
-	$('#setting').click(function(){
-		$('.metanav').toggleClass('open-metanav');
-		$('.setting').toggleClass('open');
-	});
-
 	//
 	// Display memo
 	// 1. Get json_data, it include one memo(title, text, tag) from database.
@@ -375,5 +370,13 @@ $(document).ready(function(){
 			document.querySelector('#rest').classList.remove('paser-active');
 		}
 	});
+
+	//
+	// UI event(Menu toggle)
+	//
+	var Toggle = document.querySelector("#toggle");
+	Toggle.onclick = function() {
+		Toggle.classList.toggle("on");
+	};
 });
 /* vim:set foldmethod=marker: */

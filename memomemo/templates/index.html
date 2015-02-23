@@ -12,24 +12,14 @@
 
 {% if session.user_id %}
 {% block metanav%}
-	<span class='fa fa-bars fa-2x'></span>
-	<!--<span class='fa fa-info-circle fa-2x' id='setting'></span>-->
-	<!--<a class='fa fa-power-off fa-2x' href="{{ url_for('logout') }}" style='color: red; opacity: 0.8;'></a>-->
-	<div id='setting-container setting hidden'>
-		<div class='setting hidden'>
-			<h2>User</h2>
-			<ul>
-				<li><b>ID: </b><span id='user_id'>{{ id }}</span>
-				<li><b>Name: </b>{{ name }}
-			</ul>
-		</div>
-		<div class='setting hidden'>
-			<h2>Memo</h2>
-			<ul>
-				<li><b>Num: </b>{{ memo_num }}
-				<li><b>TagNum: </b>{{ tag_num }}
-		</div>
-	</div>
+<div id="toggle"><div></div></div>
+<div id="toggle-menu">
+	<ul>
+		<li><span id='user_id' style="display: none;">{{ id }}</span><span>User: {{ name }}</span>
+		<!--<li><span style='color: orange;'>Change password</span>-->
+		<li><a class='fa fa-power-off' href="{{ url_for('logout') }}" style='color: red;'><span>Logout</span></a>
+	</ul>
+</div>
 {% endblock %}
 {% endif %}
 

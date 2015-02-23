@@ -45,6 +45,16 @@ def requires_login(f):
     return decorated_function
 
 
+def requires_signin(f):
+    @wrap(f)
+    def decorated_function(*args, **kwargs):
+        user = User.query.get(session['user_id'])
+        if user.config.json['only']:
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
 @socketio.on('fetch memo', namespace='/memo')
 def filter(msg):
     data = query_memo(json.loads(msg))
@@ -69,8 +79,6 @@ def index():
     name = user.name
     id = user.id
     tags = user.count_tags()
-    memo_num = len(user.memos)
-    tag_num = len(tags)
     # date list
     return render_template('index.html', **locals())
 

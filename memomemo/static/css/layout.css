@@ -1,7 +1,6 @@
 /***************/
 /* all setting */
 /***************/
-
 * {
 	margin: 0;
 	padding: 0;
@@ -104,7 +103,7 @@ pre {
 	font-size: 20px; 
 	padding: 5px; 
 	background: #000;
-	opacity: 0.6;
+	opacity: 0.7;
 	z-index: 100;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -124,29 +123,8 @@ pre {
 	text-decoration: none;
 	padding-right: 5px;
 }
-#setting {
-	color: #aaa;
-}
-.setting-container {
-	padding-top: 40px;
-	width: 100%;
-}
-.setting {
-	float: left;
-	text-align: left;
-	border: 1px solid #aaa;
-	margin: 10px;
-	padding: 10px;
-}
-.open-metanav {
-	height: 400px;
-	opacity: 1;
-}
 .hidden {
 	display: none;
-}
-.open {
-	display: inline-block;
 }
 /****************/
 /* Modal dialog */
@@ -284,4 +262,90 @@ margin-bottom: 0; }
   left: 0;
   right: 0;
   margin: 0 auto;
+}
+/***************/
+/* Toggle menu */
+/***************/
+#toggle {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  top: 3px;
+  right: 20px;
+  margin: 20px auto;
+  cursor: pointer;
+}
+#toggle div,
+#toggle div:after,
+#toggle div:before {
+  width: 40px;
+  height: 6px;
+  background: #eee;
+  transition: all 0.3s;
+  border-radius: 3px;
+}
+#toggle div:after,
+#toggle div:before {
+  content: "";
+  position: absolute;
+}
+#toggle div:after {
+  top: -15px;
+  right: 0px;
+}
+#toggle div:before {
+  top: 15px;
+  right: 0px;
+}
+#toggle.on div {
+  background-color: transparent;
+}
+#toggle.on div:before {
+  transform: rotate(-45deg) translate(10.5px, -11px);
+}
+#toggle.on div:after {
+  transform: rotate(45deg) translate(11px, 10.5px);
+}
+#toggle.on + #toggle-menu {
+  display: block;
+}
+#toggle-menu {
+  position: absolute;
+  top: 70px;
+  right: 25px;
+  color: #fff;
+  width: 300px;
+  margin: auto;
+  text-align: center;
+  border-radius: 5px;
+  background: #aaa;
+  display: none;
+}
+#toggle-menu:after {
+  position: absolute;
+  top: -15px;
+  right: 7px;
+  content: "";
+  display: block;
+  border-left: 8px solid transparent;
+  border-right: 8px solid transparent;
+  border-bottom: 20px solid #aaa;
+}
+#toggle-menu ul, #toggle-menu li {
+  list-style: none;
+  display: block;
+  margin: 0;
+  padding: 10px;
+}
+#toggle-menu li span {
+  padding: 5px;
+  font-family: "Ubuntu Mono", sans-serif;
+}
+#toggle-menu li {
+  background: #555;
+}
+#toggle-menu li:hover,
+#toggle-menu li:focus {
+  background: #87CEEB;
+  color: #000;
 }
