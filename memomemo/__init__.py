@@ -25,10 +25,8 @@ from memomemo.database import db_session, User, query_memo, \
 def load_current_user():
     if session.get('user_id') is not None:
         return
-
     if request.path == '/login':
         return
-
     return redirect(url_for('login'))
 
 

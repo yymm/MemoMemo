@@ -59,9 +59,9 @@ $(document).ready(function(){
 
 	socket.on('memo response', function(msg) {
 		memos = $.parseJSON(msg);
-		if (memos.length == 0) {
+		if (memos.length != 10 || memos.length == 0) {
 			old_filter = null;
-			return;
+			document.querySelector('#loading').classList.add("hidden");
 		}
 		for (i = 0; i < memos.length; ++i) {
 			display_memo(memos[i]);
@@ -100,6 +100,7 @@ $(document).ready(function(){
 		}
 		old_filter = filter;
 		$('#container').empty();
+		document.querySelector('#loading').classList.remove("hidden");
 		socket.emit('fetch memo', JSON.stringify(filter));
 	}
 
