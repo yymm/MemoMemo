@@ -8,15 +8,18 @@
 	"addons": [
 		"cleardb:ignite"
 	],
-  "env": {
-    "URL": "https://github.com/teki/tou",
-    "SECRET_TOKEN": {
-      "description": "A secret key.",
-      "generator": "secret"
-    },
-    "CONCURRENCY": {
-      "description": "The number of processes to run.",
-      "value": "5"
+    "env": {
+        "MEMOMEMO_SECRET_KEY": {
+            "description": "Session secret key(Flask)",
+            "generator": "secret"
+        },  
+        "MEMOMEMO_USER": {
+            "description": "User name(default: hoo)",
+            "value": "foo"
+        },  
+        "MEMOMEMO_PASSWORD": {
+            "description": "User password(default: bar)",
+            "value": "bar" 
+        }
     }
-  }
 }

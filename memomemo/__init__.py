@@ -45,11 +45,12 @@ def requires_login(f):
     return decorated_function
 
 
-def requires_signin(f):
+def disable_signin(f):
     @wrap(f)
     def decorated_function(*args, **kwargs):
         user = User.query.get(session['user_id'])
-        if user.config.json['only']:
+        config = json.loads(user.config.json)
+        if config['only']:
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
