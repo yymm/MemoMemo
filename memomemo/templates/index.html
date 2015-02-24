@@ -42,17 +42,21 @@
 	<div class="menu addentry-div dialogbtn">
 		<a class="icon fa fa-pencil fa-2x showdlg" style='top: 3px; left: 6px;' href="#entrydlg"></a>
 	</div>
+	<!--title-div-->
+	<div class="menu title-div dialogbtn">
+		<a class="icon fa fa-book fa-2x showdlg" style='top: 5px; left: 5px;' href="#titledlg"></a>
+	</div>
 	<!--search-div-->
 	<div class="menu search-div dialogbtn">
 		<a class="icon fa fa-search fa-2x showdlg" style='top: 3px; left: 5px;' href="#searchdlg"></a>
 	</div>
-	<!--cumulunimbus-div-->
-	<div class="menu cumulunimbus-div dialogbtn">
-		<a class="icon fa fa-cloud fa-2x showdlg" style='top: 4px; left: 3px;' href="#cumulusdlg"></a>
-	</div>
 	<!--tagcloud-div-->
 	<div class="menu tagcloud-div dialogbtn">
 		<a class="icon fa fa-tags fa-2x showdlg" style='top: 5px; left: 4px;' href="#tagdlg"></a>
+	</div>
+	<!--cumulunimbus-div-->
+	<div class="menu cumulunimbus-div dialogbtn">
+		<a class="icon fa fa-cloud fa-2x showdlg" style='top: 4px; left: 3px;' href="#cumulusdlg"></a>
 	</div>
 </div>
 
@@ -115,6 +119,34 @@
 		{% for tag in tags %}
 		<span class='tag' style='border: 2px solid {{ tag['color'] }};'><i>{{ tag['name'] }}</i>:{{ tag['num'] }}</span>
 		{% endfor %}
+	</div>
+</div>
+<div id="titledlg" class="dialog">
+	<a href="#titledlg" class="fa fa-times fa-3x closedlg"></a>
+	<h1>Book</h1>
+	<div id="title-container">
+		<ul>
+			{% for memo in memos %}
+			<li><i>{{ memo['date'] }}<span>{{ memo['tag'] }}</span></i><div>{{ memo['title'] }}</div>
+			{% endfor %}
+		</ul>
+	</div>
+	<div id="title-query">
+		<span>Tag:</span>
+		<select>
+			<option value="default" selected="selected">-</option>
+			{% for tag in tags %}
+			<option value="{{ tag['name'] }}">{{ tag['name'] }}</option>
+			{% endfor %}
+		</select>
+		<span>Year:</span>
+		<select>
+			<option value="default" selected="selected">-</option>
+		</select>
+		<span>Month:</span>
+		<select>
+			<option value="default" selected="selected">-</option>
+		</select>
 	</div>
 </div>
 

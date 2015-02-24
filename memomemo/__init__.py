@@ -68,8 +68,8 @@ def index():
     user = User.query.get(session['user_id'])
     name = user.name
     id = user.id
-    tags = user.count_tags()
-    # date list
+    tags = user.generate_tag_list()
+    memos = user.generate_memo_list()
     return render_template('index.html', **locals())
 
 

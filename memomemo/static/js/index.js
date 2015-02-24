@@ -378,5 +378,9 @@ $(document).ready(function(){
 	Toggle.onclick = function() {
 		Toggle.classList.toggle("on");
 	};
+
+	//
+	// UI event(Book dialog: incremental search)
+	//
 });
 /* vim:set foldmethod=marker: */

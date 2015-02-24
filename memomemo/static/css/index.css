@@ -149,7 +149,7 @@ a, h1, h2, h3, h4, h5 {
 /* menu UI : search-div */
 /************************/
 .search-div {
-	top: 20%;
+	top: 30%;
 }
 #searchdlg {
 	width: 270px;
@@ -167,7 +167,7 @@ a, h1, h2, h3, h4, h5 {
 /* menu UI : cumulonimbus-div */
 /******************************/
 .cumulunimbus-div {
-	top: 30%;
+	top: 50%;
 }
 #cumulusdlg {
 	width: 600px; 
@@ -222,11 +222,98 @@ a, h1, h2, h3, h4, h5 {
 	border: 2px solid #87ceeb;
 	text-decoration: none;
 }
-
+/***********************/
+/* menu UI : title-div */
+/***********************/
+.title-div {
+	top: 20%;
+}
+#titledlg {
+	width: 600px;
+	height: 550px;
+	overflow: visible;
+}
+#title-container {
+	position: absolute;
+	top: 80px;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+	background: black;
+	width: 550px;
+	height: 400px;
+	overflow: scroll;
+}
+#title-container ul, #title-container li {
+	list-style: none;
+	display: block;
+	margin: 0;
+}
+#title-container li {
+	padding: 10px;
+}
+#title-container li i {
+	display: block;
+	padding: 0 0 10px 0;
+	font-size: 80%;
+	color: #FF9C77;
+}
+#title-container li i span {
+	float: right;
+	display: none;
+	padding-right: 10px;
+}
+#title-container li div {
+	text-align: center;
+	color: white;
+}
+#title-container li:nth-child(2n) {
+	background-color: #666;
+}
+#title-container li:nth-child(2n+1) {
+	background-color: #555; 
+}
+#title-container li:hover,
+#title-container li:focus {
+  background: #377bab;
+  color: #000;
+  cursor: pointer;
+}
+#title-container li:hover i span,
+#title-container li:focus i span {
+	display: inline-block;
+	color: #87CEEB;
+	font-size: 110%;
+}
+#title-query {
+	position: absolute;
+	width: 550px;
+	height: 70px;
+	top: 500px;
+	left: 0;
+	right: 0;
+	margin: 0 auto;
+}
+#title-query span {
+	font-size: 1.0em;
+	margin: 0;
+	padding: 0;
+}
+#title-query select {
+	display: inline-block;
+	margin: 0 5px;
+	width: 120px;
+	height: 40px;
+	font-size: 1.1em;
+	color: #555;
+	background: #eee;
+	border: solid 1px transparent;
+	border-radius: 5px;
+}
 /***********/
 /* Memo UI */
 /***********/
-
 #container {
 	line-height: 1.4;
 	margin: 0 auto;
@@ -403,9 +490,9 @@ label {
   background-color: none;
   color: #fff;
 }
-/*
- *
- */
+/***************/
+/* Publish btn */
+/***************/
 #publish {
   display: none;
 }
@@ -427,9 +514,9 @@ label {
   -o-transition:all 1s;
   -ms-transition:all 1s;
 }
-/*
- *
- */
+/****************/
+/* Clear Button */
+/****************/
 .clear-btn {
   background: #F0AD4E;
   padding: 5px;

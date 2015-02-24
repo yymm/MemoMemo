@@ -82,7 +82,7 @@ class User(db.Model):
 
         return False
 
-    def count_tags(self):
+    def generate_tag_list(self):
         memos = self.memos
         if len(memos) <= 0:
             return []
@@ -114,6 +114,19 @@ class User(db.Model):
             tag_list.append(tag_dic)
 
         return tag_list
+
+
+    def generate_memo_list(self):
+        memo_list = []
+        memos = Memo.query.filter_by(user_id=self.id) \
+                .order_by(Memo.date_time.desc()).all()
+        for memo in memos:
+            dic = {}
+            dic["title"] = memo.title
+            dic["date"] = memo.date_time
+            dic["tag"] = memo.tag
+            memo_list.append(dic)
+        return memo_list
 
 
 class Memo(db.Model):
