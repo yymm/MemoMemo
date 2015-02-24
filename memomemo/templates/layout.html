@@ -5,21 +5,21 @@
 	<title>MemoMemo</title>
 	<link href='http://fonts.googleapis.com/css?family=Inconsolata' rel='stylesheet' type='text/css'>
 	<link href='http://fonts.googleapis.com/css?family=Ubuntu+Mono' rel='stylesheet' type='text/css'>
-	<link rel="shortcut icon" href="{{ url_for('static', filename='ico/favicon.ico') }}">
-	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-2.1.1.min.js') }}"></script>
+	<link rel="icon" href="{{ url_for('static', filename='ico/favicon.ico') }}" type="image/vnd.microsoft.ico">
 	<link rel='stylesheet' href="{{ url_for('static', filename='css/font-awesome.min.css') }}">
 	<link rel='stylesheet' href="{{ url_for('static', filename='css/pygments.css') }}">
 	<link rel='stylesheet' href="{{ url_for('static', filename='css/layout.css') }}">
+	<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-2.1.3.min.js') }}"></script>
 	<script type="text/javascript" src="{{ url_for('static', filename='js/layout.js') }}"></script>
 	{% block head %}
 	{% endblock %}
 </head>
 <body>
-	<header class='metanav'>
+	<div class='metanav'>
 		<span class="small-title">MemoMemo</span>
 		{% block metanav%}
 		{% endblock %}
-	</header>
+	</div>
 	{% block body %}
 	{% endblock %}
 	<div id="alert-container"></div>

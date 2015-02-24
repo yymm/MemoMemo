@@ -21,6 +21,4 @@ function alertFlash(message, category){
 				$(this).remove();
 		});
 	}, 5000);
-}
-
-/* vim:set foldmethod=marker: */
+};
