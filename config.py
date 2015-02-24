@@ -17,6 +17,10 @@ SQLALCHEMY_DATABASE_URI = os.environ['CLEARDB_DATABASE_URL'].replace("mysql://",
     if 'CLEARDB_DATABASE_URL' in os.environ else \
     SQLALCHEMY_DATABASE_URI
 
+# User name(Not signin)
+
+# User password(Not signin)
+
 DEBUG = True
 
 del os
