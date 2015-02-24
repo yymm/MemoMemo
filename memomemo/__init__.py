@@ -45,17 +45,6 @@ def requires_login(f):
     return decorated_function
 
 
-def disable_signin(f):
-    @wrap(f)
-    def decorated_function(*args, **kwargs):
-        user = User.query.get(session['user_id'])
-        config = json.loads(user.config.json)
-        if config['only']:
-            return redirect(url_for('login'))
-        return f(*args, **kwargs)
-    return decorated_function
-
-
 @socketio.on('fetch memo', namespace='/memo')
 def filter(msg):
     data = query_memo(json.loads(msg))
@@ -102,7 +91,11 @@ def login():
             session['user_id'] = user.id
             return redirect(url_for('index'))
 
-    return render_template('login.html')
+    disable_signup = False
+    if "DISABLE_SIGNUP" in app.config:
+        disable_signup = True
+        
+    return render_template('login.html', **locals())
 
 
 @app.route('/logout')

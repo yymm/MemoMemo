@@ -165,12 +165,8 @@ class Config(db.Model):
 def init_db():
     db.create_all()
     if app.config["MEMOMEMO_USER"] and app.config["MEMOMEMO_PASSWORD"]:
-        user = add_user(app.config["MEMOMEMO_USER"], app.config["MEMOMEMO_PASSWORD"]) 
-        config = Config(user.id)
-        dic = {'only': True}
-        config.json = json.dumps(dic)
-        db.session.add(config)
-        db.session.commit()
+        app.config["DISABLE_SIGNUP"] = True
+        print("hoge")
 
 
 def add_user(name, password):
