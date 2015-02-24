@@ -27,7 +27,7 @@ def load_current_user():
         return
     if request.path == '/login':
         return
-    return redirect(url_for('login'))
+    # global parameter 'g' set here if you need
 
 
 @app.teardown_request
@@ -39,7 +39,7 @@ def requires_login(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get('user_id') is None:
-            flash('You need to be signed in.')
+            #flash('You need to be signed in.')
             return redirect(url_for('login'))
         return f(*args, **kwargs)
     return decorated_function
