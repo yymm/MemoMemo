@@ -382,5 +382,54 @@ $(document).ready(function(){
 	//
 	// UI event(Book dialog: incremental search)
 	//
+	var title_list = [];
+
+	// Initialize select
+	document.querySelector("#tag-select").selectedIndex = 0;
+
+	function cache_title_list() {
+		var list = []
+		var children = document.querySelector('#title-list').children;
+		for (var i = 0; i < children.length; i++) {
+			var child = children[i];
+			var dic = {
+				"title": child.querySelector('div').innerHTML,
+				"tag": child.querySelector('span').innerHTML,
+				"date": child.querySelector('i').innerHTML
+			};
+			list.push(dic);
+		}
+		return list;
+	};
+
+	function query_title_list(tag) {
+		var list = document.querySelector('#title-list');
+		if (list.length != 0) {
+			list.remove();
+		}
+		var l = title_list.filter(function(element) {
+			return element.tag == tag
+		});
+		for (var i = 0; i < l.length; i++) {
+			var li = document.createElement("li");
+			var date = document.createElement('i');
+			date.innerHTML = l[i].date;
+			var tag = document.createElement('span');
+			tag.innerHTML = l[i].tag;
+			var title = document.createElement('div');
+			title.innerHTML = l[i].title;
+			li.appendChild(date);
+			li.appendChild(tag);
+			li.appendChild(title);
+			list.appendChild(li);
+		}
+	};
+
+	document.querySelector("#tag-select").onchange = function() {
+		if (title_list.length == 0) {
+			title_list = cache_title_list();
+		}
+		query_title_list(this.options[this.selectedIndex].value);
+	};
 });
 /* vim:set foldmethod=marker: */

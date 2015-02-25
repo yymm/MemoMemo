@@ -125,15 +125,15 @@
 	<a href="#titledlg" class="fa fa-times fa-3x closedlg"></a>
 	<h1>Book</h1>
 	<div id="title-container">
-		<ul>
+		<ul id="title-list">
 			{% for memo in memos %}
-			<li><i>{{ memo['date'] }}<span>{{ memo['tag'] }}</span></i><div>{{ memo['title'] }}</div>
+			<li><i>{{ memo['date'] }}</i><span>{{ memo['tag'] }}</span><div>{{ memo['title'] }}</div>
 			{% endfor %}
 		</ul>
 	</div>
 	<div id="title-query">
 		<span>Tag:</span>
-		<select>
+		<select id="tag-select">
 			<option value="default" selected="selected">-</option>
 			{% for tag in tags %}
 			<option value="{{ tag['name'] }}">{{ tag['name'] }}</option>

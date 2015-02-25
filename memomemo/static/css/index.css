@@ -259,7 +259,7 @@ a, h1, h2, h3, h4, h5 {
 	font-size: 80%;
 	color: #FF9C77;
 }
-#title-container li i span {
+#title-container li span {
 	float: right;
 	display: none;
 	padding-right: 10px;
@@ -280,11 +280,11 @@ a, h1, h2, h3, h4, h5 {
   color: #000;
   cursor: pointer;
 }
-#title-container li:hover i span,
-#title-container li:focus i span {
+#title-container li:hover span,
+#title-container li:focus span {
 	display: inline-block;
 	color: #87CEEB;
-	font-size: 110%;
+	font-size: 80%;
 }
 #title-query {
 	position: absolute;
