@@ -405,10 +405,10 @@ $(document).ready(function(){
 	function query_title_list(tag) {
 		var list = document.querySelector('#title-list');
 		if (list.length != 0) {
-			list.remove();
+			list.innerHTML = '';
 		}
 		var l = title_list.filter(function(element) {
-			return element.tag == tag
+			return element.tag == tag;
 		});
 		for (var i = 0; i < l.length; i++) {
 			var li = document.createElement("li");
