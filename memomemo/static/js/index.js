@@ -421,7 +421,7 @@ $(document).ready(function(){
 			if (tag == "default") {
 				return true;
 			}
-			return elem.tag == tag;
+			return (elem.tag.search(tag) >= 0)? 1 : 0;
 		});
 		l = l.filter(function(elem) {
 			if (year == "default") {
