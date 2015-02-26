@@ -251,18 +251,21 @@ a, h1, h2, h3, h4, h5 {
 	margin: 0;
 }
 #title-container li {
+	position: relative;
 	padding: 10px;
 }
 #title-container li i {
 	display: block;
 	padding: 0 0 10px 0;
-	font-size: 80%;
+	font-size: 90%;
 	color: #FF9C77;
 }
 #title-container li span {
-	float: right;
+	font-size: 90%;
 	display: none;
-	padding-right: 10px;
+	position: absolute;
+	top: 10px;
+	right: 10px;
 }
 #title-container li div {
 	text-align: center;
@@ -284,7 +287,6 @@ a, h1, h2, h3, h4, h5 {
 #title-container li:focus span {
 	display: inline-block;
 	color: #87CEEB;
-	font-size: 80%;
 }
 #title-query {
 	position: absolute;
@@ -310,6 +312,9 @@ a, h1, h2, h3, h4, h5 {
 	background: #eee;
 	border: solid 1px transparent;
 	border-radius: 5px;
+}
+#month-select:disabled {
+	opacity: 0.5;
 }
 /***********/
 /* Memo UI */

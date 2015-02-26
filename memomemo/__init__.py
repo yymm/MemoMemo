@@ -69,7 +69,8 @@ def index():
     name = user.name
     id = user.id
     tags = user.generate_tag_list()
-    memos = user.generate_memo_list()
+    memos, year = user.generate_memo_list()
+    month = ["%02d" % x for x in range(1, 13)]
     return render_template('index.html', **locals())
 
 

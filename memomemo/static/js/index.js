@@ -17,31 +17,27 @@ $(document).ready(function(){
 	//
 	// Toggle Dialog
 	//
-	$(document).ready(function(){
-		$('a.showdlg').click(function(){
-			var dialog = $(this).attr('href');
-			if (dialog === "#entrydlg") {
-				document.querySelector('#rest').classList.add('paser-active');
-				document.querySelector('#rest').classList.remove('paser-inactive');
-				document.querySelector('#mkd').classList.add('paser-inactive');
-				document.querySelector('#mkd').classList.remove('paser-active');
-				$('.publish-btn').css("background", "none");
-				$('.publish-btn label').css("color", "#000");
-				$('#publish').attr('checked', false);
-				clear_addentry();
-			}
-			$(dialog).fadeIn(200);
-			$('body').prepend('<div id="over">');
-			$('#over').fadeIn(200);
-			return false;
-		});
+	$('a.showdlg').click(function(){
+		var dialog = $(this).attr('href');
+		if (dialog === "#entrydlg") {
+			document.querySelector('#rest').classList.add('paser-active');
+			document.querySelector('#rest').classList.remove('paser-inactive');
+			document.querySelector('#mkd').classList.add('paser-inactive');
+			document.querySelector('#mkd').classList.remove('paser-active');
+			$('.publish-btn').css("background", "none");
+			$('.publish-btn label').css("color", "#000");
+			$('#publish').attr('checked', false);
+			clear_addentry();
+		}
+		$(dialog).fadeIn(200);
+		$('body').prepend('<div id="over">');
+		$('#over').fadeIn(200);
+		return false;
 	});
 	
-	$(document).ready(function(){
-		$('a.closedlg').click(function(){
-			closedlg($(this).attr('href'));
-			return false;
-		});
+	$('a.closedlg').click(function(){
+		closedlg($(this).attr('href'));
+		return false;
 	});
 
 	//
@@ -386,6 +382,8 @@ $(document).ready(function(){
 
 	// Initialize select
 	document.querySelector("#tag-select").selectedIndex = 0;
+	document.querySelector("#year-select").selectedIndex = 0;
+	document.querySelector("#month-select").selectedIndex = 0;
 
 	function cache_title_list() {
 		var list = []
@@ -402,16 +400,56 @@ $(document).ready(function(){
 		return list;
 	};
 
-	function query_title_list(tag) {
+	function get_value_from_select(id) {
+		var elem = document.querySelector(id);
+		return elem.options[elem.selectedIndex].value;
+	};
+
+	function filter_by_select(list) {
+		var year = get_value_from_select("#year-select");
+		// month
+		if (year == "default") {
+			document.querySelector("#month-select").disabled = true;
+			document.querySelector("#month-select").selectedIndex = 0;
+		} else {
+			document.querySelector("#month-select").disabled = false;
+		}
+		var tag = get_value_from_select("#tag-select");
+		var month = get_value_from_select("#month-select");
+		var l = [];
+		l = list.filter(function(elem) {
+			if (tag == "default") {
+				return true;
+			}
+			return elem.tag == tag;
+		});
+		l = l.filter(function(elem) {
+			if (year == "default") {
+				return true;
+			}
+			var y = elem.date.slice(0, 4);
+			return y == year;
+		});
+		l = l.filter(function(elem) {
+			if (month == "default") {
+				return true;
+			}
+			var m = elem.date.slice(5, 7);
+			return m == month;
+		});
+		return l;
+	};
+
+	function query_title_list() {
 		var list = document.querySelector('#title-list');
 		if (list.length != 0) {
 			list.innerHTML = '';
 		}
-		var l = title_list.filter(function(element) {
-			return element.tag == tag;
-		});
+		var l = filter_by_select(title_list.slice());
 		for (var i = 0; i < l.length; i++) {
 			var li = document.createElement("li");
+			li.className = "memo-title";
+			$(li).click(select_title);
 			var date = document.createElement('i');
 			date.innerHTML = l[i].date;
 			var tag = document.createElement('span');
@@ -429,7 +467,27 @@ $(document).ready(function(){
 		if (title_list.length == 0) {
 			title_list = cache_title_list();
 		}
-		query_title_list(this.options[this.selectedIndex].value);
+		query_title_list();
 	};
+	document.querySelector("#year-select").onchange = function() {
+		if (title_list.length == 0) {
+			title_list = cache_title_list();
+		}
+		query_title_list();
+	};
+	document.querySelector("#month-select").onchange = function() {
+		if (title_list.length == 0) {
+			title_list = cache_title_list();
+		}
+		query_title_list();
+	};
+	$(".memo-title").click(select_title);
+
+	function select_title() {
+		var title = $(this).children('div').text();
+		var tag = $(this).children('span').text();
+		send_to_websocket(title, '', tag);
+	};
+
 });
 /* vim:set foldmethod=marker: */

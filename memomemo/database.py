@@ -118,6 +118,7 @@ class User(db.Model):
 
     def generate_memo_list(self):
         memo_list = []
+        year_list = []
         memos = Memo.query.filter_by(user_id=self.id) \
                 .order_by(Memo.date_time.desc()).all()
         for memo in memos:
@@ -126,7 +127,8 @@ class User(db.Model):
             dic["date"] = memo.date_time
             dic["tag"] = memo.tag
             memo_list.append(dic)
-        return memo_list
+            year_list.append(memo.date_time.year)
+        return memo_list, list(set(year_list))
 
 
 class Memo(db.Model):

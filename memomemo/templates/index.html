@@ -127,7 +127,7 @@
 	<div id="title-container">
 		<ul id="title-list">
 			{% for memo in memos %}
-			<li><i>{{ memo['date'] }}</i><span>{{ memo['tag'] }}</span><div>{{ memo['title'] }}</div>
+			<li class="memo-title"><i>{{ memo['date'] }}</i><span>{{ memo['tag'] }}</span><div>{{ memo['title'] }}</div>
 			{% endfor %}
 		</ul>
 	</div>
@@ -140,12 +140,18 @@
 			{% endfor %}
 		</select>
 		<span>Year:</span>
-		<select>
+		<select id="year-select">
 			<option value="default" selected="selected">-</option>
+			{% for y in year %}
+			<option value="{{ y }}">{{ y }}</option>
+			{% endfor %}
 		</select>
 		<span>Month:</span>
-		<select>
+		<select id="month-select" disabled>
 			<option value="default" selected="selected">-</option>
+			{% for m in  month %}
+			<option value="{{ m }}">{{ m }}</option>
+			{% endfor %}
 		</select>
 	</div>
 </div>
