@@ -487,6 +487,7 @@ $(document).ready(function(){
 		var title = $(this).children('div').text();
 		var tag = $(this).children('span').text();
 		send_to_websocket(title, '', tag);
+		closedlg($('#titledlg'));
 	};
 
 });
