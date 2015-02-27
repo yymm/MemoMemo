@@ -103,8 +103,12 @@ def login():
     signup = True
     if len(User.query.all()) == 1:
         user = User.query.first()
-        obj = user.config.get_config_obj()
-        if not obj["signin"]:
+        config = user.config
+        if config:
+            obj = config.get_config_obj()
+            if not obj["signin"]:
+                signup = False
+        else:
             signup = False
         
     return render_template('login.html', **locals())
