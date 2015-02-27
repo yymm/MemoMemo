@@ -195,12 +195,14 @@ def add_user(name, password, signin=True):
     if not user:
         user = User(name, password)
         db.session.add(user)
-        config = Config(user.id)
-        config.json = json.dumps({"signin": signin})
-        memo = create_first_memo(user.id)
-        db.session.add(memo)
-        db.session.add(config)
         db.session.commit()
+        if user.id:
+            config = Config(user.id)
+            config.json = json.dumps({"signin": signin})
+            memo = create_first_memo(user.id)
+            db.session.add(config)
+            db.session.add(memo)
+            db.session.commit()
 
     return user
 
