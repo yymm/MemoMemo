@@ -1,4 +1,4 @@
-![MemoMemo](memomemo.png)
+# φ(..)
 
 [![Build Status](https://drone.io/github.com/yymm/MemoMemo/status.png)](https://drone.io/github.com/yymm/MemoMemo/latest)
 
@@ -12,13 +12,16 @@
 
 # Environmental variables
 
-"MEMOMEMO\_SECRET\_KEY" if you do not set 'dev key'
-
-"MEMOMEMO\_DATABASE\_URI" if you do not set 'mysql+pymysql://root:root@localhost/memomemo'
+Env                       | Default
+------------------------- | -----------------------------------------------
+"MEMOMEMO\_SECRET\_KEY"   | 'dev key'
+"MEMOMEMO\_DATABASE\_URI" | 'mysql+pymysql://root:root@localhost/memomemo'
+"MEMOMEMO\_USER"          | 'foo'
+"MEMOMEMO\_PASSWORD"      | 'bar' 
 
 # Python Requirements
 
-[requirements.txt at master](https://github.com/yymm/MemoMemo/blob/master/requirements.txt "MemoMemo/requirements.txt at master · yymm/MemoMemo")
+[requirements.txt](https://github.com/yymm/MemoMemo/blob/master/requirements.txt "MemoMemo/requirements.txt at master · yymm/MemoMemo")
 
 # Licence
 

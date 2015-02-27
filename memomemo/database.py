@@ -176,24 +176,65 @@ class Config(db.Model):
     def __init__(self, user_id):
         self.user_id = user_id
 
+    def get_config_obj(self):
+        return json.loads(self.json)
+
 
 def init_db():
     db.create_all()
-    if app.config["MEMOMEMO_USER"] and app.config["MEMOMEMO_PASSWORD"]:
-        add_user(app.config["MEMOMEMO_USER"], app.config["MEMOMEMO_PASSWORD"])
-        app.config["DISABLE_SIGNUP"] = True
+    name = app.config["MEMOMEMO_USER"]
+    password = app.config["MEMOMEMO_PASSWORD"]
+    if name and password:
+        if len(User.query.all()) == 0:
+            user = add_user(name, password, False)
 
 
-def add_user(name, password):
+def add_user(name, password, signin=True):
     user = User.query.filter_by(name=name).first()
 
     if not user:
         user = User(name, password)
         db.session.add(user)
+        config = Config(user.id)
+        user.config.json = json.dumps({"signin": signin})
+        memo = create_first_memo(user.id)
+        db.session.add(memo)
+        db.session.add(config)
         db.session.commit()
 
     return user
 
+
+def create_first_memo(id):
+    text = '''# Simple Markdown Example
+
+GFM = GitHub Flavored Markdown
+
+## list
+
+* list1
+* list2
+
+## code
+
+```python
+from Flask import flask
+app = Flase(__name__)
+
+@route.app('/')
+def hello():
+    return "Hello Flask"
+```
+
+## table
+
+foo  | bar
+---- | ----
+FOO  | BAR
+    '''
+    return Memo(id, "Hello MemoMemo!",
+                text,
+                "Sample", "Markdown")
 
 def varify_user(name, password):
     user = User.query.filter_by(name=name).first()
@@ -208,6 +249,12 @@ def varify_user(name, password):
 
 def delete_user(user):
     db.session.delete(user)
+    db.session.commit()
+
+
+def change_password(user_id, password):
+    user = User.query.get(user_id)
+    user.password = password
     db.session.commit()
 
 

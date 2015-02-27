@@ -16,7 +16,12 @@
 <div id="toggle-menu">
 	<ul>
 		<li><span id='user_id' style="display: none;">{{ id }}</span><span>User: {{ name }}</span>
-		<!--<li><span style='color: orange;'>Change password</span>-->
+		<li><span style='color: orange;'>Change password
+				<form>
+					<input type="password" class='menu-input' id="change-password-input">
+					<input type="button" value="submit" class='menu-btn' id="change-password">
+				</form>
+			</span>
 		<li><a class='fa fa-power-off' href="{{ url_for('logout') }}" style='color: red;'><span>Logout</span></a>
 	</ul>
 </div>

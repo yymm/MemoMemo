@@ -490,5 +490,28 @@ $(document).ready(function(){
 		closedlg($('#titledlg'));
 	};
 
+	//
+	// UI event(change password)
+	//
+
+	$("#change-password").click(function(){
+		var p = $("#change-password-input").val();
+		$.ajax({
+			type: 'POST',
+			url: "/changepassword",
+			data: JSON.stringify({"password": p}),
+			contentType: 'application/json',
+			success: function(json_memo){
+				alertFlash("Success to change password.", 'information');
+				$("#change-password-input").val('');
+				Toggle.classList.toggle("on");
+			},
+			error: function(){
+				alertFlash('Connection Error: Please retry.', 'error');
+				Toggle.classList.toggle("on");
+			}
+		});
+
+	});
 });
 /* vim:set foldmethod=marker: */

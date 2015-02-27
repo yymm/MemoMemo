@@ -18,7 +18,7 @@ app.config.from_object('config')
 socketio = SocketIO(app)
 
 from memomemo.database import db_session, User, query_memo, \
-                              varify_user, add_user
+                              varify_user, add_user, change_password
 
 
 @app.before_request
@@ -46,18 +46,21 @@ def requires_login(f):
 
 
 @socketio.on('fetch memo', namespace='/memo')
+@requires_login
 def filter(msg):
     data = query_memo(json.loads(msg))
     emit('memo response', data, namespace='/memo')
 
 
 @socketio.on('connect', namespace='/memo')
+@requires_login
 def connect():
     print('Client connected')
     emit('log response', {'log': 'Connection'})
 
 
 @socketio.on('disconnect', namespace='/memo')
+@requires_login
 def disconnect():
     print('Client disconnected')
 
@@ -76,6 +79,11 @@ def index():
 
 @app.route('/signup', methods=['POST'])
 def signup():
+    if len(User.query.all()) == 1:
+        user = User.query.first()
+        obj = user.config.get_config_obj()
+        if not obj["signin"]:
+            return render_template('404.html'), 404
     name = request.form['username']
     password = request.form['password']
     user = add_user(name, password)
@@ -92,9 +100,12 @@ def login():
             session['user_id'] = user.id
             return redirect(url_for('index'))
 
-    disable_signup = False
-    if "DISABLE_SIGNUP" in app.config:
-        disable_signup = True
+    signup = True
+    if len(User.query.all()) == 1:
+        user = User.query.first()
+        obj = user.config.get_config_obj()
+        if not obj["signin"]:
+            signup = False
         
     return render_template('login.html', **locals())
 
@@ -137,4 +148,14 @@ def delete_memo():
         json_data = request.json
         if user.delete_memo(json_data):
             return json.dumps({'status': 'success'})
+    return None
+
+
+@app.route('/changepassword', methods=['POST'])
+@requires_login
+def changepassword():
+    if request.method == 'POST':
+        json_data = request.json
+        change_password(session['user_id'], json_data['password'])
+        return json.dumps({'status': 'success'})
     return None
