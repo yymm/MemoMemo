@@ -44,7 +44,11 @@ $(document).ready(function(){
 	// SocketIO event
 	//
 	namespace = '/memo';
-	var socket = io.connect('http://' + document.domain + ':' + location.port + namespace);
+	var socket = io.connect('http://' + document.domain + ':' + location.port + namespace, {
+			'reconnect': true,
+			'reconnection delay': 500,
+			'max reconnection attempts': 10
+	});
 
 	var old_filter = null;
 	var connecting = false;
