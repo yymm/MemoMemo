@@ -1,4 +1,4 @@
-# φ(..)
+# MemoMemo φ(..)
 
 [![Build Status](https://drone.io/github.com/yymm/MemoMemo/status.png)](https://drone.io/github.com/yymm/MemoMemo/latest)
 
