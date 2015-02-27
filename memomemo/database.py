@@ -196,7 +196,7 @@ def add_user(name, password, signin=True):
         user = User(name, password)
         db.session.add(user)
         config = Config(user.id)
-        user.config.json = json.dumps({"signin": signin})
+        config.json = json.dumps({"signin": signin})
         memo = create_first_memo(user.id)
         db.session.add(memo)
         db.session.add(config)
