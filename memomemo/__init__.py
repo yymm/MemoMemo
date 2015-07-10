@@ -46,7 +46,6 @@ def requires_login(f):
 @app.route('/filter', methods=['POST'])
 @requires_login
 def filter():
-    #emit('memo response', data, namespace='/memo')
     user = User.query.get(session['user_id'])
     if request.method == 'POST':
         return query_memo(user.id, request.json)

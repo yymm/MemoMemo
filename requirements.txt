@@ -1,6 +1,5 @@
 Flask
 Flask-SQLAlchemy
-Flask-SocketIO
 Sphinx
 PyMySQL
 colour
