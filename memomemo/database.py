@@ -260,11 +260,10 @@ def change_password(user_id, password):
     db.session.commit()
 
 
-def query_memo(data, publish=None):
+def query_memo(user_id, data, publish=None):
     '''
     data = {
         query: {
-            user_id: int,
             title: string,
             text: string,
             tag: string
@@ -273,7 +272,6 @@ def query_memo(data, publish=None):
         limit: int
     }
     '''
-    user_id = data['query']['user_id']
     title = data['query']['title']
     text = data['query']['text']
     tag = data['query']['tag']

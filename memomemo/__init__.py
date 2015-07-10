@@ -10,12 +10,10 @@ from docutils.core import publish_parts
 from sphinx.directives.other import *
 from sphinx.directives.code import *
 import utils
-from flask.ext.socketio import SocketIO, emit
 
 
 app = Flask(__name__)
 app.config.from_object('config')
-socketio = SocketIO(app)
 
 from memomemo.database import db_session, User, query_memo, \
                               varify_user, add_user, change_password
@@ -45,24 +43,14 @@ def requires_login(f):
     return decorated_function
 
 
-@socketio.on('fetch memo', namespace='/memo')
+@app.route('/filter', methods=['POST'])
 @requires_login
-def filter(msg):
-    data = query_memo(json.loads(msg))
-    emit('memo response', data, namespace='/memo')
-
-
-@socketio.on('connect', namespace='/memo')
-@requires_login
-def connect():
-    print('Client connected')
-    emit('log response', {'log': 'Connection'})
-
-
-@socketio.on('disconnect', namespace='/memo')
-@requires_login
-def disconnect():
-    print('Client disconnected')
+def filter():
+    #emit('memo response', data, namespace='/memo')
+    user = User.query.get(session['user_id'])
+    if request.method == 'POST':
+        return query_memo(user.id, request.json)
+    return json.dumps({"status": False})
 
 
 @app.route('/')
@@ -70,7 +58,6 @@ def disconnect():
 def index():
     user = User.query.get(session['user_id'])
     name = user.name
-    id = user.id
     tags = user.generate_tag_list()
     memos, year = user.generate_memo_list()
     month = ["%02d" % x for x in range(1, 13)]

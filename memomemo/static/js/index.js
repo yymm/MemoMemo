@@ -43,46 +43,18 @@ $(document).ready(function(){
 	//
 	// SocketIO event
 	//
-	namespace = '/memo';
-	var socket = io.connect('http://' + document.domain + ':' + location.port + namespace, {
-			'reconnect': true,
-			'reconnection delay': 500,
-			'max reconnection attempts': 10
-	});
-
 	var old_filter = null;
 	var connecting = false;
 
-	socket.on('connect', function() {
-		socket.emit('recieve log', {log: 'Success to connect!'});
-	});
-
-	socket.on('memo response', function(msg) {
-		memos = $.parseJSON(msg);
-		if (memos.length != 10 || memos.length == 0) {
-			old_filter = null;
-			document.querySelector('#loading').classList.add("hidden");
-		}
-		for (i = 0; i < memos.length; ++i) {
-			display_memo(memos[i]);
-		}
-	});
-
-	socket.on('log response', function(msg) {
-		console.log(msg);
-		send_to_websocket();
-	});
-
 	//
-	// UI event (Websocket)
+	// UI event (Ajax)
 	//
-	function send_to_websocket(title, text, tag){
+	function send_to_filter(title, text, tag){
 		if (typeof title === 'undefined') title = '';
 		if (typeof text === 'undefined') text = '';
 		if (typeof tag === 'undefined') tag = '';
 		var filter = {
 			query: {
-				user_id: $('#user_id').html(),
 				title: title,
 				text: text,
 				tag: tag,
@@ -101,24 +73,51 @@ $(document).ready(function(){
 		old_filter = filter;
 		$('#container').empty();
 		document.querySelector('#loading').classList.remove("hidden");
-		socket.emit('fetch memo', JSON.stringify(filter));
+		//socket.emit('fetch memo', JSON.stringify(filter));
+		
+        post_filter(filter);
 	}
+
+    // first load
+    send_to_filter();
+
+    function post_filter(f) {
+		$.ajax({
+			type: 'POST',
+			url: '/filter',
+			data: JSON.stringify(f),
+			contentType: 'application/json',
+			success: function(json_memos){
+		        memos = $.parseJSON(json_memos);
+		        if (memos.length != 10 || memos.length == 0) {
+		        	old_filter = null;
+		        	document.querySelector('#loading').classList.add("hidden");
+		        }
+		        for (i = 0; i < memos.length; ++i) {
+		        	display_memo(memos[i]);
+		        }
+			},
+			error: function(){
+				alertFlash('Connection Error: Please retry.', 'error');
+			}
+		});
+    }
 
 	$('.submit-button').click(function(){
 		title = $("#search-form [name=title]").val();
 		text = $("#search-form [name=text]").val();
 		tag = $("#search-form [name=tag]").val();
-		send_to_websocket(title, text, tag);
+		send_to_filter(title, text, tag);
 		closedlg($('#searchdlg'));
 	});
 
 	$('.jsCumulus').click(function(){
-		send_to_websocket('', '', $(this).text());
+		send_to_filter('', '', $(this).text());
 		closedlg($('#cumulusdlg'));
 	});
 
 	$('.tag').click(function(){
-		send_to_websocket('', '', $(this).children('i').text());
+		send_to_filter('', '', $(this).children('i').text());
 		closedlg($('#tagdlg'));
 	});
 
@@ -131,7 +130,8 @@ $(document).ready(function(){
 			limit = old_filter['limit'];
 			old_filter['offset'] = limit;
 			old_filter['limit'] = limit + 10;
-			socket.emit('fetch memo', JSON.stringify(old_filter));
+			//socket.emit('fetch memo', JSON.stringify(old_filter));
+            post_filter(old_filter);
 		}
 	});
 
@@ -490,7 +490,7 @@ $(document).ready(function(){
 	function select_title() {
 		var title = $(this).children('div').text();
 		var tag = $(this).children('span').text();
-		send_to_websocket(title, '', tag);
+		send_to_filter(title, '', tag);
 		closedlg($('#titledlg'));
 	};
 
