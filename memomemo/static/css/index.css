@@ -149,7 +149,7 @@ a, h1, h2, h3, h4, h5 {
 /* menu UI : search-div */
 /************************/
 .search-div {
-	top: 30%;
+	top: 20%;
 }
 #searchdlg {
 	width: 270px;
@@ -179,7 +179,7 @@ a, h1, h2, h3, h4, h5 {
 /* menu UI : cumulonimbus-div */
 /******************************/
 .cumulunimbus-div {
-	top: 50%;
+	top: 30%;
 }
 #cumulusdlg {
 	width: 600px; 
@@ -189,7 +189,7 @@ a, h1, h2, h3, h4, h5 {
 /* menu UI : tagcloud-div */
 /**************************/
 .tagcloud-div {
-	top: 40%;
+	top: 25%;
 }
 #tagdlg {
 	width: 500px;
@@ -238,7 +238,7 @@ a, h1, h2, h3, h4, h5 {
 /* menu UI : title-div */
 /***********************/
 .title-div {
-	top: 20%;
+	top: 15%;
 }
 #titledlg {
 	width: 700px;
@@ -327,6 +327,18 @@ a, h1, h2, h3, h4, h5 {
 }
 #month-select:disabled {
 	opacity: 0.5;
+}
+/*********************/
+/* menu UI : log-div */
+/*********************/
+.log-div {
+	top: 35%;
+}
+/*************************/
+/* menu UI : publish-div */
+/*************************/
+.publish-div {
+	top: 40%;
 }
 /***********/
 /* Memo UI */
