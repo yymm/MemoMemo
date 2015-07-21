@@ -55,15 +55,17 @@ $(document).ready(function(){
 	//
 	// UI event (Ajax)
 	//
-	function send_to_filter(title, text, tag){
+	function send_to_filter(title, text, tag, publish){
 		if (typeof title === 'undefined') title = '';
 		if (typeof text === 'undefined') text = '';
 		if (typeof tag === 'undefined') tag = '';
+		if (typeof publish === 'undefined') publish = 0;
 		var filter = {
 			query: {
 				title: title,
 				text: text,
 				tag: tag,
+                publish: publish
 			},
 			offset: 0,
 			limit: 10
@@ -72,6 +74,7 @@ $(document).ready(function(){
 			filter.query.title == old_filter.query.title &&
 			filter.query.text == old_filter.query.text &&
 			filter.query.tag == old_filter.query.tag &&
+			filter.query.publish == old_filter.query.publish &&
 			filter.offset == old_filter.offset &&
 			filter.limit == old_filter.limit) {
 			return;
@@ -79,7 +82,6 @@ $(document).ready(function(){
 		old_filter = filter;
 		$('#container').empty();
 		document.querySelector('#loading').classList.remove("hidden");
-		//socket.emit('fetch memo', JSON.stringify(filter));
 		
         post_filter(filter);
 	}
@@ -113,7 +115,12 @@ $(document).ready(function(){
 		title = $("#search-form [name=title]").val();
 		text = $("#search-form [name=text]").val();
 		tag = $("#search-form [name=tag]").val();
-		send_to_filter(title, text, tag);
+        var elem = $("#search-form [name=publish]");
+        var publish = 0;
+        if (elem) {
+            publish = elem.val();
+        }
+		send_to_filter(title, text, tag, publish);
 		closedlg($('#searchdlg'));
 	});
 
@@ -136,7 +143,6 @@ $(document).ready(function(){
 			limit = old_filter['limit'];
 			old_filter['offset'] = limit;
 			old_filter['limit'] = limit + 10;
-			//socket.emit('fetch memo', JSON.stringify(old_filter));
             post_filter(old_filter);
 		}
 	});
@@ -400,6 +406,7 @@ $(document).ready(function(){
 	var title_list = [];
 
 	// Initialize select
+	document.querySelector("#search-publish-select").selectedIndex = 0;
 	document.querySelector("#tag-select").selectedIndex = 0;
 	document.querySelector("#publish-select").selectedIndex = 0;
 	document.querySelector("#year-select").selectedIndex = 0;

@@ -112,6 +112,17 @@
 		<input type="text", name="title"  placeholder="Title" class='menu-input'></input>
 		<input type="text", name="text"  placeholder="Text" class='menu-input'></input>
 		<input type="text", name="tag" placeholder="Tag" class='menu-input'></input>
+		{% if categories %}
+		<select name="publish" id="search-publish-select">
+			<option value="0" selected="selected">-</option>
+			<option value="100">All</option>
+			{% for category in categories %}
+			{% if not loop.first %}
+			<option value="{{ loop.index-1 }}">{{ category['name'] }}</option>
+			{% endif %}
+			{% endfor %}
+		</select>
+		{% endif %}
 		<input type="button" value="Submit" class="menu-btn submit-button"></input>
 	</form>
 </div>

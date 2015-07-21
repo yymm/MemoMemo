@@ -261,13 +261,14 @@ def change_password(user_id, password):
     db.session.commit()
 
 
-def query_memo(user_id, data, publish=None):
+def query_memo(user_id, data):
     '''
     data = {
         query: {
             title: string,
             text: string,
             tag: string
+            publish: int
         },
         offset: int,
         limit: int
@@ -276,13 +277,20 @@ def query_memo(user_id, data, publish=None):
     title = data['query']['title']
     text = data['query']['text']
     tag = data['query']['tag']
+    publish = int(data['query']['publish'])
     offset = data['offset']
     limit = data['limit']
 
     q = Memo.query.filter_by(user_id=user_id)
 
-    if publish:
-        q = q.filter_by(publish=publish)
+    categories = app.config['PELICAN_CATEGORIES'] \
+            if 'PELICAN_CATEGORIES' in app.config else None;
+    if categories:
+        if publish != 0:
+            if publish > len(categories):
+                q = q.filter(Memo.publish > 0)
+            else:
+                q = q.filter_by(publish=publish)
 
     if len(title) != 0:
         q = q.filter(Memo.title.like('%'+title+'%'))

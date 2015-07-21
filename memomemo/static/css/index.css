@@ -153,7 +153,7 @@ a, h1, h2, h3, h4, h5 {
 }
 #searchdlg {
 	width: 270px;
-	height: 300px;
+	height: 350px;
 }
 #searchdlg input {
 	width: 200px;
@@ -162,6 +162,18 @@ a, h1, h2, h3, h4, h5 {
     font-size: 1.0em;
 	padding: 10px 0;
 	text-align: center;
+}
+#searchdlg select {
+	display: inline-block;
+	margin: 1em 1em 0em 2em;
+	padding: 10px 0;
+	width: 200px;
+	height: 40px;
+	font-size: 1.1em;
+	color: #555;
+	background: #eee;
+	border: solid 1px transparent;
+	border-radius: 5px;
 }
 /******************************/
 /* menu UI : cumulonimbus-div */
