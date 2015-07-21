@@ -126,6 +126,7 @@ class User(db.Model):
             dic["title"] = memo.title
             dic["date"] = memo.date_time
             dic["tag"] = memo.tag
+            dic["publish"] = memo.publish
             memo_list.append(dic)
             year_list.append(memo.date_time.year)
         return memo_list, list(set(year_list))
@@ -281,7 +282,7 @@ def query_memo(user_id, data, publish=None):
     q = Memo.query.filter_by(user_id=user_id)
 
     if publish:
-        q = q.filter_by(publish=1)
+        q = q.filter_by(publish=publish)
 
     if len(title) != 0:
         q = q.filter(Memo.title.like('%'+title+'%'))

@@ -229,8 +229,8 @@ a, h1, h2, h3, h4, h5 {
 	top: 20%;
 }
 #titledlg {
-	width: 600px;
-	height: 550px;
+	width: 700px;
+	height: 600px;
 	overflow: visible;
 }
 #title-container {
@@ -241,8 +241,8 @@ a, h1, h2, h3, h4, h5 {
 	right: 0;
 	margin: 0 auto;
 	background: black;
-	width: 550px;
-	height: 400px;
+	width: 650px;
+	height: 450px;
 	overflow: scroll;
 }
 #title-container ul, #title-container li {
@@ -290,9 +290,9 @@ a, h1, h2, h3, h4, h5 {
 }
 #title-query {
 	position: absolute;
-	width: 550px;
+	width: 700px;
 	height: 70px;
-	top: 500px;
+	top: 550px;
 	left: 0;
 	right: 0;
 	margin: 0 auto;
@@ -305,7 +305,7 @@ a, h1, h2, h3, h4, h5 {
 #title-query select {
 	display: inline-block;
 	margin: 0 5px;
-	width: 120px;
+	width: 100px;
 	height: 40px;
 	font-size: 1.1em;
 	color: #555;
@@ -350,12 +350,20 @@ a, h1, h2, h3, h4, h5 {
 	color: #ff9c77;
 }
 .memo-publish {
-	margin-left: 1em;
-	padding: 4px 8px;
+	margin: 10px;
+	padding: 5px;
 	border-radius: 5px;
-    font-size: 20px;
 	color: #FFF;
-	background-color: #ff8800;
+	animation: spin 0.5s 1 ease-in-out;
+	-webkit-animation: spin 0.5s 1 ease-in-out;
+}
+@keyframes spin {
+	0% { transform: rotate(0deg);}
+	100% { transform: rotate(360deg);}
+}
+@-webkit-keyframes spin {
+	0% { -webkit-transform: rotate(0deg);}
+	100% { -webkit-transform: rotate(360deg);}
 }
 .memo-edit,
 .memo-delete {
@@ -461,7 +469,7 @@ a, h1, h2, h3, h4, h5 {
 	padding: 10px;
 }
 /*
- *
+ * parser switch
  */
 input[type="radio"] {
   display: none;
@@ -498,26 +506,43 @@ label {
 /***************/
 /* Publish btn */
 /***************/
-#publish {
-  display: none;
-}
-.publish-btn {
+#publish-btn {
+  position: relative;
+  /*background: #aaa;*/
   float: right;
   padding: 5px;
-  margin-right: 10px;
-  display: block;
+  margin: 0 20px 0 0;
+  width: 150px;
   border-radius: 5px;
 }
-.publish-btn label {
+#publish-btn span {
   height: 21px;
   line-height: 21px;
   cursor: pointer;
-  color: #000;
-  text-shadow: 2px 2px 3px rgba(255, 255, 255, 0.0);
-  -moz-transition:all 1s;
-  -webkit-transition:all 1s;
-  -o-transition:all 1s;
-  -ms-transition:all 1s;
+}
+#publish-btn ul {
+  position: absolute;
+  top: 32px;
+  height: 0;
+}
+#publish-btn ul li {
+  visibility: hidden;
+  overflow: hidden;
+  width: 140px;
+  height: 0;
+  list-style: none;
+  padding: 10px;
+  z-index: -100;
+}
+#publish-btn:hover ul li {
+  visibility: visible;
+  overflow: visible;
+  height: 40px;
+  z-index: 10;
+  cursor: pointer;
+}
+#publish-btn ul li:hover {
+  color: #777;
 }
 /****************/
 /* Clear Button */

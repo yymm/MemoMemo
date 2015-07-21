@@ -77,10 +77,16 @@
 		<div class="clear-btn">
 			<span class="fa fa-times"></span><span>Clear</span>
 		</div>
-		<div class="publish-btn">
-			<input type="checkbox" id="publish" disabled />
-			<label for="publish" id="publish-label">Publish</label>
+		{% if categories %}
+		<div id="publish-btn">
+			<span class="publish-status"><span class="fa fa-minus-square"></span>None</span>
+			<ul>
+				{% for category in categories %}
+				<li class="publish-item publish-{{ loop.index-1 }}" style="background: {{ category['color'] }}"><span class="fa fa-{{ category['fa'] }}"></span>{{ category['name'] }}</li>
+				{% endfor %}
+			</ul>
 		</div>
+		{% endif %}
 	</div>
 	<form onsubmit="return false;" class='addentry-form'>
 		<dl>
@@ -132,7 +138,11 @@
 	<div id="title-container">
 		<ul id="title-list">
 			{% for memo in memos %}
-			<li class="memo-title"><i>{{ memo['date'] }}</i><span>{{ memo['tag'] }}</span><div>{{ memo['title'] }}</div>
+			<li class="memo-title">
+				<i>{{ memo['date'] }}</i>
+				<span>{{ memo['tag'] }}</span>
+				<div>{% if categories %}{% if memo.publish > 0 %}<p class="fa fa-{{ categories[memo.publish].fa }}" style="color: {{ categories[memo.publish].color }}"></p>{% endif %}{% endif %}{{ memo['title'] }}</div>
+			</li>
 			{% endfor %}
 		</ul>
 	</div>
@@ -144,6 +154,18 @@
 			<option value="{{ tag['name'] }}">{{ tag['name'] }}</option>
 			{% endfor %}
 		</select>
+		{% if categories %}
+		<span>Publish:</span>
+		<select id="publish-select">
+			<option value="default" selected="selected">-</option>
+			<option value="All">All</option>
+			{% for category in categories %}
+			{% if not loop.first %}
+			<option value="{{ category['fa'] }}">{{ category['name'] }}</option>
+			{% endif %}
+			{% endfor %}
+		</select>
+		{% endif %}
 		<span>Year:</span>
 		<select id="year-select">
 			<option value="default" selected="selected">-</option>

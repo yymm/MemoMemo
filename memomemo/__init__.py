@@ -60,6 +60,8 @@ def index():
     tags = user.generate_tag_list()
     memos, year = user.generate_memo_list()
     month = ["%02d" % x for x in range(1, 13)]
+    categories = app.config['PELICAN_CATEGORIES'] \
+            if 'PELICAN_CATEGORIES' in app.config else None;
     return render_template('index.html', **locals())
 
 

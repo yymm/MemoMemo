@@ -1,3 +1,4 @@
+# -*- encoding: utf-8 -*-
 import os
 
 _basedir = os.path.abspath(os.path.dirname(__file__))
@@ -24,6 +25,11 @@ MEMOMEMO_USER = os.environ["MEMOMEMO_USER"] \
 # User password(Not signin)
 MEMOMEMO_PASSWORD = os.environ["MEMOMEMO_PASSWORD"] \
         if 'MEMOMEMO_PASSWORD' in os.environ else None
+
+PELICAN_CATEGORIES = [{"name": "None", "color": "#aaa", "fa": "minus-square"},
+                      {"name": "Diary", "color": "#0bd566", "fa": "book"},
+                      {"name": "Home", "color": "#f48c39", "fa": "home"},
+                      {"name": "Programming", "color": "#000", "fa": "terminal"}]
 
 DEBUG = True
 
