@@ -1,0 +1,47 @@
+[
+    {
+        "date_time": "2015-07-21 19:28:20", 
+        "title": "\u8a18\u4e8b\u3092\u5897\u3084\u3059", 
+        "text": "<p>\u52aa\u529b</p>\n", 
+        "publish": 1, 
+        "basetext": "\u52aa\u529b", 
+        "tag": "test", 
+        "paser": "ReST"
+    }, 
+    {
+        "date_time": "2015-07-21 19:01:21", 
+        "title": "\u3071\u3044\u306a\u3063\u3077\u308b", 
+        "text": "<blockquote class=\"twitter-tweet\" data-partner=\"tweetdeck\"><p>\u3071\u3044\u306a\u3063\u3077\u308b&#10;5. \u3084\u3063\u3064&#10;6. \u304b\u308f&#10;7. \u3058\u3083\u3070\u3089&#10;8. \u3082\u308b <a href=\"http://t.co/HkqwbMjn5d\">pic.twitter.com/HkqwbMjn5d</a></p>&mdash; (Y\u25e1Y) .\uff61oO (\ufdfd) (@yymm6666) <a href=\"https://twitter.com/yymm6666/status/570004082967990272\">February 23, 2015</a></blockquote>\n<script async src=\"//platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>", 
+        "publish": 2, 
+        "basetext": ".. raw:: html\n\n <blockquote class=\"twitter-tweet\" data-partner=\"tweetdeck\"><p>\u3071\u3044\u306a\u3063\u3077\u308b&#10;5. \u3084\u3063\u3064&#10;6. \u304b\u308f&#10;7. \u3058\u3083\u3070\u3089&#10;8. \u3082\u308b <a href=\"http://t.co/HkqwbMjn5d\">pic.twitter.com/HkqwbMjn5d</a></p>&mdash; (Y\u25e1Y) .\uff61oO (\ufdfd) (@yymm6666) <a href=\"https://twitter.com/yymm6666/status/570004082967990272\">February 23, 2015</a></blockquote>\n <script async src=\"//platform.twitter.com/widgets.js\" charset=\"utf-8\"></script>", 
+        "tag": "Diary", 
+        "paser": "ReST"
+    }, 
+    {
+        "date_time": "2015-07-21 19:01:00", 
+        "title": "Go by Example: Hello World", 
+        "text": "", 
+        "publish": 3, 
+        "basetext": "[Go by Example: Hello World](https://gobyexample.com/hello-world \"Go by Example: Hello World\")\n\n```go\npackage main\n\n\t\n\nimport \"fmt\"\n\n\t\n\nfunc main() {\n    fmt.Println(\"hello world\")\n}\n\n```", 
+        "tag": "Golang", 
+        "paser": "Markdown"
+    }, 
+    {
+        "date_time": "2015-07-21 16:51:32", 
+        "title": "Go by Example: Regular Expressions", 
+        "text": "", 
+        "publish": 2, 
+        "basetext": "[Go by Example: Regular Expressions](https://gobyexample.com/regular-expressions \"Go by Example: Regular Expressions\")\n\n```go\n// Go offers built-in support for [regular expressions](http://en.wikipedia.org/wiki/Regular_expression).\n// Here are some examples of  common regexp-related tasks\n// in Go.\n\npackage main\n\nimport \"bytes\"\nimport \"fmt\"\nimport \"regexp\"\n\nfunc main() {\n\n    // This tests whether a pattern matches a string.\n    match, _ := regexp.MatchString(\"p([a-z]+)ch\", \"peach\")\n    fmt.Println(match)\n\n    // Above we used a string pattern directly, but for\n    // other regexp tasks you'll need to `Compile` an\n    // optimized `Regexp` struct.\n    r, _ := regexp.Compile(\"p([a-z]+)ch\")\n\n    // Many methods are available on these structs. Here's\n    // a match test like we saw earlier.\n    fmt.Println(r.MatchString(\"peach\"))\n\n    // This finds the match for the regexp.\n    fmt.Println(r.FindString(\"peach punch\"))\n\n    // The also finds the first match but returns the\n    // start and end indexes for the match instead of the\n    // matching text.\n    fmt.Println(r.FindStringIndex(\"peach punch\"))\n\n    // The `Submatch` variants include information about\n    // both the whole-pattern matches and the submatches\n    // within those matches. For example this will return\n    // information for both `p([a-z]+)ch` and `([a-z]+)`.\n    fmt.Println(r.FindStringSubmatch(\"peach punch\"))\n\n    // Similarly this will return information about the\n    // indexes of matches and submatches.\n    fmt.Println(r.FindStringSubmatchIndex(\"peach punch\"))\n\n    // The `All` variants of these functions apply to all\n    // matches in the input, not just the first. For\n    // example to find all matches for a regexp.\n    fmt.Println(r.FindAllString(\"peach punch pinch\", -1))\n\n    // These `All` variants are available for the other\n    // functions we saw above as well.\n    fmt.Println(r.FindAllStringSubmatchIndex(\n        \"peach punch pinch\", -1))\n\n    // Providing a non-negative integer as the second\n    // argument to these functions will limit the number\n    // of matches.\n    fmt.Println(r.FindAllString(\"peach punch pinch\", 2))\n\n    // Our examples above had string arguments and used\n    // names like `MatchString`. We can also provide\n    // `[]byte` arguments and drop `String` from the\n    // function name.\n    fmt.Println(r.Match([]byte(\"peach\")))\n\n    // When creating constants with regular expressions\n    // you can use the `MustCompile` variation of\n    // `Compile`. A plain `Compile` won't work for\n    // constants because it has 2 return values.\n    r = regexp.MustCompile(\"p([a-z]+)ch\")\n    fmt.Println(r)\n\n    // The `regexp` package can also be used to replace\n    // subsets of strings with other values.\n    fmt.Println(r.ReplaceAllString(\"a peach\", \"<fruit>\"))\n\n    // The `Func` variant allows you to transform matched\n    // text with a given function.\n    in := []byte(\"a peach\")\n    out := r.ReplaceAllFunc(in, bytes.ToUpper)\n    fmt.Println(string(out))\n}\n```", 
+        "tag": "Golang", 
+        "paser": "Markdown"
+    }, 
+    {
+        "date_time": "2015-07-21 16:50:34", 
+        "title": "Go by Example: SHA1 Hashes", 
+        "text": "", 
+        "publish": 3, 
+        "basetext": "[Go Playground](http://play.golang.org/p/YUaWWEeB4U \"Go Playground\")\n\n```go\n// [_SHA1 hashes_](http://en.wikipedia.org/wiki/SHA-1) are\n// frequently used to compute short identities for binary\n// or text blobs. For example, the [git revision control\n// system](http://git-scm.com/) uses SHA1s extensively to\n// identify versioned files and directories. Here's how to\n// compute SHA1 hashes in Go.\n\npackage main\n\n// Go implements several hash functions in various\n// `crypto/*` packages.\nimport \"crypto/sha1\"\nimport \"fmt\"\n\nfunc main() {\n    s := \"sha1 this string\"\n\n    // The pattern for generating a hash is `sha1.New()`,\n    // `sha1.Write(bytes)`, then `sha1.Sum([]byte{})`.\n    // Here we start with a new hash.\n    h := sha1.New()\n\n    // `Write` expects bytes. If you have a string `s`,\n    // use `[]byte(s)` to coerce it to bytes.\n    h.Write([]byte(s))\n\n    // This gets the finalized hash result as a byte\n    // slice. The argument to `Sum` can be used to append\n    // to an existing byte slice: it usually isn't needed.\n    bs := h.Sum(nil)\n\n    // SHA1 values are often printed in hex, for example\n    // in git commits. Use the `%x` format verb to convert\n    // a hash results to a hex string.\n    fmt.Println(s)\n    fmt.Printf(\"%x\\n\", bs)\n}\n```", 
+        "tag": "Golang", 
+        "paser": "Markdown"
+    }
+]

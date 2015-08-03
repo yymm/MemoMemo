@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 import os
+import sys
 import json
 import datetime
 from functools import wraps
@@ -151,3 +152,38 @@ def changepassword():
         change_password(session['user_id'], json_data['password'])
         return json.dumps({'status': 'success'})
     return None
+
+@app.route('/publish', methods=['POST'])
+@requires_login
+def publish_pelican():
+    user_id = session['user_id']
+    # publishする記事のリスト生成
+    q = {"query": {
+            "title": "",
+            "text": "",
+            "tag": "",
+            "publish": 100
+            },
+        "offset": 0,
+        "limit": sys.maxint
+        }
+    sl = query_memo(user_id, q)
+    # 更新のある分だけ更新する
+    # => jsonファイルと読んで記事と日付の対応をチェック
+    #    => タイトルの無いもの、日付が一致しないものを更新対象に選択
+    #with open("publish.json", "r") as f:
+        #old_l = json.loads(f)
+    # ファイル作成
+    with open("publish.json", "w") as f:
+        l = json.loads(sl)
+        l = [ for x in l]
+        json.dump(l, f, indent=4)
+    # => content/*/にmd or rstファイル生成
+    # => jsonファイルも生成
+    # => カテゴリ別にファイルを作成
+    # pelicanテーマをgit clone
+    # テーマを使用してhtmlを生成
+    # github用に修正(gh-import?)
+    # gh-pagesにpush
+    # 成功したか失敗したかを戻す
+    return json.dumps({'status': 'success'})

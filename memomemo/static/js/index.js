@@ -557,7 +557,24 @@ $(document).ready(function(){
 				Toggle.classList.toggle("on");
 			}
 		});
-
 	});
+
+    //
+    // UI event(publish pelican)
+    //
+    $("#publish-request").click(function(){
+		$.ajax({
+			type: 'POST',
+			url: "/publish",
+			data: JSON.stringify({"publish": true}),
+			contentType: 'application/json',
+			success: function(){
+				alertFlash("Success to change password.", 'information');
+			},
+			error: function(){
+				alertFlash('Connection Error: Please retry.', 'error');
+			}
+		});
+    });
 });
 /* vim:set foldmethod=marker: */

@@ -340,6 +340,11 @@ a, h1, h2, h3, h4, h5 {
 .publish-div {
 	top: 40%;
 }
+#publishdlg {
+	width: 500px;
+	height: 400px;
+	overflow: visible;
+}
 /***********/
 /* Memo UI */
 /***********/
