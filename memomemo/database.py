@@ -155,6 +155,7 @@ class Memo(db.Model):
 
     def dump_dic(self):
         dic = {}
+        dic['id'] = self.id
         dic['title'] = self.title
         dic['basetext'] = self.text
         if self.paser == "Markdown":

@@ -6,3 +6,5 @@ colour
 gunicorn
 nose
 coverage
+pelican
+Markdown

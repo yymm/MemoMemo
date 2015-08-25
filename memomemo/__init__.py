@@ -167,17 +167,37 @@ def publish_pelican():
         "offset": 0,
         "limit": sys.maxint
         }
-    sl = query_memo(user_id, q)
+    l = json.loads(query_memo(user_id, q))
     # 更新のある分だけ更新する
     # => jsonファイルと読んで記事と日付の対応をチェック
     #    => タイトルの無いもの、日付が一致しないものを更新対象に選択
-    #with open("publish.json", "r") as f:
-        #old_l = json.loads(f)
-    # ファイル作成
-    with open("publish.json", "w") as f:
-        l = json.loads(sl)
-        l = [ for x in l]
-        json.dump(l, f, indent=4)
+    def check_update(new, old):
+        ret_l = {}
+        for e in new:
+            key = str(e["id"])
+            if key in old:
+                # update
+                if "update" in old[key]:
+                    if old[key]['update'] != e['date_time']:
+                        e["update"] = e["date_time"]
+                        e["date_time"] = old[key]["date_time"]
+                        ret_l[key] = e
+                else:
+                    if old[key]["date_time"] != e["date_time"]:
+                        e["update"] = e["date_time"]
+                        e["date_time"] = old[key]["date_time"]
+                        ret_l[key] = e
+            else:
+                # new
+                ret_l[key] = e
+        return ret_l
+
+    updates = []
+    if os.path.exists("publish.json"):
+        with open("publish.json", "r") as f:
+            updates = check_update(l, json.load(f))
+    print updates
+
     # => content/*/にmd or rstファイル生成
     # => jsonファイルも生成
     # => カテゴリ別にファイルを作成
@@ -185,5 +205,18 @@ def publish_pelican():
     # テーマを使用してhtmlを生成
     # github用に修正(gh-import?)
     # gh-pagesにpush
+    # jsonファイル作成
+    with open("publish.json", "w") as f:
+        d = dict()
+        for e in l:
+            id = e['id']
+            tmp = e
+            del tmp["text"]
+            del tmp["basetext"]
+            del tmp["id"]
+            d[id] = tmp
+        json.dump(d, f, indent=4)
     # 成功したか失敗したかを戻す
     return json.dumps({'status': 'success'})
+
+
