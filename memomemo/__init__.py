@@ -172,43 +172,78 @@ def publish_pelican():
     # => jsonファイルと読んで記事と日付の対応をチェック
     #    => タイトルの無いもの、日付が一致しないものを更新対象に選択
     def check_update(new, old):
-        ret_l = {}
+        ret_l = []
         for e in new:
             key = str(e["id"])
             if key in old:
                 # update
-                if "update" in old[key]:
-                    if old[key]['update'] != e['date_time']:
-                        e["update"] = e["date_time"]
+                if "modified" in old[key]:
+                    if old[key]['modified'] != e['date_time']:
+                        e["modified"] = e["date_time"]
                         e["date_time"] = old[key]["date_time"]
-                        ret_l[key] = e
+                        ret_l.append(e)
                 else:
                     if old[key]["date_time"] != e["date_time"]:
-                        e["update"] = e["date_time"]
+                        e["modified"] = e["date_time"]
                         e["date_time"] = old[key]["date_time"]
-                        ret_l[key] = e
+                        ret_l.append(e)
             else:
                 # new
-                ret_l[key] = e
+                ret_l.append(e)
         return ret_l
 
+    # => content/*/にmd or rstファイル生成
+    # => カテゴリ別にファイルを作成
+    def create_post(post_list):
+        pelican_val = app.config['PELICAN_CATEGORIES']
+        for l in post_list:
+            dir = 'pelican/content/' + pelican_val[l["publish"]]["name"] + "/"
+            ext = '.rst' if l["paser"] == "ReST" else '.md'
+            ext_other = '.md' if l["paser"] == "ReST" else '.rst'
+            name = dir + str(l['id']) + ext
+            name_other = dir + str(l['id']) + ext_other
+            title_tag = ':title: ' if l["paser"] == "ReST" else 'Title: '
+            tags_tag = ':tags: ' if l["paser"] == "ReST" else 'Tags: '
+            date_tag = ':date: ' if l["paser"] == "ReST" else 'Date: '
+            mod_tag = ':modified: ' if l["paser"] == "ReST" else 'Modified: '
+            if os.path.exists(name_other):
+                os.remove(name_other)
+            with open(name, 'w') as f:
+                f.write(title_tag + l["title"] + "\n")
+                f.write(tags_tag + l["tag"] + "\n")
+                f.write(date_tag + l["date_time"] + "\n")
+                if "modified" in l:
+                    f.write(mod_tag + l["modified"] + "\n")
+                f.write("\n" + l["basetext"].encode('utf_8'))
+                print l
+
     updates = []
+    old = None
     if os.path.exists("publish.json"):
         with open("publish.json", "r") as f:
-            updates = check_update(l, json.load(f))
-    print updates
+            old = json.load(f)
+            updates = check_update(l, old)
+            print updates
+        create_post(updates)
+    else:
+        create_post(l)
 
-    # => content/*/にmd or rstファイル生成
-    # => jsonファイルも生成
-    # => カテゴリ別にファイルを作成
     # pelicanテーマをgit clone
     # テーマを使用してhtmlを生成
     # github用に修正(gh-import?)
+    # gh-pagesをpull
     # gh-pagesにpush
+
     # jsonファイル作成
+    if os.path.exists("publish.json") and len(updates) == 0:
+        return json.dumps({'status': 'success'})
+
     with open("publish.json", "w") as f:
+        for e in updates:
+            old[str(e["id"])] = e
         d = dict()
-        for e in l:
+        write_list = l if os.path.exists("publish.json") else old
+        for e in write_list:
             id = e['id']
             tmp = e
             del tmp["text"]
@@ -216,7 +251,5 @@ def publish_pelican():
             del tmp["id"]
             d[id] = tmp
         json.dump(d, f, indent=4)
-    # 成功したか失敗したかを戻す
+
     return json.dumps({'status': 'success'})
-
-
