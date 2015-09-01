@@ -1,5 +1,6 @@
 # -*- encoding: utf-8 -*-
 import os
+import json
 
 _basedir = os.path.abspath(os.path.dirname(__file__))
 
@@ -26,10 +27,13 @@ MEMOMEMO_USER = os.environ["MEMOMEMO_USER"] \
 MEMOMEMO_PASSWORD = os.environ["MEMOMEMO_PASSWORD"] \
         if 'MEMOMEMO_PASSWORD' in os.environ else None
 
-PELICAN_CATEGORIES = [{"name": "None", "color": "#aaa", "fa": "minus-square"},
-                      {"name": "Diary", "color": "#0bd566", "fa": "book"},
-                      {"name": "Home", "color": "#f48c39", "fa": "home"},
-                      {"name": "Programming", "color": "#000", "fa": "terminal"}]
+if os.path.exists("pelicanconf.json"):
+    with open("pelicanconf.json") as f:
+        data = json.load(f)
+        PELICAN_CATEGORIES = data["categories"] if "categories" in data else None
+        PELICAN_GITHUB_REPO = data["github_repo"] if "github_repo" in data else None
+        PELICAN_THEME = data["theme"] if "theme" in data else None
+        PELICAN_GH_PAGES_REPO = data["gh_pages_repo"] if "gh_pages_repo" in data else None
 
 DEBUG = True
 
