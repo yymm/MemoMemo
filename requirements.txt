@@ -8,3 +8,5 @@ nose
 coverage
 pelican
 Markdown
+ghp-import
+mdx-del-ins
