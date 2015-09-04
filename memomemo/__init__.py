@@ -166,7 +166,8 @@ def publish_pelican():
             app.config['PELICAN_GITHUB_REPO'],
             app.config['PELICAN_CATEGORIES'],
             app.config['PELICAN_THEME'],
-            app.config['PELICAN_GH_PAGES_REPO'])
+            app.config['PELICAN_GH_PAGES_REPO'],
+            app.config['PELICAN_CUSTOM'])
 
     if pp.run():
         return json.dumps({'status': 'Failure, see system log.'})

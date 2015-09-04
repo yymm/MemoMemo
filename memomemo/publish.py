@@ -2,6 +2,7 @@
 
 import os
 import sys
+import md5
 import json
 import subprocess
 from memomemo.database import query_memo
@@ -12,12 +13,13 @@ def command_sync(command, cwd="."):
 class PublishPelican:
     publish_file = "publish.json"
 
-    def __init__(self, user_id, url, categories, theme, publish_url):
+    def __init__(self, user_id, url, categories, theme, publish_url, custom):
         self.user_id = user_id
         self.url = "https://github.com/" + url
         self.categories = categories
         self.theme = theme
         self.pub_url = publish_url
+        self.custom = custom
 
     def run(self):
         new = self.__query_publish_memos()
@@ -53,7 +55,11 @@ class PublishPelican:
             else:
                 command_sync(["git pull origin master"], cwd="pelican")
 
-            command_sync(["git submodule init && git submodule update", "pelican"],
+            if not os.path.exists("pelican/pelican-plugins"):
+               command_sync(["git clone --recursive https://github.com/getpelican/pelican-plugins"],
+                    cwd="pelican")
+
+            command_sync(["git submodule init && git submodule update"],
                     cwd="pelican")
         except Exception as e:
             return e
@@ -68,11 +74,17 @@ class PublishPelican:
             command_sync(["pelican content -s pelicanconf.py -t " + self.theme],
                     cwd="pelican")
 
+            print self.custom
+            if self.custom:
+                for c in self.custom:
+                    command_sync([c["command"]], cwd=c["cwd"])
+
             #command_sync(["ghp-import output"], cwd="pelican")
 
             #command_sync(["git push -f git@github.com:" + self.pub_url + " gh-pages:master"],
                     #cwd="pelican")
         except Exception as e:
+            print e
             return e
         return None
 
@@ -105,6 +117,9 @@ class PublishPelican:
                     n["modified"] = n["date_time"]
                     n["date_time"] = o["date_time"]
                     updates.append(n)
+                elif "modified" in o:
+                    n["date_time"] = o["date_time"]
+                    n["modified"] = o["modified"]
             else:
                 # new
                 updates.append(n)
@@ -127,6 +142,7 @@ class PublishPelican:
             tags_tag = ':tags: ' if p["paser"] == "ReST" else 'Tags: '
             date_tag = ':date: ' if p["paser"] == "ReST" else 'Date: '
             mod_tag = ':modified: ' if p["paser"] == "ReST" else 'Modified: '
+            slug_tag = ':slug: ' if p["paser"] == "ReST" else 'Slug: '
             if os.path.exists(name_other):
                 os.remove(name_other)
             with open(name, 'w') as f:
@@ -135,6 +151,7 @@ class PublishPelican:
                 f.write(date_tag + p["date_time"] + "\n")
                 if "modified" in p:
                     f.write(mod_tag + p["modified"] + "\n")
+                f.write(slug_tag + md5.new(str(p["id"])).hexdigest() + "\n")
                 f.write("\n" + p["basetext"].encode('utf_8'))
 
     def __generate_publish_file(self, posts):
