@@ -562,17 +562,39 @@ $(document).ready(function(){
     //
     // UI event(publish pelican)
     //
-    $("#publish-request").click(function(){
+    $(".publish-request").click(function(){
+        var type = $(this).text();
+		var ret = window.confirm("Publish pelican for '" + type + "'.\nAre you sure?");
+        if (ret === false) {
+			alertFlash("Cancel.", 'warning');
+            return;
+        }
+        $('#publish-wrapper').css('display', 'block');
 		$.ajax({
 			type: 'POST',
 			url: "/publish",
-			data: JSON.stringify({"publish": true}),
+			data: JSON.stringify({"type": type}),
 			contentType: 'application/json',
-			success: function(){
-				alertFlash("Success to change password.", 'information');
+			success: function(ret){
+                var v = $.parseJSON(ret);
+                var message = v["log"];
+                if (v["updates"].length != 0) {
+                    message += "<br />[" + v["type"] + "]<br />";
+                    message += "<ul>";
+                    v["updates"].forEach(function(e, i, a) {
+                        message += "<li>" + e["date_time"] + ": " + e["title"] + "</li>"
+                    });
+                    message += "</ul>";
+                } else {
+                    message += "<br />No update.";
+                }
+				alertFlash(message ,'information');
+				$('#publish-wrapper').css('display', 'none');
 			},
-			error: function(){
-				alertFlash('Connection Error: Please retry.', 'error');
+			error: function(ret){
+                var v = $.parseJSON(ret);
+				alertFlash('Connection Error: Please retry.\n' + v['log'], 'error');
+				$('#publish-wrapper').css('display', 'none');
 			}
 		});
     });

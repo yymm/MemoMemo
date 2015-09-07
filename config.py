@@ -35,6 +35,7 @@ if os.path.exists("pelicanconf.json"):
         PELICAN_THEME = data["theme"] if "theme" in data else None
         PELICAN_GH_PAGES_REPO = data["gh_pages_repo"] if "gh_pages_repo" in data else None
         PELICAN_CUSTOM = data["custom"] if "custom" in data else None
+        PELICAN_STAGING_HEROKU = data["staging_heroku"] if "staging_heroku" in data else None
 
 DEBUG = True
 

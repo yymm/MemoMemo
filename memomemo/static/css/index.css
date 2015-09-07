@@ -345,6 +345,47 @@ a, h1, h2, h3, h4, h5 {
 	height: 400px;
 	overflow: visible;
 }
+#publishdlg p {
+	font-size: 1.4em;
+	margin: 20px;
+}
+#publishdlg button {
+	margin: 20px;
+	width: 200px;
+	height: 80px;
+	font-size: 1.8em;
+	color: #fff;
+	border: none;
+	border-radius: 5px;
+    -moz-transition:all 0.2s;
+    -webkit-transition:all 0.2s;
+    -o-transition:all 0.2s;
+    -ms-transition:all 0.2s;
+}
+#publishdlg .heroku-publish {
+	background-color: #3b2f63;
+}
+#publishdlg .heroku-publish:hover {
+	background-color: rgb(84, 90, 182);
+}
+#publishdlg .github-publish {
+	background-color: #264873;
+}
+#publishdlg .github-publish:hover {
+	background-color: #4078c0;
+}
+#publishdlg #publish-wrapper {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	background-color: #000;
+	opacity: 0.5;
+	text-align: center;
+	display: none;
+}
+#publishdlg .publish-waiter {
+	margin-top: 150px;
+}
 /***********/
 /* Memo UI */
 /***********/

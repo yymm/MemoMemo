@@ -61,7 +61,15 @@ def index():
     memos, year = user.generate_memo_list()
     month = ["%02d" % x for x in range(1, 13)]
     categories = app.config['PELICAN_CATEGORIES'] \
-            if 'PELICAN_CATEGORIES' in app.config else None;
+            if 'PELICAN_CATEGORIES' in app.config else None
+    if app.config['PELICAN_GITHUB_REPO'] and \
+       app.config['PELICAN_CATEGORIES'] and \
+       app.config['PELICAN_THEME'] and \
+       app.config['PELICAN_GH_PAGES_REPO']:
+        publish = {"pelican_github_repo": app.config['PELICAN_GITHUB_REPO'],
+                   "pelican_theme": app.config['PELICAN_THEME'],
+                   "pelican_gh_pages_repo": app.config['PELICAN_GH_PAGES_REPO'],
+                   "pelican_staging_heroku": app.config['PELICAN_STAGING_HEROKU']}
     return render_template('index.html', **locals())
 
 
@@ -168,8 +176,11 @@ def publish_pelican():
             app.config['PELICAN_THEME'],
             app.config['PELICAN_GH_PAGES_REPO'],
             app.config['PELICAN_CUSTOM'])
+    data = request.json
+    ret, updates = pp.run()
+    if not ret:
+        return json.dumps({'log': 'Failure, see system log.'})
 
-    if pp.run():
-        return json.dumps({'status': 'Failure, see system log.'})
-
-    return json.dumps({'status': 'Success'})
+    return json.dumps({'log': 'Success to publish.',
+                       'type': data["type"],
+                       'updates': updates})

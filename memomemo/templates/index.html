@@ -63,14 +63,16 @@
 	<div class="menu cumulunimbus-div dialogbtn">
 		<a class="icon fa fa-cloud fa-2x showdlg" style='top: 4px; left: 3px;' href="#cumulusdlg"></a>
 	</div>
-	<!--cumulunimbus-div-->
+	<!--log-div-->
 	<div class="menu log-div dialogbtn">
 		<a class="icon fa fa-line-chart fa-2x showdlg" style='top: 4px; left: 3px;' href="#logdlg"></a>
 	</div>
-	<!--cumulunimbus-div-->
+    {% if publish %}
+	<!--publish-div-->
 	<div class="menu publish-div dialogbtn">
 		<a class="icon fa fa-upload fa-2x showdlg" style='top: 4px; left: 5px;' href="#publishdlg"></a>
 	</div>
+    {% endif %}
 </div>
 
 <!--Dialog-->
@@ -205,12 +207,21 @@
 	<a href="#logdlg" class="fa fa-times fa-3x closedlg"></a>
 	<h1>Graph</h1>
 </div>
+{% if publish %}
 <div id="publishdlg" class="dialog">
+    <div id="publish-wrapper">
+        <div class="fa fa-refresh fa-spin fa-4x publish-waiter"></div>
+    </div>
 	<a href="#publishdlg" class="fa fa-times fa-3x closedlg"></a>
 	<h1>Publish</h1>
-	<input type="text" name="cname" placeholder="CNAME" class=""></input>
-	<input type="button" value="Submit" id="publish-request"></input>
+    <p><i>Pelican Repo</i>: <a target="_blank" href="https://github.com/{{ publish["pelican_github_repo"] }}">{{ publish["pelican_github_repo"] }}</a></p>
+    <p><i>Theme</i>: <span>{{ publish["pelican_theme"] }}</span></p>
+    <p><i>Heroku(Staging)</i>: <a target="_blank" href="http://{{ pelican_staging_heroku }}.herokuapp.com">{{ publish["pelican_staging_heroku"] }}</a></p>
+    <p><i>gh-pages(Deploy)</i>: <a target="_blank" href="https://github.com/{{ publish["pelican_gh_pages_repo"] }}">{{ publish["pelican_gh_pages_repo"] }}</a></p>
+	<button class="publish-request heroku-publish">Staging</button>
+	<button class="publish-request github-publish">Deploy</button>
 </div>
+{% endif %}
 
 
 <div style='width: 100%; height: 50px;'></div>

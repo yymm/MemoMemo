@@ -33,19 +33,19 @@ class PublishPelican:
             posts = updates = new
 
         if len(updates) == 0:
-            return True
+            return True, []
 
         if self.__pull_pelican():
-            return False
+            return False, []
 
         self.__create_post(updates)
 
         if self.__push_to_gh_pages():
-            return False
+            return False, []
 
         self.__generate_publish_file(posts)
 
-        return True
+        return True, updates
 
     def __pull_pelican(self):
         # pelicanのリポジトリをgit clone (or git pull)
