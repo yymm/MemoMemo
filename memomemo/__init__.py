@@ -69,7 +69,7 @@ def index():
         publish = {"pelican_github_repo": app.config['PELICAN_GITHUB_REPO'],
                    "pelican_theme": app.config['PELICAN_THEME'],
                    "pelican_gh_pages_repo": app.config['PELICAN_GH_PAGES_REPO'],
-                   "pelican_staging_heroku": app.config['PELICAN_STAGING_HEROKU']}
+                   "pelican_blog_url": app.config['PELICAN_BLOG_URL']}
     return render_template('index.html', **locals())
 
 
@@ -167,6 +167,7 @@ def publish_pelican():
     if not app.config['PELICAN_GITHUB_REPO'] or \
        not app.config['PELICAN_CATEGORIES'] or \
        not app.config['PELICAN_THEME'] or \
+       not app.config['PELICAN_BLOG_URL'] or \
        not app.config['PELICAN_GH_PAGES_REPO']:
         return json.dumps({'status': 'Invalid parameter(pelicanconf.json).'})
 
@@ -175,7 +176,8 @@ def publish_pelican():
             app.config['PELICAN_CATEGORIES'],
             app.config['PELICAN_THEME'],
             app.config['PELICAN_GH_PAGES_REPO'],
-            app.config['PELICAN_CUSTOM'])
+            app.config['PELICAN_CUSTOM'],
+            app.config['PELICAN_BLOG_URL'])
     data = request.json
     ret, updates = pp.run()
     if not ret:

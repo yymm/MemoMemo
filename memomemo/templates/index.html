@@ -216,10 +216,9 @@
 	<h1>Publish</h1>
     <p><i>Pelican Repo</i>: <a target="_blank" href="https://github.com/{{ publish["pelican_github_repo"] }}">{{ publish["pelican_github_repo"] }}</a></p>
     <p><i>Theme</i>: <span>{{ publish["pelican_theme"] }}</span></p>
-    <p><i>Heroku(Staging)</i>: <a target="_blank" href="http://{{ pelican_staging_heroku }}.herokuapp.com">{{ publish["pelican_staging_heroku"] }}</a></p>
     <p><i>gh-pages(Deploy)</i>: <a target="_blank" href="https://github.com/{{ publish["pelican_gh_pages_repo"] }}">{{ publish["pelican_gh_pages_repo"] }}</a></p>
-	<button class="publish-request heroku-publish">Staging</button>
-	<button class="publish-request github-publish">Deploy</button>
+    <p><i>CNAME</i>: <a target="_blank" href="http://{{ publish["pelican_blog_url"] }}">{{ publish["pelican_blog_url"] }}</a></p>
+	<button class="publish-request">Deploy</button>
 </div>
 {% endif %}
 

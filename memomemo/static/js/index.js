@@ -563,8 +563,7 @@ $(document).ready(function(){
     // UI event(publish pelican)
     //
     $(".publish-request").click(function(){
-        var type = $(this).text();
-		var ret = window.confirm("Publish pelican for '" + type + "'.\nAre you sure?");
+		var ret = window.confirm("Publish pelican to gh-pages.\nAre you sure?");
         if (ret === false) {
 			alertFlash("Cancel.", 'warning');
             return;
@@ -573,14 +572,13 @@ $(document).ready(function(){
 		$.ajax({
 			type: 'POST',
 			url: "/publish",
-			data: JSON.stringify({"type": type}),
+			data: JSON.stringify({"type": "TODO"}),
 			contentType: 'application/json',
 			success: function(ret){
                 var v = $.parseJSON(ret);
                 var message = v["log"];
                 if (v["updates"].length != 0) {
-                    message += "<br />[" + v["type"] + "]<br />";
-                    message += "<ul>";
+                    message += "<br /><ul>";
                     v["updates"].forEach(function(e, i, a) {
                         message += "<li>" + e["date_time"] + ": " + e["title"] + "</li>"
                     });

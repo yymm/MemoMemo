@@ -13,13 +13,15 @@ def command_sync(command, cwd="."):
 class PublishPelican:
     publish_file = "publish.json"
 
-    def __init__(self, user_id, url, categories, theme, publish_url, custom):
+    def __init__(self, user_id, url, categories, theme,
+            publish_url, custom, blog_url):
         self.user_id = user_id
         self.url = "https://github.com/" + url
         self.categories = categories
         self.theme = theme
         self.pub_url = publish_url
         self.custom = custom
+        self.blog_url = blog_url
 
     def run(self):
         new = self.__query_publish_memos()
@@ -74,15 +76,20 @@ class PublishPelican:
             command_sync(["pelican content -s pelicanconf.py -t " + self.theme],
                     cwd="pelican")
 
-            print self.custom
             if self.custom:
                 for c in self.custom:
                     command_sync([c["command"]], cwd=c["cwd"])
 
-            #command_sync(["ghp-import output"], cwd="pelican")
+            command_sync(["ghp-import output"], cwd="pelican")
 
-            #command_sync(["git push -f git@github.com:" + self.pub_url + " gh-pages:master"],
-                    #cwd="pelican")
+            command_sync(["git checkout gh-pages"], cwd="pelican")
+            command_sync(['echo "' + self.blog_url + '" > CNAME'], cwd="pelican")
+            command_sync(["git add CNAME"], cwd="pelican")
+            command_sync(['git cm "Add CNAME."'], cwd="pelican")
+            command_sync(['git checkout master'], cwd="pelican")
+
+            command_sync(["git push git@github.com:" + self.pub_url + " gh-pages:master"],
+                    cwd="pelican")
         except Exception as e:
             print e
             return e
