@@ -77,6 +77,9 @@
 
 <!--Dialog-->
 <div id="entrydlg" class="dialog">
+    <div id="entry-wrapper" class="dlg-wrapper">
+        <div class="fa fa-refresh fa-spin fa-4x dlg-waiter"></div>
+    </div>
 	<a href="#entrydlg" class="fa fa-times fa-3x closedlg"></a>
 	<h1>Edit</h1>
 	<div id="edit-menu">
@@ -209,8 +212,8 @@
 </div>
 {% if publish %}
 <div id="publishdlg" class="dialog">
-    <div id="publish-wrapper">
-        <div class="fa fa-refresh fa-spin fa-4x publish-waiter"></div>
+    <div id="publish-wrapper" class="dlg-wrapper">
+        <div class="fa fa-refresh fa-spin fa-4x dlg-waiter"></div>
     </div>
 	<a href="#publishdlg" class="fa fa-times fa-3x closedlg"></a>
 	<h1>Publish</h1>

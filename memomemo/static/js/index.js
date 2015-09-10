@@ -171,6 +171,7 @@ $(document).ready(function(){
 	clear_addentry();
 
 	$('.commit-button').click( function() {
+        $('#entry-wrapper').css('display', 'block');
 		var url = '/add';	// {{{
 		var memo = {
 			title : $('input[name="title"]').val(),
@@ -211,10 +212,12 @@ $(document).ready(function(){
 					msg = 'Updated at ' + $.parseJSON(json_memo).date_time;
 				}
 				clear_addentry();
+                $('#entry-wrapper').css('display', 'none');
 				closedlg($('#entrydlg'));
 				alertFlash(msg, 'information');
 			},
 			error: function(){
+                $('#entry-wrapper').css('display', 'none');
 				alertFlash('Connection Error: Please retry.', 'error');
 			}
 		});
