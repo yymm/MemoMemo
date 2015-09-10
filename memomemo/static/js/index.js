@@ -177,8 +177,12 @@ $(document).ready(function(){
 			text : $('.memo-input-text').val(),
 			tag : $('input[name="tag"]').val(),
 			paser: document.querySelector(".paser-active").innerHTML,
-			publish: $("#publish-btn").attr("class").split("-")[1]
 		};
+        if ($("#publish-btn").attr("class")) {
+			memo["publish"] = $("#publish-btn").attr("class").split("-")[1];
+        } else {
+            memo["publish"] = "0";
+        }
 		if (!memo.title || !memo.text) {
 			alertFlash("Nothing input...", 'warning');
 			return false;
@@ -406,9 +410,13 @@ $(document).ready(function(){
 	var title_list = [];
 
 	// Initialize select
-	document.querySelector("#search-publish-select").selectedIndex = 0;
+    if (document.querySelector("#search-publish-select")) {
+	    document.querySelector("#search-publish-select").selectedIndex = 0;
+    }
 	document.querySelector("#tag-select").selectedIndex = 0;
-	document.querySelector("#publish-select").selectedIndex = 0;
+    if (document.querySelector("#publish-select")) {
+	    document.querySelector("#publish-select").selectedIndex = 0;
+    }
 	document.querySelector("#year-select").selectedIndex = 0;
 	document.querySelector("#month-select").selectedIndex = 0;
 
@@ -524,9 +532,11 @@ $(document).ready(function(){
 	document.querySelector("#month-select").onchange = function() {
 		query_title_list();
 	};
-	document.querySelector("#publish-select").onchange = function() {
-		query_title_list();
-	};
+    if (document.querySelector("#publish-select")) {
+	    document.querySelector("#publish-select").onchange = function() {
+	    	query_title_list();
+	    };
+    }
 	$(".memo-title").click(select_title);
 
 	function select_title() {

@@ -62,10 +62,10 @@ def index():
     month = ["%02d" % x for x in range(1, 13)]
     categories = app.config['PELICAN_CATEGORIES'] \
             if 'PELICAN_CATEGORIES' in app.config else None
-    if app.config['PELICAN_GITHUB_REPO'] and \
-       app.config['PELICAN_CATEGORIES'] and \
-       app.config['PELICAN_THEME'] and \
-       app.config['PELICAN_GH_PAGES_REPO']:
+    if 'PELICAN_GITHUB_REPO'  in app.config and \
+       'PELICAN_CATEGORIES'   in app.config and \
+       'PELICAN_THEME'        in app.config and \
+       'PELICAN_GH_PAGES_REPO'in app.config:
         publish = {"pelican_github_repo": app.config['PELICAN_GITHUB_REPO'],
                    "pelican_theme": app.config['PELICAN_THEME'],
                    "pelican_gh_pages_repo": app.config['PELICAN_GH_PAGES_REPO'],

@@ -28,7 +28,7 @@ MEMOMEMO_PASSWORD = os.environ["MEMOMEMO_PASSWORD"] \
         if 'MEMOMEMO_PASSWORD' in os.environ else None
 
 if os.path.exists("pelicanconf.json"):
-    with open("pelicanconf.json") as f:
+    with open("pelicanconf.json", "r") as f:
         data = json.load(f)
         PELICAN_CATEGORIES = data["categories"] if "categories" in data else None
         PELICAN_GITHUB_REPO = data["github_repo"] if "github_repo" in data else None
