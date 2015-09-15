@@ -27,16 +27,6 @@ MEMOMEMO_USER = os.environ["MEMOMEMO_USER"] \
 MEMOMEMO_PASSWORD = os.environ["MEMOMEMO_PASSWORD"] \
         if 'MEMOMEMO_PASSWORD' in os.environ else None
 
-if os.path.exists("pelicanconf.json"):
-    with open("pelicanconf.json", "r") as f:
-        data = json.load(f)
-        PELICAN_CATEGORIES = data["categories"] if "categories" in data else None
-        PELICAN_GITHUB_REPO = data["github_repo"] if "github_repo" in data else None
-        PELICAN_THEME = data["theme"] if "theme" in data else None
-        PELICAN_GH_PAGES_REPO = data["gh_pages_repo"] if "gh_pages_repo" in data else None
-        PELICAN_CUSTOM = data["custom"] if "custom" in data else None
-        PELICAN_BLOG_URL = data["blog_url"] if "blog_url" in data else None
-
 DEBUG = True
 
 del os

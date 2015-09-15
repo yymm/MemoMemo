@@ -576,6 +576,33 @@ $(document).ready(function(){
     // UI event(publish pelican)
     //
     $(".publish-request").click(function(){
+        var event_type = $(".publish-request").text();
+        if (event_type == "Enable") {
+            console.log(event_type);
+            var text = $("#pelicanconf").val();
+    		$.ajax({
+    			type: 'POST',
+    			url: "/publish",
+    			data: JSON.stringify({"type": "config", "pelicanconf": text}),
+    			contentType: 'application/json',
+    			success: function(ret){
+                    var v = $.parseJSON(ret);
+                    if (v["status"]) {
+    				    alertFlash("Success to save config.<br />", 'information');
+                        location.reload();
+                    } else {
+    				    alertFlash("Failure....<br />" + v["message"], 'warning');
+                    }
+    				$('#publish-wrapper').css('display', 'none');
+    			},
+    			error: function(ret){
+                    var v = $.parseJSON(ret);
+				    alertFlash('Connection Error: Please retry.\n' + v['log'], 'error');
+    				$('#publish-wrapper').css('display', 'none');
+    			}
+    		});
+            return;
+        }
 		var ret = window.confirm("Publish pelican to gh-pages.\nAre you sure?");
         if (ret === false) {
 			alertFlash("Cancel.", 'warning');
@@ -585,22 +612,32 @@ $(document).ready(function(){
 		$.ajax({
 			type: 'POST',
 			url: "/publish",
-			data: JSON.stringify({"type": "TODO"}),
+			data: JSON.stringify({"type": "publish"}),
 			contentType: 'application/json',
 			success: function(ret){
                 var v = $.parseJSON(ret);
                 var message = v["log"];
                 if (v["updates"].length != 0) {
-                    message += "<br /><ul>";
+                    message += "<br /><i>- Update list</i><ul>";
                     v["updates"].forEach(function(e, i, a) {
                         message += "<li>" + e["date_time"] + ": " + e["title"] + "</li>"
                     });
                     message += "</ul>";
                 } else {
-                    message += "<br />No update.";
+                    message += "<br />No update.<br />";
+                }
+                if (v["deletes"].length != 0) {
+                    message += "<br /><i>- Delete list</i><ul>";
+                    v["deletes"].forEach(function(e, i, a) {
+                        message += "<li>" + e["date_time"] + ": " + e["title"] + "</li>"
+                    });
+                    message += "</ul>";
+                } else {
+                    message += "<br />No delete.<br />";
                 }
 				alertFlash(message ,'information');
 				$('#publish-wrapper').css('display', 'none');
+		        closedlg($('#publishdlg'));
 			},
 			error: function(ret){
                 var v = $.parseJSON(ret);

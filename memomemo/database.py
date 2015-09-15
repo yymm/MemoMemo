@@ -171,6 +171,16 @@ class Memo(db.Model):
 
 
 class Config(db.Model):
+    '''
+    This table save the flexible json objects.
+    Now, write keys that exist here,
+      -----------   --------  
+    | Key         | Type     |
+      ----------- | --------  
+    | signin      | <Bool>   |
+    | pelicanconf | <Object> |
+    | publish     | <Object> |
+    '''
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     json = db.Column(db.Text)
@@ -180,6 +190,23 @@ class Config(db.Model):
 
     def get_config_obj(self):
         return json.loads(self.json)
+
+    def get_config_element(self, key):
+        obj = json.loads(self.json)
+        if not key in obj:
+            return None
+        return obj[key]
+
+    def set_config_obj(self, obj):
+        self.json = json.dumps(obj)
+        db.session.add(self)
+        db.session.commit()
+        return self.json
+
+    def set_config_element(self, key, elem):
+        obj = self.get_config_obj()
+        obj[key] = elem
+        self.set_config_obj(obj)
 
 
 def init_db():
@@ -284,9 +311,10 @@ def query_memo(user_id, data):
 
     q = Memo.query.filter_by(user_id=user_id)
 
-    categories = app.config['PELICAN_CATEGORIES'] \
-            if 'PELICAN_CATEGORIES' in app.config else None;
-    if categories:
+    user = User.query.get(user_id)
+    pelicanconf = user.config.get_config_element("pelicanconf")
+    if pelicanconf:
+        categories = pelicanconf["categories"]
         if publish != 0:
             if publish > len(categories):
                 q = q.filter(Memo.publish > 0)

@@ -5,17 +5,16 @@ import sys
 import md5
 import json
 import subprocess
-from memomemo.database import query_memo
+from memomemo.database import User, query_memo
 
 def command_sync(command, cwd="."):
     return subprocess.call(command, cwd=cwd, shell=True)
 
 class PublishPelican:
-    publish_file = "publish.json"
-
     def __init__(self, user_id, url, categories, theme,
             publish_url, custom, blog_url):
         self.user_id = user_id
+        self.user = User.query.get(self.user_id)
         self.url = "https://github.com/" + url
         self.categories = categories
         self.theme = theme
@@ -27,15 +26,19 @@ class PublishPelican:
         new = self.__query_publish_memos()
         posts = []
         updates = []
-        if os.path.exists(self.publish_file):
-            with open(self.publish_file, "r") as f:
-                old = json.load(f)
-                posts, updates = self.__check_update(new, old)
+        deletes = []
+
+        old = self.user.config.get_config_element("publish")
+        if old:
+            posts, updates, deletes = self.__check_update(new, old)
         else:
             posts = updates = new
 
-        if len(updates) == 0:
+        if len(updates) == 0 and len(deletes) == 0:
             return True, []
+
+        if len(deletes) != 0:
+            self.__delete_pages(deletes)
 
         if self.__pull_pelican():
             return False, []
@@ -47,7 +50,7 @@ class PublishPelican:
 
         self.__generate_publish_file(posts)
 
-        return True, updates
+        return True, updates, deletes
 
     def __pull_pelican(self):
         # pelicanのリポジトリをgit clone (or git pull)
@@ -73,6 +76,7 @@ class PublishPelican:
         # gh-pagesをpull
         # gh-pagesにpush
         try:
+            command_sync(["rm -r output"], cwd="pelican")
             command_sync(["pelican content -s pelicanconf.py -t " + self.theme],
                     cwd="pelican")
 
@@ -91,7 +95,6 @@ class PublishPelican:
             command_sync(["git push git@github.com:" + self.pub_url + " gh-pages:master"],
                     cwd="pelican")
         except Exception as e:
-            print e
             return e
         return None
 
@@ -114,6 +117,7 @@ class PublishPelican:
         #    => タイトルの無いもの、日付が一致しないものを更新対象に選択
         posts = []
         updates = []
+        deletes = []
         for n in new:
             key = str(n["id"])
             if key in old:
@@ -132,7 +136,27 @@ class PublishPelican:
                 updates.append(n)
             # all posts
             posts.append(n)
-        return posts, updates
+
+        # delete
+        for key in old.iterkeys():
+            is_exist = False
+            for n in new:
+                if n["id"] == int(key):
+                    is_exist = True
+                    continue
+            if not is_exist:
+                deletes.append(old[key])
+
+        return posts, updates, deletes
+
+    def __delete_pages(self, deletes):
+        # => 記事削除
+        for d in deletes:
+            path = 'pelican/content/' + self.categories[d["publish"]]["name"] \
+                    + "/" + str(d["id"])
+            ext = ".rst" if d["paser"] == "ReST" else ".md"
+            os.remove(path + ext)
+        return
 
     def __create_post(self, posts):
         # => content/*/にmd or rstファイル生成
@@ -163,13 +187,12 @@ class PublishPelican:
 
     def __generate_publish_file(self, posts):
         # jsonファイル作成
-        with open("publish.json", "w") as f:
-            d = dict()
-            for p in posts:
-                id = p['id']
-                tmp = p
-                del tmp["text"]
-                del tmp["basetext"]
-                del tmp["id"]
-                d[id] = tmp
-            json.dump(d, f, indent=4)
+        d = dict()
+        for p in posts:
+            id = p['id']
+            tmp = p
+            del tmp["text"]
+            del tmp["basetext"]
+            del tmp["tag"]
+            d[id] = tmp
+        self.user.config.set_config_element("publish", d)

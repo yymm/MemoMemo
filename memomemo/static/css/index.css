@@ -369,6 +369,12 @@ a, h1, h2, h3, h4, h5 {
 #publishdlg .publish-request:hover {
 	background-color: #4078c0;
 }
+#publishdlg textarea {
+	width: 500px;
+	height: 230px;
+	margin: 1px;
+	font-size: 120%;
+}
 .dlg-wrapper {
 	position: absolute;
 	width: 100%;
