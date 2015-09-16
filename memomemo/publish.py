@@ -35,18 +35,18 @@ class PublishPelican:
             posts = updates = new
 
         if len(updates) == 0 and len(deletes) == 0:
-            return True, []
+            return True, [], []
 
         if len(deletes) != 0:
             self.__delete_pages(deletes)
 
         if self.__pull_pelican():
-            return False, []
+            return False, [], []
 
         self.__create_post(updates)
 
         if self.__push_to_gh_pages():
-            return False, []
+            return False, [], []
 
         self.__generate_publish_file(posts)
 

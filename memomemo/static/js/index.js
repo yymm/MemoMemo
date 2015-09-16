@@ -616,7 +616,7 @@ $(document).ready(function(){
 			contentType: 'application/json',
 			success: function(ret){
                 var v = $.parseJSON(ret);
-                var message = v["log"];
+                var message = v["log"] + "<br />";
                 if (v["updates"].length != 0) {
                     message += "<br /><i>- Update list</i><ul>";
                     v["updates"].forEach(function(e, i, a) {
