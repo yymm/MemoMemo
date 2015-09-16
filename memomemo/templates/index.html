@@ -63,10 +63,21 @@
 	<div class="menu cumulunimbus-div dialogbtn">
 		<a class="icon fa fa-cloud fa-2x showdlg" style='top: 4px; left: 3px;' href="#cumulusdlg"></a>
 	</div>
+	<!--log-div-->
+	<div class="menu log-div dialogbtn">
+		<a class="icon fa fa-line-chart fa-2x showdlg" style='top: 4px; left: 3px;' href="#logdlg"></a>
+	</div>
+	<!--publish-div-->
+	<div class="menu publish-div dialogbtn">
+		<a class="icon fa fa-upload fa-2x showdlg" style='top: 4px; left: 5px;' href="#publishdlg"></a>
+	</div>
 </div>
 
 <!--Dialog-->
 <div id="entrydlg" class="dialog">
+    <div id="entry-wrapper" class="dlg-wrapper">
+        <div class="fa fa-refresh fa-spin fa-4x dlg-waiter"></div>
+    </div>
 	<a href="#entrydlg" class="fa fa-times fa-3x closedlg"></a>
 	<h1>Edit</h1>
 	<div id="edit-menu">
@@ -77,10 +88,16 @@
 		<div class="clear-btn">
 			<span class="fa fa-times"></span><span>Clear</span>
 		</div>
-		<div class="publish-btn">
-			<input type="checkbox" id="publish" disabled />
-			<label for="publish" id="publish-label">Publish</label>
+		{% if categories %}
+		<div id="publish-btn">
+			<span class="publish-status"><span class="fa fa-minus-square"></span>None</span>
+			<ul>
+				{% for category in categories %}
+				<li class="publish-item publish-{{ loop.index-1 }}" style="background: {{ category['color'] }}"><span class="fa fa-{{ category['fa'] }}"></span>{{ category['name'] }}</li>
+				{% endfor %}
+			</ul>
 		</div>
+		{% endif %}
 	</div>
 	<form onsubmit="return false;" class='addentry-form'>
 		<dl>
@@ -106,6 +123,17 @@
 		<input type="text", name="title"  placeholder="Title" class='menu-input'></input>
 		<input type="text", name="text"  placeholder="Text" class='menu-input'></input>
 		<input type="text", name="tag" placeholder="Tag" class='menu-input'></input>
+		{% if categories %}
+		<select name="publish" id="search-publish-select">
+			<option value="0" selected="selected">-</option>
+			<option value="100">All</option>
+			{% for category in categories %}
+			{% if not loop.first %}
+			<option value="{{ loop.index-1 }}">{{ category['name'] }}</option>
+			{% endif %}
+			{% endfor %}
+		</select>
+		{% endif %}
 		<input type="button" value="Submit" class="menu-btn submit-button"></input>
 	</form>
 </div>
@@ -132,7 +160,11 @@
 	<div id="title-container">
 		<ul id="title-list">
 			{% for memo in memos %}
-			<li class="memo-title"><i>{{ memo['date'] }}</i><span>{{ memo['tag'] }}</span><div>{{ memo['title'] }}</div>
+			<li class="memo-title">
+				<i>{{ memo['date'] }}</i>
+				<span>{{ memo['tag'] }}</span>
+				<div>{% if categories %}{% if memo.publish > 0 %}<p class="fa fa-{{ categories[memo.publish].fa }}" style="color: {{ categories[memo.publish].color }}"></p>{% endif %}{% endif %}{{ memo['title'] }}</div>
+			</li>
 			{% endfor %}
 		</ul>
 	</div>
@@ -144,6 +176,18 @@
 			<option value="{{ tag['name'] }}">{{ tag['name'] }}</option>
 			{% endfor %}
 		</select>
+		{% if categories %}
+		<span>Publish:</span>
+		<select id="publish-select">
+			<option value="default" selected="selected">-</option>
+			<option value="All">All</option>
+			{% for category in categories %}
+			{% if not loop.first %}
+			<option value="{{ category['fa'] }}">{{ category['name'] }}</option>
+			{% endif %}
+			{% endfor %}
+		</select>
+		{% endif %}
 		<span>Year:</span>
 		<select id="year-select">
 			<option value="default" selected="selected">-</option>
@@ -160,6 +204,31 @@
 		</select>
 	</div>
 </div>
+
+<div id="logdlg" class="dialog">
+	<a href="#logdlg" class="fa fa-times fa-3x closedlg"></a>
+	<h1>Graph</h1>
+</div>
+
+<div id="publishdlg" class="dialog">
+    <div id="publish-wrapper" class="dlg-wrapper">
+        <div class="fa fa-refresh fa-spin fa-4x dlg-waiter"></div>
+    </div>
+	<a href="#publishdlg" class="fa fa-times fa-3x closedlg"></a>
+{% if publish %}
+	<h1>Publish</h1>
+    <p><i>Pelican Repo</i>: <a target="_blank" href="https://github.com/{{ publish["pelican_github_repo"] }}">{{ publish["pelican_github_repo"] }}</a></p>
+    <p><i>Theme</i>: <span>{{ publish["pelican_theme"] }}</span></p>
+    <p><i>gh-pages(Deploy)</i>: <a target="_blank" href="https://github.com/{{ publish["pelican_gh_pages_repo"] }}">{{ publish["pelican_gh_pages_repo"] }}</a></p>
+    <p><i>CNAME</i>: <a target="_blank" href="http://{{ publish["pelican_blog_url"] }}">{{ publish["pelican_blog_url"] }}</a></p>
+	<button class="publish-request">Deploy</button>
+{% else %}
+	<h1>Config: Publish to Pelican</h1>
+    <textarea id="pelicanconf" placeholder="Input json here."></textarea>
+	<button class="publish-request">Enable</button>
+{% endif %}
+</div>
+
 
 <div style='width: 100%; height: 50px;'></div>
 <div id="container"></div>

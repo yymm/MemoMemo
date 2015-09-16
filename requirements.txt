@@ -6,3 +6,9 @@ colour
 gunicorn
 nose
 coverage
+pelican
+Markdown
+ghp-import
+mdx-del-ins
+docutils
+pelican_youtube

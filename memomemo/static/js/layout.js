@@ -6,7 +6,7 @@ function alertFlash(message, category){
 	var child = document.createElement('button');
 	prnt.className = 'flash-alert';
 	prnt.id = category === undefined ? 'important' : category;
-	prnt.textContent = message;
+	prnt.innerHTML = message;
 	child.className = 'close-btn';
 	child.textContent = 'x';
 	child.onclick = function(){

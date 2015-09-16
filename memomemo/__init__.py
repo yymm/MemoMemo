@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 
 import os
+import sys
 import json
 import datetime
 from functools import wraps
@@ -9,14 +10,13 @@ from flask import Flask, render_template, session, g, \
 from docutils.core import publish_parts
 from sphinx.directives.other import *
 from sphinx.directives.code import *
-import utils
-
 
 app = Flask(__name__)
 app.config.from_object('config')
 
 from memomemo.database import db_session, User, query_memo, \
                               varify_user, add_user, change_password
+from memomemo.publish import PublishPelican
 
 
 @app.before_request
@@ -60,6 +60,13 @@ def index():
     tags = user.generate_tag_list()
     memos, year = user.generate_memo_list()
     month = ["%02d" % x for x in range(1, 13)]
+    pelicanconf = user.config.get_config_element("pelicanconf")
+    if pelicanconf:
+        categories = pelicanconf['categories']
+        publish = {"pelican_github_repo":   pelicanconf['github_repo'],
+                   "pelican_theme":         pelicanconf['theme'],
+                   "pelican_gh_pages_repo": pelicanconf['gh_pages_repo'],
+                   "pelican_blog_url":      pelicanconf['blog_url']}
     return render_template('index.html', **locals())
 
 
@@ -67,8 +74,8 @@ def index():
 def signup():
     if len(User.query.all()) == 1:
         user = User.query.first()
-        obj = user.config.get_config_obj()
-        if not obj["signin"]:
+        obj = user.config.get_config_element("signin")
+        if not obj:
             return render_template('404.html'), 404
     name = request.form['username']
     password = request.form['password']
@@ -89,12 +96,8 @@ def login():
     signup = True
     if len(User.query.all()) == 1:
         user = User.query.first()
-        config = user.config
-        if config:
-            obj = config.get_config_obj()
-            if not obj["signin"]:
-                signup = False
-        else:
+        obj = user.config.get_config_element("signin")
+        if not obj:
             signup = False
         
     return render_template('login.html', **locals())
@@ -149,3 +152,41 @@ def changepassword():
         change_password(session['user_id'], json_data['password'])
         return json.dumps({'status': 'success'})
     return None
+
+
+@app.route('/publish', methods=['POST'])
+@requires_login
+def publish_pelican():
+    user = User.query.get(session['user_id'])
+    pelicanconf = user.config.get_config_element("pelicanconf")
+
+    data = request.json
+
+    if not pelicanconf:
+        try:
+            conf = json.loads(data["pelicanconf"])
+            if "categories" not in conf or "github_repo" not in conf or \
+               "theme" not in conf or "gh_pages_repo" not in conf:
+                   return json.dumps({"status": False, "message": "Key error."})
+        except Exception as e:
+            return json.dumps({"status": False, "message": "Invalid json data."})
+        ret = user.config.set_config_element("pelicanconf", conf)
+        return json.dumps({"status": True, "message": ret})
+
+    pp = PublishPelican(session['user_id'],
+            pelicanconf['github_repo'],
+            pelicanconf['categories'],
+            pelicanconf['theme'],
+            pelicanconf['gh_pages_repo'],
+            pelicanconf['custom'],
+            pelicanconf['blog_url'])
+
+    ret, updates, deletes = pp.run()
+
+    if not ret:
+        return json.dumps({'log': 'Failure, see process log.'})
+
+    return json.dumps({'log': 'Success to publish.',
+                       'type': data["type"],
+                       'updates': updates,
+                       'deletes': deletes})

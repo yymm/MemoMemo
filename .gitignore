@@ -10,3 +10,5 @@ wiki
 memo.json
 cover
 .coverage
+pelican/
+*.json

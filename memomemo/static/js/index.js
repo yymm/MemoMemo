@@ -1,3 +1,5 @@
+"use struct";
+
 $(document).ready(function(){
 
 	marked.setOptions({
@@ -24,9 +26,13 @@ $(document).ready(function(){
 			document.querySelector('#rest').classList.remove('paser-inactive');
 			document.querySelector('#mkd').classList.add('paser-inactive');
 			document.querySelector('#mkd').classList.remove('paser-active');
-			$('.publish-btn').css("background", "none");
-			$('.publish-btn label').css("color", "#000");
-			$('#publish').attr('checked', false);
+            var content = get_publish(0);
+            if (content) {
+                $('.publish-status').html(content.inner);
+                $("#publish-btn").removeClass();
+                $("#publish-btn").addClass("pub-0");
+                $("#publish-btn").css("background", content.color);
+            }
 			clear_addentry();
 		}
 		$(dialog).fadeIn(200);
@@ -41,7 +47,7 @@ $(document).ready(function(){
 	});
 
 	//
-	// SocketIO event
+	// Ajax event
 	//
 	var old_filter = null;
 	var connecting = false;
@@ -49,15 +55,17 @@ $(document).ready(function(){
 	//
 	// UI event (Ajax)
 	//
-	function send_to_filter(title, text, tag){
+	function send_to_filter(title, text, tag, publish){
 		if (typeof title === 'undefined') title = '';
 		if (typeof text === 'undefined') text = '';
 		if (typeof tag === 'undefined') tag = '';
+		if (typeof publish === 'undefined') publish = 0;
 		var filter = {
 			query: {
 				title: title,
 				text: text,
 				tag: tag,
+                publish: publish
 			},
 			offset: 0,
 			limit: 10
@@ -66,6 +74,7 @@ $(document).ready(function(){
 			filter.query.title == old_filter.query.title &&
 			filter.query.text == old_filter.query.text &&
 			filter.query.tag == old_filter.query.tag &&
+			filter.query.publish == old_filter.query.publish &&
 			filter.offset == old_filter.offset &&
 			filter.limit == old_filter.limit) {
 			return;
@@ -73,7 +82,6 @@ $(document).ready(function(){
 		old_filter = filter;
 		$('#container').empty();
 		document.querySelector('#loading').classList.remove("hidden");
-		//socket.emit('fetch memo', JSON.stringify(filter));
 		
         post_filter(filter);
 	}
@@ -107,7 +115,12 @@ $(document).ready(function(){
 		title = $("#search-form [name=title]").val();
 		text = $("#search-form [name=text]").val();
 		tag = $("#search-form [name=tag]").val();
-		send_to_filter(title, text, tag);
+        var elem = $("#search-form [name=publish]");
+        var publish = 0;
+        if (elem) {
+            publish = elem.val();
+        }
+		send_to_filter(title, text, tag, publish);
 		closedlg($('#searchdlg'));
 	});
 
@@ -130,7 +143,6 @@ $(document).ready(function(){
 			limit = old_filter['limit'];
 			old_filter['offset'] = limit;
 			old_filter['limit'] = limit + 10;
-			//socket.emit('fetch memo', JSON.stringify(old_filter));
             post_filter(old_filter);
 		}
 	});
@@ -159,14 +171,19 @@ $(document).ready(function(){
 	clear_addentry();
 
 	$('.commit-button').click( function() {
+        $('#entry-wrapper').css('display', 'block');
 		var url = '/add';	// {{{
 		var memo = {
 			title : $('input[name="title"]').val(),
 			text : $('.memo-input-text').val(),
 			tag : $('input[name="tag"]').val(),
 			paser: document.querySelector(".paser-active").innerHTML,
-			publish: ($("#publish").attr("checked") === undefined)? 0 : 1
 		};
+        if ($("#publish-btn").attr("class")) {
+			memo["publish"] = $("#publish-btn").attr("class").split("-")[1];
+        } else {
+            memo["publish"] = "0";
+        }
 		if (!memo.title || !memo.text) {
 			alertFlash("Nothing input...", 'warning');
 			return false;
@@ -195,10 +212,12 @@ $(document).ready(function(){
 					msg = 'Updated at ' + $.parseJSON(json_memo).date_time;
 				}
 				clear_addentry();
+                $('#entry-wrapper').css('display', 'none');
 				closedlg($('#entrydlg'));
 				alertFlash(msg, 'information');
 			},
 			error: function(){
+                $('#entry-wrapper').css('display', 'none');
 				alertFlash('Connection Error: Please retry.', 'error');
 			}
 		});
@@ -227,7 +246,14 @@ $(document).ready(function(){
 	function create_dom_from_memo(memo)
 	{ // {{{
 		var div =    "<div class='memo-div' style='display: none;'>";
-		var h1 =        "<div class='headline memo-title'>" + spchar_encoder(memo.title) +
+		var pub = "";
+        if (memo.publish > 0) {
+            var content = get_publish(memo.publish);
+            if (content) {
+                pub = "<span class='memo-publish " + content.fa + "' style='background: " + content.color + "'></span>";
+            }
+        }
+		var h1 =        "<div class='headline memo-title'>" + pub + spchar_encoder(memo.title) +
 				            "<var class='memo-date'>" + spchar_encoder(memo.date_time) + "</var>" +
 				            "<var class='memo-tag'>"  + spchar_encoder(memo.tag) + "</var>";
 		var h1_c =   "</div>";
@@ -235,10 +261,6 @@ $(document).ready(function(){
 				        '<a class="memo-edit">edit</a><div class="memo-inner">';
 		if (memo.paser == "Markdown") {
 			memo.text = marked(memo.basetext);
-		}
-		var pub = "";
-		if (memo.publish == 1) {
-			pub = "<var class='memo-publish'><span class='fa fa-check-square'></span>Publish</var>"
 		}
 		var text =      memo.text; // html
 		var meta =      '</div><p class="memo-title-only" style="display: none;">' + spchar_encoder(memo.title) + '</p>' +
@@ -248,7 +270,7 @@ $(document).ready(function(){
 						'<p class="memo-publish" style="display: none;">' + memo.publish + '</p>';
 		var div_end= '</div>';
 
-		return div + h1 + pub + h1_c + a + text + meta + div_end;
+		return div + h1 + h1_c + a + text + meta + div_end;
 	}	// }}}
 
 	function set_attr(memo)
@@ -276,15 +298,13 @@ $(document).ready(function(){
 				document.querySelector('#mkd').classList.add('paser-inactive');
 				document.querySelector('#mkd').classList.remove('paser-active');
 			}
-			if(publish == 0) {
-				$('.publish-btn').css("background", "none");
-				$('.publish-btn label').css("color", "#000");
-				$('#publish').attr('checked', false);
-			}else{
-				$('.publish-btn').css("background", "#ff8800");
-				$('.publish-btn label').css("color", "#FFF");
-				$('#publish').attr('checked', true);
-			}
+            var content = get_publish(publish);
+            if (content) {
+                $('.publish-status').html(content.inner);
+                $("#publish-btn").removeClass();
+                $("#publish-btn").addClass("pub-" + publish);
+                $("#publish-btn").css("background", content.color);
+            }
 			// Update Info
 			update_memo = $(this).closest('div');
 			update_flag = true;
@@ -344,18 +364,26 @@ $(document).ready(function(){
 	$('.clear-btn').click(function(){
 		clear_addentry();
 	});
-	$('#publish-label').click(function(){
-		var val = $('#publish').attr('checked');
-		if(val == undefined) {
-			$('.publish-btn').css("background", "#ff8800");
-			$('.publish-btn label').css("color", "#FFF");
-			$('#publish').attr('checked', true);
-		}else{
-			$('.publish-btn').css("background", "none");
-			$('.publish-btn label').css("color", "#000");
-			$('#publish').attr('checked', false);
-		}
+	$('.publish-item').click(function(){
+        var content = get_publish($(this).get(0).className.split(" ")[1].split("-")[1]);
+        if (content) {
+            $('.publish-status').html(content.inner);
+            $("#publish-btn").removeClass();
+            $("#publish-btn").addClass("pub-" + content.id);
+            $("#publish-btn").css("background", content.color);
+        }
 	});
+    function get_publish(id) {
+        var elem = $(".publish-" + id);
+        if (elem.length == 0) {
+            return null;
+        }
+        var color = elem.attr("style").split(" ")[1];
+        var fa = elem.children("span").attr("class");
+        var name = elem.text();
+        var inner = elem.html();
+        return {id: id, color: color, fa: fa, name: name, inner: inner};
+    }
 	$('.paser-label').click(function(){
 		var checked_id = $(this).attr("id");
 		if (checked_id == "rest") {
@@ -385,7 +413,13 @@ $(document).ready(function(){
 	var title_list = [];
 
 	// Initialize select
+    if (document.querySelector("#search-publish-select")) {
+	    document.querySelector("#search-publish-select").selectedIndex = 0;
+    }
 	document.querySelector("#tag-select").selectedIndex = 0;
+    if (document.querySelector("#publish-select")) {
+	    document.querySelector("#publish-select").selectedIndex = 0;
+    }
 	document.querySelector("#year-select").selectedIndex = 0;
 	document.querySelector("#month-select").selectedIndex = 0;
 
@@ -399,6 +433,10 @@ $(document).ready(function(){
 				"tag": child.querySelector('span').innerHTML,
 				"date": child.querySelector('i').innerHTML
 			};
+            var publish = child.querySelector('p');
+            if (publish) {
+                dic["publish"] = publish.className;
+            }
 			list.push(dic);
 		}
 		return list;
@@ -406,6 +444,7 @@ $(document).ready(function(){
 
 	function get_value_from_select(id) {
 		var elem = document.querySelector(id);
+        if (!elem) return null;
 		return elem.options[elem.selectedIndex].value;
 	};
 
@@ -420,6 +459,7 @@ $(document).ready(function(){
 		}
 		var tag = get_value_from_select("#tag-select");
 		var month = get_value_from_select("#month-select");
+		var publish = get_value_from_select("#publish-select");
 		var l = [];
 		l = list.filter(function(elem) {
 			if (tag == "default") {
@@ -441,10 +481,29 @@ $(document).ready(function(){
 			var m = elem.date.slice(5, 7);
 			return m == month;
 		});
+        if (publish) {
+            l = l.filter(function(elem) {
+	    		if (publish == "default") {
+		    		return true;
+			    }
+                if (publish == "All") {
+                    if (elem.publish) {
+                        return true;
+                    } else {
+                        return false;
+                    }
+                }
+                var pub = "fa fa-" + publish;
+                return pub == elem.publish
+            });
+        }
 		return l;
 	};
 
 	function query_title_list() {
+		if (title_list.length == 0) {
+			title_list = cache_title_list();
+		}
 		var list = document.querySelector('#title-list');
 		if (list.length != 0) {
 			list.innerHTML = '';
@@ -468,23 +527,19 @@ $(document).ready(function(){
 	};
 
 	document.querySelector("#tag-select").onchange = function() {
-		if (title_list.length == 0) {
-			title_list = cache_title_list();
-		}
 		query_title_list();
 	};
 	document.querySelector("#year-select").onchange = function() {
-		if (title_list.length == 0) {
-			title_list = cache_title_list();
-		}
 		query_title_list();
 	};
 	document.querySelector("#month-select").onchange = function() {
-		if (title_list.length == 0) {
-			title_list = cache_title_list();
-		}
 		query_title_list();
 	};
+    if (document.querySelector("#publish-select")) {
+	    document.querySelector("#publish-select").onchange = function() {
+	    	query_title_list();
+	    };
+    }
 	$(".memo-title").click(select_title);
 
 	function select_title() {
@@ -515,7 +570,81 @@ $(document).ready(function(){
 				Toggle.classList.toggle("on");
 			}
 		});
-
 	});
+
+    //
+    // UI event(publish pelican)
+    //
+    $(".publish-request").click(function(){
+        var event_type = $(".publish-request").text();
+        if (event_type == "Enable") {
+            console.log(event_type);
+            var text = $("#pelicanconf").val();
+    		$.ajax({
+    			type: 'POST',
+    			url: "/publish",
+    			data: JSON.stringify({"type": "config", "pelicanconf": text}),
+    			contentType: 'application/json',
+    			success: function(ret){
+                    var v = $.parseJSON(ret);
+                    if (v["status"]) {
+    				    alertFlash("Success to save config.<br />", 'information');
+                        location.reload();
+                    } else {
+    				    alertFlash("Failure....<br />" + v["message"], 'warning');
+                    }
+    				$('#publish-wrapper').css('display', 'none');
+    			},
+    			error: function(ret){
+                    var v = $.parseJSON(ret);
+				    alertFlash('Connection Error: Please retry.\n' + v['log'], 'error');
+    				$('#publish-wrapper').css('display', 'none');
+    			}
+    		});
+            return;
+        }
+		var ret = window.confirm("Publish pelican to gh-pages.\nAre you sure?");
+        if (ret === false) {
+			alertFlash("Cancel.", 'warning');
+            return;
+        }
+        $('#publish-wrapper').css('display', 'block');
+		$.ajax({
+			type: 'POST',
+			url: "/publish",
+			data: JSON.stringify({"type": "publish"}),
+			contentType: 'application/json',
+			success: function(ret){
+                var v = $.parseJSON(ret);
+                var message = v["log"];
+                if (v["updates"].length != 0) {
+                    message += "<br /><i>- Update list</i><ul>";
+                    v["updates"].forEach(function(e, i, a) {
+                        message += "<li>" + e["date_time"] + ": " + e["title"] + "</li>"
+                    });
+                    message += "</ul>";
+                } else {
+                    message += "<br />No update.<br />";
+                }
+                if (v["deletes"].length != 0) {
+                    message += "<br /><i>- Delete list</i><ul>";
+                    v["deletes"].forEach(function(e, i, a) {
+                        message += "<li>" + e["date_time"] + ": " + e["title"] + "</li>"
+                    });
+                    message += "</ul>";
+                } else {
+                    message += "<br />No delete.<br />";
+                }
+				alertFlash(message ,'information');
+				$('#publish-wrapper').css('display', 'none');
+		        closedlg($('#publishdlg'));
+			},
+			error: function(ret){
+                var v = $.parseJSON(ret);
+				alertFlash('Connection Error: Please retry.\n' + v['log'], 'error');
+				$('#publish-wrapper').css('display', 'none');
+			}
+		});
+    });
 });
 /* vim:set foldmethod=marker: */
