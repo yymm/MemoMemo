@@ -8,6 +8,9 @@ import subprocess
 from memomemo.database import User, query_memo
 
 def command_sync(command, cwd="."):
+    print(">>>")
+    print(">>> " + command[0] + "  [path: " + cwd + "]")
+    print(">>>")
     return subprocess.call(command, cwd=cwd, shell=True)
 
 class PublishPelican:
@@ -15,10 +18,10 @@ class PublishPelican:
             publish_url, custom, blog_url):
         self.user_id = user_id
         self.user = User.query.get(self.user_id)
-        self.url = "https://github.com/" + url
+        self.url = "git@github.com:" + url + ".git"
         self.categories = categories
         self.theme = theme
-        self.pub_url = publish_url
+        self.pub_url = "git@github.com:" + publish_url + ".git"
         self.custom = custom
         self.blog_url = blog_url
 
@@ -48,7 +51,7 @@ class PublishPelican:
         if self.__push_to_gh_pages():
             return False, [], []
 
-        self.__generate_publish_file(posts)
+        self.__generate_publish(posts)
 
         return True, updates, deletes
 
@@ -76,7 +79,14 @@ class PublishPelican:
         # gh-pagesをpull
         # gh-pagesにpush
         try:
-            command_sync(["rm -r output"], cwd="pelican")
+            # master branch
+            command_sync(["git add . --all"], cwd="pelican")
+            command_sync(['git commit -m "Update posts."'], cwd="pelican")
+            command_sync(["git push origin master"], cwd="pelican")
+
+            # create output
+            if os.path.exists("pelican/output/"):
+                command_sync(["rm -r output"], cwd="pelican")
             command_sync(["pelican content -s pelicanconf.py -t " + self.theme],
                     cwd="pelican")
 
@@ -86,13 +96,14 @@ class PublishPelican:
 
             command_sync(["ghp-import output"], cwd="pelican")
 
+            # ph-pages branch
             command_sync(["git checkout gh-pages"], cwd="pelican")
             command_sync(['echo "' + self.blog_url + '" > CNAME'], cwd="pelican")
             command_sync(["git add CNAME"], cwd="pelican")
             command_sync(['git commit -m "Add CNAME."'], cwd="pelican")
             command_sync(['git checkout master'], cwd="pelican")
 
-            command_sync(["git push git@github.com:" + self.pub_url + " gh-pages:master"],
+            command_sync(["git push " + self.pub_url + " gh-pages:master"],
                     cwd="pelican")
         except Exception as e:
             return e
@@ -185,8 +196,7 @@ class PublishPelican:
                 f.write(slug_tag + md5.new(str(p["id"])).hexdigest() + "\n")
                 f.write("\n" + p["basetext"].encode('utf_8'))
 
-    def __generate_publish_file(self, posts):
-        # jsonファイル作成
+    def __generate_publish(self, posts):
         d = dict()
         for p in posts:
             id = p['id']
