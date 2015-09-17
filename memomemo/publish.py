@@ -18,10 +18,16 @@ class PublishPelican:
             publish_url, custom, blog_url):
         self.user_id = user_id
         self.user = User.query.get(self.user_id)
-        self.url = "git@github.com:" + url + ".git"
         self.categories = categories
         self.theme = theme
-        self.pub_url = "git@github.com:" + publish_url + ".git"
+        if "MEMOMEMO_GIT_USER" in os.environ and "MEMOMEMO_GIT_PASS" in os.environ:
+            u = os.environ["MEMOMEMO_GIT_USER"]
+            p = os.environ["MEMOMEMO_GIT_PASS"]
+            self.url = "https://" + u + ":" + p + "@github.com/" + url + ".git"
+            self.pub_url = "https://" + u + ":" + p + "@github.com/" + publish_url + ".git"
+        else:
+            self.url = "git@github.com:" + url + ".git"
+            self.pub_url = "git@github.com:" + publish_url + ".git"
         self.custom = custom
         self.blog_url = blog_url
 
@@ -58,6 +64,7 @@ class PublishPelican:
     def __pull_pelican(self):
         # pelicanのリポジトリをgit clone (or git pull)
         try:
+            command_sync(["git config --global --list"])
             if not os.path.exists("pelican"):
                 command_sync(["git clone " + self.url + " pelican"])
             else:
