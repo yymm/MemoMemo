@@ -89,7 +89,7 @@ class PublishPelican:
             command_sync(["git checkout gh-pages"], cwd="pelican")
             command_sync(['echo "' + self.blog_url + '" > CNAME'], cwd="pelican")
             command_sync(["git add CNAME"], cwd="pelican")
-            command_sync(['git cm "Add CNAME."'], cwd="pelican")
+            command_sync(['git commit -m "Add CNAME."'], cwd="pelican")
             command_sync(['git checkout master'], cwd="pelican")
 
             command_sync(["git push git@github.com:" + self.pub_url + " gh-pages:master"],
