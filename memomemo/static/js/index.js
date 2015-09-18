@@ -614,6 +614,7 @@ $(document).ready(function(){
 			url: "/publish",
 			data: JSON.stringify({"type": "publish"}),
 			contentType: 'application/json',
+            timeout: 100000,
 			success: function(ret){
                 var v = $.parseJSON(ret);
                 var message = v["log"] + "<br />";

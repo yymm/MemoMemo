@@ -179,7 +179,8 @@ def publish_pelican():
             pelicanconf['theme'],
             pelicanconf['gh_pages_repo'],
             pelicanconf['custom'],
-            pelicanconf['blog_url'])
+            pelicanconf['blog_url'],
+            pelicanconf['plugins'])
 
     ret, updates, deletes = pp.run()
 

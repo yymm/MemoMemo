@@ -7,15 +7,19 @@ import json
 import subprocess
 from memomemo.database import User, query_memo
 
-def command_sync(command, cwd="."):
-    print(">>>")
-    print(">>> " + command[0] + "  [path: " + cwd + "]")
-    print(">>>")
-    return subprocess.call(command, cwd=cwd, shell=True)
+def command_sync(command, cwd=".", env=None):
+    sys.stderr.write(">>> " + command + "  [path: " + cwd + "]\n")
+    p = subprocess.Popen(command, cwd=cwd, shell=True, stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE, env=env)
+    stdout_data, stderr_data = p.communicate()
+    sys.stderr.write(stdout_data)
+    sys.stderr.write("=======up: stdout============down: stderr=======\n")
+    sys.stderr.write(stderr_data)
+
 
 class PublishPelican:
     def __init__(self, user_id, url, categories, theme,
-            publish_url, custom, blog_url):
+            publish_url, custom, blog_url, plugins):
         self.user_id = user_id
         self.user = User.query.get(self.user_id)
         self.categories = categories
@@ -30,6 +34,7 @@ class PublishPelican:
             self.pub_url = "git@github.com:" + publish_url + ".git"
         self.custom = custom
         self.blog_url = blog_url
+        self.plugins = plugins
 
     def run(self):
         new = self.__query_publish_memos()
@@ -64,17 +69,20 @@ class PublishPelican:
     def __pull_pelican(self):
         # pelicanのリポジトリをgit clone (or git pull)
         try:
-            command_sync(["git config --global --list"])
             if not os.path.exists("pelican"):
-                command_sync(["git clone " + self.url + " pelican"])
+                command_sync("git clone " + self.url + " pelican")
             else:
-                command_sync(["git pull origin master"], cwd="pelican")
+                command_sync("git pull origin master", cwd="pelican")
 
             if not os.path.exists("pelican/pelican-plugins"):
-               command_sync(["git clone --recursive https://github.com/getpelican/pelican-plugins"],
+               command_sync("git clone https://github.com/getpelican/pelican-plugins",
                     cwd="pelican")
+               for p in self.plugins:
+                   command_sync("git submodule update --init " + p,
+                        cwd="pelican/pelican-plugins")
 
-            command_sync(["git submodule init && git submodule update"],
+
+            command_sync("git submodule init && git submodule update",
                     cwd="pelican")
         except Exception as e:
             return e
@@ -86,31 +94,33 @@ class PublishPelican:
         # gh-pagesをpull
         # gh-pagesにpush
         try:
+            command_sync('git config --global user.name "muunyblue"')
+            command_sync('git config --global user.email "muuny.blue@gmail.com"')
             # master branch
-            command_sync(["git add . --all"], cwd="pelican")
-            command_sync(['git commit -m "Update posts."'], cwd="pelican")
-            command_sync(["git push origin master"], cwd="pelican")
+            command_sync("git add . --all", cwd="pelican")
+            command_sync('git commit -m "Update posts."', cwd="pelican", env={"HOME": os.environ["HOME"]})
+            command_sync("git push origin master", cwd="pelican")
 
             # create output
             if os.path.exists("pelican/output/"):
-                command_sync(["rm -r output"], cwd="pelican")
-            command_sync(["pelican content -s pelicanconf.py -t " + self.theme],
+                command_sync("rm -r output", cwd="pelican")
+            command_sync("pelican content -s pelicanconf.py -t " + self.theme,
                     cwd="pelican")
 
             if self.custom:
                 for c in self.custom:
-                    command_sync([c["command"]], cwd=c["cwd"])
+                    command_sync(c["command"], cwd=c["cwd"])
 
-            command_sync(["ghp-import output"], cwd="pelican")
+            command_sync("ghp-import output", cwd="pelican")
 
             # ph-pages branch
-            command_sync(["git checkout gh-pages"], cwd="pelican")
-            command_sync(['echo "' + self.blog_url + '" > CNAME'], cwd="pelican")
-            command_sync(["git add CNAME"], cwd="pelican")
-            command_sync(['git commit -m "Add CNAME."'], cwd="pelican")
-            command_sync(['git checkout master'], cwd="pelican")
+            command_sync("git checkout gh-pages", cwd="pelican")
+            command_sync('echo "' + self.blog_url + '" > CNAME', cwd="pelican")
+            command_sync("git add CNAME", cwd="pelican")
+            command_sync('git commit -m "Add CNAME."', cwd="pelican", env={"HOME": os.environ["HOME"]})
+            command_sync('git checkout master', cwd="pelican")
 
-            command_sync(["git push " + self.pub_url + " gh-pages:master"],
+            command_sync("git push -f " + self.pub_url + " gh-pages:master",
                     cwd="pelican")
         except Exception as e:
             return e
