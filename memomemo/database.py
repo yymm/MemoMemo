@@ -6,7 +6,7 @@ import datetime
 from colour import Color
 from flask_sqlalchemy import SQLAlchemy
 from memomemo import app
-from sqlalchemy import and_, exc, event
+from sqlalchemy import and_, exc, event, or_
 from sqlalchemy.pool import Pool
 from memomemo.utils import datetime2str, str2datetime, parse_rst
 
@@ -331,9 +331,15 @@ def query_memo(user_id, data):
         if tag.find(',') >= 0:
             tags = tag.split(',')
             for t in tags:
-                q = q.filter(Memo.tag.like('%'+t.strip()+'%'))
+                q = q.filter(or_(Memo.tag.like(t.strip()+',%'),
+                                 Memo.tag.like('%, '+t.strip()),
+                                 Memo.tag.like('%, '+t.strip()+',%'),
+                                 Memo.tag == t.strip()))
         else:
-            q = q.filter(Memo.tag.like('%'+tag+'%'))
+            q = q.filter(or_(Memo.tag.like(tag.strip()+',%'),
+                             Memo.tag.like('%, '+tag.strip()),
+                             Memo.tag.like('%, '+tag.strip()+',%'),
+                             Memo.tag == tag.strip()))
 
     #print(q.count())
     memos = q.order_by(Memo.date_time.desc()).slice(offset, limit).all()
