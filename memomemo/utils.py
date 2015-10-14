@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import datetime
+import markdown
 from flask import Markup
 from docutils.core import publish_parts
 
@@ -104,3 +105,9 @@ class Pygments(Directive):
 
 directives.register_directive('sourcecode', Pygments)
 directives.register_directive('code-block', Pygments)
+
+
+def parse_md(md):
+    extensions = ['extra', 'admonition', 'codehilite(css_class=highlight)',
+                  'nl2br', 'sane_lists', 'toc', 'del_ins']
+    return Markup(markdown.markdown(md, extensions))

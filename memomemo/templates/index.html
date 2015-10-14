@@ -3,11 +3,8 @@
 
 {% block head %}
 <script type="text/javascript" src="{{ url_for('static', filename='js/cumulus.js') }}"></script>
-<script type="text/javascript" src="{{ url_for('static', filename='js/marked.min.js') }}"></script>
 <link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/index.css') }}">
-<script type="text/javascript" src="{{ url_for('static', filename='js/socket.io-0.9.16.js') }}"></script>
 <link rel="stylesheet" href="{{ url_for('static', filename='css/solarized_dark.css') }}">
-<script src="{{ url_for('static', filename='js/highlight.pack.js') }}"></script>
 {% endblock %}
 
 {% if session.user_id %}

@@ -8,7 +8,7 @@ from flask_sqlalchemy import SQLAlchemy
 from memomemo import app
 from sqlalchemy import and_, exc, event
 from sqlalchemy.pool import Pool
-from memomemo.utils import datetime2str, str2datetime, parse_rst
+from memomemo.utils import datetime2str, str2datetime, parse_rst, parse_md
 
 
 db = SQLAlchemy(app)
@@ -159,7 +159,7 @@ class Memo(db.Model):
         dic['title'] = self.title
         dic['basetext'] = self.text
         if self.paser == "Markdown":
-            dic['text'] = ""
+            dic['text'] = parse_md(self.text)
         else:
             dic['text'] = parse_rst(self.text)
         dic['tag'] = self.tag

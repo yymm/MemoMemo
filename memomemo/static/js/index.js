@@ -1,21 +1,6 @@
 "use struct";
 
 $(document).ready(function(){
-
-	marked.setOptions({
-	  renderer: new marked.Renderer(),
-	  gfm: true,
-	  tables: true,
-	  breaks: false,
-	  pedantic: false,
-	  sanitize: true,
-	  smartLists: true,
-	  smartypants: false,
-	  highlight: function (code) {
-	    return hljs.highlightAuto(code).value;
-	  }
-	});
-
 	//
 	// Toggle Dialog
 	//
@@ -259,9 +244,6 @@ $(document).ready(function(){
 		var h1_c =   "</div>";
 		var a =         '<a class="memo-delete">delete</a>' + 
 				        '<a class="memo-edit">edit</a><div class="memo-inner">';
-		if (memo.paser == "Markdown") {
-			memo.text = marked(memo.basetext);
-		}
 		var text =      memo.text; // html
 		var meta =      '</div><p class="memo-title-only" style="display: none;">' + spchar_encoder(memo.title) + '</p>' +
 				        '<p class="memo-text" style="display: none;">' + spchar_encoder(memo.basetext) + '</p>' + 
