@@ -12,3 +12,4 @@ ghp-import
 mdx-del-ins
 docutils
 pelican_youtube
+mdx_embedly

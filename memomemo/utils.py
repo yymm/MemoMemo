@@ -109,5 +109,5 @@ directives.register_directive('code-block', Pygments)
 
 def parse_md(md):
     extensions = ['extra', 'admonition', 'codehilite(css_class=highlight)',
-                  'nl2br', 'sane_lists', 'toc', 'del_ins']
+                  'nl2br', 'sane_lists', 'toc', 'del_ins', 'embedly']
     return Markup(markdown.markdown(md, extensions))
