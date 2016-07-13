@@ -12,3 +12,9 @@ cover
 .coverage
 pelican/
 *.json
+bin/
+lib/
+man/
+.python-version
+misc/static
+misc/templates

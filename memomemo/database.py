@@ -1,5 +1,9 @@
 # -*- encoding:utf-8 -*-
 
+"""
+Model with O/R mapper (Flask-SQLAlchemy)
+"""
+
 import json
 import zlib
 import datetime
@@ -215,57 +219,59 @@ def init_db():
     password = app.config["MEMOMEMO_PASSWORD"]
     if name and password:
         if len(User.query.all()) == 0:
-            user = add_user(name, password, False)
+            user = create_user(name, password, False)
 
 
-def add_user(name, password, signin=True):
+def create_user(name, password):
     user = User.query.filter_by(name=name).first()
-
-    if not user:
-        user = User(name, password)
-        db.session.add(user)
-        db.session.commit()
-        if user.id:
-            config = Config(user.id)
-            config.json = json.dumps({"signin": signin})
-            memo = create_first_memo(user.id)
-            db.session.add(config)
-            db.session.add(memo)
-            db.session.commit()
-
+    if user:
+        return None
+        # TODO: Signup禁止処理 & メモが一つもない場合には追加する処理
+        # if user.id:
+        #     config = Config(user.id)
+        #     config.json = json.dumps({"signin": signin})
+        #     memo = create_first_memo(user.id)
+        #     db.session.add(config)
+        #     db.session.add(memo)
+        #     db.session.commit()
+        #return user
+    user = User(name, password)
+    db.session.add(user)
+    db.session.commit()
     return user
 
 
-def create_first_memo(id):
-    text = '''# Simple Markdown Example
-
-GFM = GitHub Flavored Markdown
-
-## list
-
-* list1
-* list2
-
-## code
-
-```python
-from Flask import flask
-app = Flase(__name__)
-
-@route.app('/')
-def hello():
-    return "Hello Flask"
-```
-
-## table
-
-foo  | bar
----- | ----
-FOO  | BAR
-    '''
-    return Memo(id, "Hello MemoMemo!",
-                text,
-                "Sample", "Markdown")
+# TODO: メモが一つもなくても大丈夫にしようよ...
+# def create_first_memo(id):
+#     text = '''# Simple Markdown Example
+# 
+# GFM = GitHub Flavored Markdown
+# 
+# ## list
+# 
+# * list1
+# * list2
+# 
+# ## code
+# 
+# ```python
+# from Flask import flask
+# app = Flase(__name__)
+# 
+# @route.app('/')
+# def hello():
+#     return "Hello Flask"
+# ```
+# 
+# ## table
+# 
+# foo  | bar
+# ---- | ----
+# FOO  | BAR
+#     '''
+#     return Memo(id, "Hello MemoMemo!",
+#                 text,
+#                 "Sample", "Markdown")
 
 def varify_user(name, password):
     user = User.query.filter_by(name=name).first()

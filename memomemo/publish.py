@@ -2,7 +2,7 @@
 
 import os
 import sys
-import md5
+import hashlib
 import json
 import subprocess
 from memomemo.database import User, query_memo
@@ -210,7 +210,7 @@ class PublishPelican:
                 f.write(date_tag + p["date_time"] + "\n")
                 if "modified" in p:
                     f.write(mod_tag + p["modified"] + "\n")
-                f.write(slug_tag + md5.new(str(p["id"])).hexdigest() + "\n")
+                f.write(slug_tag + hashlib.md5.new(str(p["id"])).hexdigest() + "\n")
                 f.write("\n" + p["basetext"].encode('utf_8'))
 
     def __generate_publish(self, posts):

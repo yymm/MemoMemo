@@ -13,9 +13,9 @@
     </ul>
   {% endif %}
 {% endwith %}
-<form action="{{ url_for('login') }}" method="post">
+<form action="{{ url_for('signup') }}" method="post">
     <input type="text" name="name">
     <input type="password" name="password">
-    <input type="submit" value="login">
+    <input type="submit" value="signup">
 </form>
 {% endblock %}
