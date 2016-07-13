@@ -23,18 +23,23 @@ from memomemo.database import db_session, User, query_memo, \
 from memomemo.publish import PublishPelican
 
 
-# TODO: 何の用途で残してあるのか不明なのでコメントアウト
-# (before_requestはリクエストがあるごとに実行されるデコレータ)
-# @app.before_request
-# def load_current_user():
-#     if session.get('user_id') is not None:
-#         print("not logined")
-#         return
-#     if request.path == '/login':
-#         print("access to /login")
-#         return
-#     print("Nope?")
-#     # global parameter 'g' set here if you need
+@app.before_request
+def load_current_user():
+    '''
+    sessionにuser_ifがある場合のみglobal objects(g)にユーザ情報を追加
+    gはrequire_loginデコレータ付きメソッド、templateから利用可能なので
+    ユーザー情報は基本的にglobal objectsから取得する
+    sessionがあってgがNoneの場合のみユーザー情報をDBから取得
+    (無駄なDBアクセスを排除)
+    '''
+    if "user_id" in session:
+        user = getattr(g, 'user', None)
+        if user is None:
+            user = User.query.get(session['user_id'])
+            g.user = user
+    else:
+        g.user = None
+    #if request.path == '/login': // request.pathも取得可能
 
 
 @app.teardown_request
