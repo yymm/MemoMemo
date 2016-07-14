@@ -32,14 +32,13 @@ def load_current_user():
     sessionがあってgがNoneの場合のみユーザー情報をDBから取得
     (無駄なDBアクセスを排除)
     '''
-    if "user_id" in session:
+    if 'user_id' in session:
         user = getattr(g, 'user', None)
         if user is None:
             user = User.query.get(session['user_id'])
             g.user = user
     else:
         g.user = None
-    #if request.path == '/login': // request.pathも取得可能
 
 
 @app.teardown_request
@@ -57,7 +56,7 @@ def requires_login(f):
     return decorated_function
 
 
-@app.route('/', methods=["GET"])
+@app.route('/', methods=['GET'])
 def index():
     '''
     template: index.html
@@ -92,13 +91,13 @@ def signup():
     #     if not obj:
     #         return render_template('404.html'), 404
     if request.method == 'POST':
-        name = request.form['name']
+        username = request.form['username']
         password = request.form['password']
-        user = create_user(name, password)
+        user = create_user(username, password)
         if user:
             return redirect(url_for('login'))
         else:
-            flash("Already there is a user of the same name.")
+            flash('Already there is a user of the same name.')
             return redirect(url_for('signup'))
     return render_template('signup.html')
 
@@ -111,12 +110,12 @@ def login():
     '''
     if request.method == 'POST':
         # login処理
-        name = request.form['name']
+        username = request.form['username']
         password = request.form['password']
-        user = varify_user(name, password)
+        user = varify_user(username, password)
         if user:
             session['user_id'] = user.id
-            return redirect(url_for("memo", name=name))
+            return redirect(url_for('memo', username=username))
         else:
             flash('Failure to login.')
             return redirect(url_for('login'))
@@ -136,9 +135,9 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/memo/<name>', methods=['GET'])
+@app.route('/memo/<username>', methods=['GET'])
 @requires_login
-def memo(name):
+def memo(username):
     '''
     template: memo.html
     URLはユーザ名固有の値にしているため
@@ -146,9 +145,12 @@ def memo(name):
     memo.htmlはSPAとして設計するので必要なデータは
     sessionに紐付いた
     '''
-    # URLユーザ名(name)確認
+    # ユーザ名(username)確認
     user = User.query.get(session['user_id'])
-    if user.name != name:
+    if user is None:
+        flash('You need to be login.')
+        return redirect(url_for('login'))
+    if user.name != username:
         flash('You need to be login.')
         return redirect(url_for('login'))
     return render_template('memo.html')
@@ -205,27 +207,27 @@ def filter():
     user = User.query.get(session['user_id'])
     if request.method == 'POST':
         return query_memo(user.id, request.json)
-    return json.dumps({"status": False})
+    return json.dumps({'status': False})
 
 
 @app.route('/memo/publish', methods=['POST'])
 @requires_login
 def publish_pelican():
     user = User.query.get(session['user_id'])
-    pelicanconf = user.config.get_config_element("pelicanconf")
+    pelicanconf = user.config.get_config_element('pelicanconf')
 
     data = request.json
 
     if not pelicanconf:
         try:
-            conf = json.loads(data["pelicanconf"])
-            if "categories" not in conf or "github_repo" not in conf or \
-               "theme" not in conf or "gh_pages_repo" not in conf:
-                   return json.dumps({"status": False, "message": "Key error."})
+            conf = json.loads(data['pelicanconf'])
+            if 'categories' not in conf or 'github_repo' not in conf or \
+               'theme' not in conf or 'gh_pages_repo' not in conf:
+                   return json.dumps({'status': False, 'message': 'Key error.'})
         except Exception as e:
-            return json.dumps({"status": False, "message": "Invalid json data."})
-        ret = user.config.set_config_element("pelicanconf", conf)
-        return json.dumps({"status": True, "message": ret})
+            return json.dumps({'status': False, 'message': 'Invalid json data.'})
+        ret = user.config.set_config_element('pelicanconf', conf)
+        return json.dumps({'status': True, 'message': ret})
 
     pp = PublishPelican(session['user_id'],
             pelicanconf['github_repo'],
@@ -242,6 +244,6 @@ def publish_pelican():
         return json.dumps({'log': 'Failure, see process log.'})
 
     return json.dumps({'log': 'Success to publish.',
-                       'type': data["type"],
+                       'type': data['type'],
                        'updates': updates,
                        'deletes': deletes})

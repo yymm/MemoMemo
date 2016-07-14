@@ -18,14 +18,14 @@ from memomemo.utils import datetime2str, str2datetime, parse_rst, parse_md
 db = SQLAlchemy(app)
 db_session = db.session
 
-@event.listens_for(Pool, "checkout")
+@event.listens_for(Pool, 'checkout')
 def ping_connection(dbapi_connection, connection_record, connection_proxy):
     '''
     MySQL Connection forced wake up, before connect to mysql server.
     '''
     cursor = dbapi_connection.cursor()
     try:
-        cursor.execute("SELECT 1")
+        cursor.execute('SELECT 1')
     except:
         # optional - dispose the whole pool
         # instead of invalidating one at a time
@@ -127,10 +127,10 @@ class User(db.Model):
                 .order_by(Memo.date_time.desc()).all()
         for memo in memos:
             dic = {}
-            dic["title"] = memo.title
-            dic["date"] = memo.date_time
-            dic["tag"] = memo.tag
-            dic["publish"] = memo.publish
+            dic['title'] = memo.title
+            dic['date'] = memo.date_time
+            dic['tag'] = memo.tag
+            dic['publish'] = memo.publish
             memo_list.append(dic)
             year_list.append(memo.date_time.year)
         return memo_list, list(set(year_list))
@@ -162,7 +162,7 @@ class Memo(db.Model):
         dic['id'] = self.id
         dic['title'] = self.title
         dic['basetext'] = self.text
-        if self.paser == "Markdown":
+        if self.paser == 'Markdown':
             dic['text'] = parse_md(self.text)
         else:
             dic['text'] = parse_rst(self.text)
@@ -215,11 +215,13 @@ class Config(db.Model):
 
 def init_db():
     db.create_all()
-    name = app.config["MEMOMEMO_USER"]
-    password = app.config["MEMOMEMO_PASSWORD"]
-    if name and password:
-        if len(User.query.all()) == 0:
-            user = create_user(name, password, False)
+    print(app.config['SQLALCHEMY_DATABASE_URI'])
+    # TODO: Signup禁止処理
+    # name = app.config["MEMOMEMO_USER"]
+    # password = app.config["MEMOMEMO_PASSWORD"]
+    # if name and password:
+    #     if len(User.query.all()) == 0:
+    #         user = create_user(name, password, False)
 
 
 def create_user(name, password):
@@ -275,13 +277,11 @@ def create_user(name, password):
 
 def varify_user(name, password):
     user = User.query.filter_by(name=name).first()
-    if user:
-        if user.password == password:
-            return user
-        else:
-            return None
-    else:
-        return None
+    if user == None:
+        return None # User not found
+    if user.password != password:
+        return None # Password is incorrect
+    return user
 
 
 def delete_user(user):
@@ -318,9 +318,9 @@ def query_memo(user_id, data):
     q = Memo.query.filter_by(user_id=user_id)
 
     user = User.query.get(user_id)
-    pelicanconf = user.config.get_config_element("pelicanconf")
+    pelicanconf = user.config.get_config_element('pelicanconf')
     if pelicanconf:
-        categories = pelicanconf["categories"]
+        categories = pelicanconf['categories']
         if publish != 0:
             if publish > len(categories):
                 q = q.filter(Memo.publish > 0)

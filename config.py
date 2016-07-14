@@ -7,26 +7,29 @@ _basedir = os.path.abspath(os.path.dirname(__file__))
 SECRET_KEY = os.environ['MEMOMEMO_SECRET_KEY'] \
     if 'MEMOMEMO_SECRET_KEY' in os.environ else 'dev key'
 
-# Deploy
-SQLALCHEMY_DATABASE_URI = os.environ['MEMOMEMO_DATABASE_URI'] \
-    if 'MEMOMEMO_DATABASE_URI' in os.environ else \
-    'mysql+pymysql://root@localhost/memomemo'  # Local
-    #'sqlite:///memomemo.db'
+DEBUG = False if 'MEMOMEMO_SECRET_KEY' in os.environ else True
+
+SQLALCHEMY_TRACK_MODIFICATIONS = True
+
+# Default(SQLite)
+SQLALCHEMY_DATABASE_URI = 'sqlite:///memomemo.db'
+
+# Local MySQL
+if 'MEMOMEMO_LOCAL_MYSQL' in os.environ:
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root@localhost/memomemo'
+
+# Deploy MySQL
+if 'MEMOMEMO_DATABASE_URI' in os.environ:
+    SQLALCHEMY_DATABASE_URI = os.environ['MEMOMEMO_DATABASE_URI']
 
 # Heroku(ClearDB)
-SQLALCHEMY_DATABASE_URI = os.environ['CLEARDB_DATABASE_URL'].replace("mysql://",
-        "mysql+pymysql://").replace("?reconnect=true", "") \
-    if 'CLEARDB_DATABASE_URL' in os.environ else \
-    SQLALCHEMY_DATABASE_URI
+if 'CLEARDB_DATABASE_URL' in os.environ:
+    SQLALCHEMY_DATABASE_URI = os.environ['CLEARDB_DATABASE_URL'] \
+            .replace("mysql://", "mysql+pymysql://") \
+            .replace("?reconnect=true", "") \
 
-# User name(Not signin)
-MEMOMEMO_USER = os.environ["MEMOMEMO_USER"] \
-        if 'MEMOMEMO_USER' in os.environ else None
-
-# User password(Not signin)
-MEMOMEMO_PASSWORD = os.environ["MEMOMEMO_PASSWORD"] \
-        if 'MEMOMEMO_PASSWORD' in os.environ else None
-
-DEBUG = True
+# Single user
+SINGLE_USER = os.environ["MEMOMEMO_SINGLE_USER"] \
+        if 'MEMOMEMO_SINGLE_USER' in os.environ else None
 
 del os

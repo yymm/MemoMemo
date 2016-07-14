@@ -18,3 +18,4 @@ man/
 .python-version
 misc/static
 misc/templates
+.cache
