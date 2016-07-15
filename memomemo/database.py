@@ -215,65 +215,17 @@ class Config(db.Model):
 
 def init_db():
     db.create_all()
-    print(app.config['SQLALCHEMY_DATABASE_URI'])
-    # TODO: Signup禁止処理
-    # name = app.config["MEMOMEMO_USER"]
-    # password = app.config["MEMOMEMO_PASSWORD"]
-    # if name and password:
-    #     if len(User.query.all()) == 0:
-    #         user = create_user(name, password, False)
 
 
 def create_user(name, password):
     user = User.query.filter_by(name=name).first()
     if user:
         return None
-        # TODO: Signup禁止処理 & メモが一つもない場合には追加する処理
-        # if user.id:
-        #     config = Config(user.id)
-        #     config.json = json.dumps({"signin": signin})
-        #     memo = create_first_memo(user.id)
-        #     db.session.add(config)
-        #     db.session.add(memo)
-        #     db.session.commit()
-        #return user
     user = User(name, password)
     db.session.add(user)
     db.session.commit()
     return user
 
-
-# TODO: メモが一つもなくても大丈夫にしようよ...
-# def create_first_memo(id):
-#     text = '''# Simple Markdown Example
-# 
-# GFM = GitHub Flavored Markdown
-# 
-# ## list
-# 
-# * list1
-# * list2
-# 
-# ## code
-# 
-# ```python
-# from Flask import flask
-# app = Flase(__name__)
-# 
-# @route.app('/')
-# def hello():
-#     return "Hello Flask"
-# ```
-# 
-# ## table
-# 
-# foo  | bar
-# ---- | ----
-# FOO  | BAR
-#     '''
-#     return Memo(id, "Hello MemoMemo!",
-#                 text,
-#                 "Sample", "Markdown")
 
 def varify_user(name, password):
     user = User.query.filter_by(name=name).first()

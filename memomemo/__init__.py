@@ -61,18 +61,6 @@ def index():
     '''
     template: index.html
     '''
-#    user = User.query.get(session['user_id'])
-#    name = user.name
-#    tags = user.generate_tag_list()
-#    memos, year = user.generate_memo_list()
-#    month = ["%02d" % x for x in range(1, 13)]
-#    pelicanconf = user.config.get_config_element("pelicanconf")
-#    if pelicanconf:
-#        categories = pelicanconf['categories']
-#        publish = {"pelican_github_repo":   pelicanconf['github_repo'],
-#                   "pelican_theme":         pelicanconf['theme'],
-#                   "pelican_gh_pages_repo": pelicanconf['gh_pages_repo'],
-#                   "pelican_blog_url":      pelicanconf['blog_url']}
     return render_template('index.html', **locals())
 
 
@@ -82,14 +70,12 @@ def signup():
     template: signup.html
     signupエラー関係はflashで出力
     '''
-    # TODO: Signup禁止処理
-    # (Signup禁止処理がcreate_userとかにも入っててカオス感)
-    # (configレコードをKVS的に使ってるけどサバイバル的に使ってるので体系化したさ)
-    # if len(User.query.all()) == 1:
-    #     user = User.query.first()
-    #     obj = user.config.get_config_element("signin")
-    #     if not obj:
-    #         return render_template('404.html'), 404
+    if 'SINGLE_USER' in app.config:
+        # SINGLE_USER環境変数が設定されていて且つユーザー登録がある場合は
+        # '/'にリダイレクトしsignupできないようにする
+        users = User.query.all()
+        if len(users) > 0:
+            return redirect(url_for('/'))
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
@@ -119,13 +105,6 @@ def login():
         else:
             flash('Failure to login.')
             return redirect(url_for('login'))
-    # TODO: Signupを許さない処理(必要がどうか検討)
-    # signup = True
-    # if len(User.query.all()) == 1:
-    #     user = User.query.first()
-    #     obj = user.config.get_config_element("signin")
-    #     if not obj:
-    #         signup = False
     return render_template('login.html')
 
 
@@ -153,6 +132,19 @@ def memo(username):
     if user.name != username:
         flash('You need to be login.')
         return redirect(url_for('login'))
+# TODO: もとindexのコメントアウト部分
+#    user = User.query.get(session['user_id'])
+#    name = user.name
+#    tags = user.generate_tag_list()
+#    memos, year = user.generate_memo_list()
+#    month = ["%02d" % x for x in range(1, 13)]
+#    pelicanconf = user.config.get_config_element("pelicanconf")
+#    if pelicanconf:
+#        categories = pelicanconf['categories']
+#        publish = {"pelican_github_repo":   pelicanconf['github_repo'],
+#                   "pelican_theme":         pelicanconf['theme'],
+#                   "pelican_gh_pages_repo": pelicanconf['gh_pages_repo'],
+#                   "pelican_blog_url":      pelicanconf['blog_url']}
     return render_template('memo.html')
 
 
@@ -166,7 +158,7 @@ def changepassword():
     return None
 
 
-@app.route('/memo/add', methods=['POST'])
+@app.route('/memo/api/add', methods=['POST'])
 @requires_login
 def add_memo():
     memo = None
@@ -177,7 +169,7 @@ def add_memo():
     return json.dumps(memo.dump_dic())
 
 
-@app.route('/memo/update', methods=['POST'])
+@app.route('/memo/api/update', methods=['POST'])
 @requires_login
 def update_memo():
     memo = None
@@ -190,7 +182,7 @@ def update_memo():
     return json.dumps(memo.dump_dic())
 
 
-@app.route('/memo/delete', methods=['POST'])
+@app.route('/memo/api/delete', methods=['POST'])
 @requires_login
 def delete_memo():
     if request.method == 'POST':
@@ -201,7 +193,7 @@ def delete_memo():
     return None
 
 
-@app.route('/memo/filter', methods=['POST'])
+@app.route('/memo/api/filter', methods=['POST'])
 @requires_login
 def filter():
     user = User.query.get(session['user_id'])
@@ -210,7 +202,7 @@ def filter():
     return json.dumps({'status': False})
 
 
-@app.route('/memo/publish', methods=['POST'])
+@app.route('/memo/api/publish', methods=['POST'])
 @requires_login
 def publish_pelican():
     user = User.query.get(session['user_id'])

@@ -4,5 +4,9 @@
 {% endblock %}
 
 {% block body %}
-<p>index</p>
+<div class="container">
+    <h1>MemoMemo</h1>
+    <a href="{{ url_for('login') }}">login</a>
+    <a href="{{ url_for('signup') }}">signup</a>
+</div>
 {% endblock %}
