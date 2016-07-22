@@ -4,23 +4,17 @@
 View(routing) and Controller
 """
 
-import os
-import sys
-import json
-import datetime
 from functools import wraps
 from flask import Flask, render_template, session, g, \
-                  Markup, request, redirect, url_for, flash
-from docutils.core import publish_parts
-from sphinx.directives.other import *
-from sphinx.directives.code import *
+                  request, redirect, url_for, flash, jsonify
+from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config.from_object('config')
+db = SQLAlchemy(app)
 
-from memomemo.database import db_session, User, query_memo, \
-                              varify_user, create_user, change_password
-from memomemo.publish import PublishPelican
+from memomemo.database import User, \
+                              varify_user, create_user, get_memos
 
 
 @app.before_request
@@ -43,7 +37,7 @@ def load_current_user():
 
 @app.teardown_request
 def remove_db_session(exception):
-    db_session.remove()
+    db.session.remove()
 
 
 def requires_login(f):
@@ -101,7 +95,7 @@ def login():
         user = varify_user(username, password)
         if user:
             session['user_id'] = user.id
-            return redirect(url_for('memo', username=username))
+            return redirect(url_for('memo'))
         else:
             flash('Failure to login.')
             return redirect(url_for('login'))
@@ -114,24 +108,12 @@ def logout():
     return redirect(url_for('login'))
 
 
-@app.route('/memo/<username>', methods=['GET'])
+@app.route('/memo')
 @requires_login
-def memo(username):
+def memo():
     '''
     template: memo.html
-    URLはユーザ名固有の値にしているため
-    sessionとユーザ名の確認の必要あり
-    memo.htmlはSPAとして設計するので必要なデータは
-    sessionに紐付いた
     '''
-    # ユーザ名(username)確認
-    user = User.query.get(session['user_id'])
-    if user is None:
-        flash('You need to be login.')
-        return redirect(url_for('login'))
-    if user.name != username:
-        flash('You need to be login.')
-        return redirect(url_for('login'))
 # TODO: もとindexのコメントアウト部分
 #    user = User.query.get(session['user_id'])
 #    name = user.name
@@ -148,94 +130,24 @@ def memo(username):
     return render_template('memo.html')
 
 
-@app.route('/changepassword', methods=['POST'])
+@app.route('/memo/api/get', methods=['POST'])
 @requires_login
-def changepassword():
-    if request.method == 'POST':
-        json_data = request.json
-        change_password(session['user_id'], json_data['password'])
-        return json.dumps({'status': 'success'})
-    return None
+def memo_api_get():
+    json = request.json
+    data = get_memos(g.user, 0)
+    return jsonify(data=data)
 
 
-@app.route('/memo/api/add', methods=['POST'])
+@app.route('/memo/api/create', methods=['POST'])
 @requires_login
-def add_memo():
-    memo = None
-    user = User.query.get(session['user_id'])
-    if request.method == 'POST':
-        json_data = request.json
-        memo = user.add_memo(json_data)
-    return json.dumps(memo.dump_dic())
+def memo_api_create():
+    json = request.json
+    memo = g.user.create_memo(json)
+    return jsonify(data=json)
 
 
 @app.route('/memo/api/update', methods=['POST'])
 @requires_login
-def update_memo():
-    memo = None
-    user = User.query.get(session['user_id'])
-    if request.method == 'POST':
-        json_data = request.json
-        memo = user.update_memo(json_data)
-        if not memo:
-            return None
-    return json.dumps(memo.dump_dic())
-
-
-@app.route('/memo/api/delete', methods=['POST'])
-@requires_login
-def delete_memo():
-    if request.method == 'POST':
-        user = User.query.get(session['user_id'])
-        json_data = request.json
-        if user.delete_memo(json_data):
-            return json.dumps({'status': 'success'})
-    return None
-
-
-@app.route('/memo/api/filter', methods=['POST'])
-@requires_login
-def filter():
-    user = User.query.get(session['user_id'])
-    if request.method == 'POST':
-        return query_memo(user.id, request.json)
-    return json.dumps({'status': False})
-
-
-@app.route('/memo/api/publish', methods=['POST'])
-@requires_login
-def publish_pelican():
-    user = User.query.get(session['user_id'])
-    pelicanconf = user.config.get_config_element('pelicanconf')
-
-    data = request.json
-
-    if not pelicanconf:
-        try:
-            conf = json.loads(data['pelicanconf'])
-            if 'categories' not in conf or 'github_repo' not in conf or \
-               'theme' not in conf or 'gh_pages_repo' not in conf:
-                   return json.dumps({'status': False, 'message': 'Key error.'})
-        except Exception as e:
-            return json.dumps({'status': False, 'message': 'Invalid json data.'})
-        ret = user.config.set_config_element('pelicanconf', conf)
-        return json.dumps({'status': True, 'message': ret})
-
-    pp = PublishPelican(session['user_id'],
-            pelicanconf['github_repo'],
-            pelicanconf['categories'],
-            pelicanconf['theme'],
-            pelicanconf['gh_pages_repo'],
-            pelicanconf['custom'],
-            pelicanconf['blog_url'],
-            pelicanconf['plugins'])
-
-    ret, updates, deletes = pp.run()
-
-    if not ret:
-        return json.dumps({'log': 'Failure, see process log.'})
-
-    return json.dumps({'log': 'Success to publish.',
-                       'type': data['type'],
-                       'updates': updates,
-                       'deletes': deletes})
+def memo_api_update():
+    json = request.json
+    return jsonify(data=json)

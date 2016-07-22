@@ -1,0 +1,26 @@
+.view-change-appear {
+  opacity: 0.01;
+  transition: opacity .5s ease-in;
+}
+
+.view-change-appear.view-change-appear-active {
+  opacity: 1;
+}
+
+.view-change-enter {
+  opacity: 0.01;
+  transition: opacity .5s ease-in;
+}
+
+.view-change-enter.view-change-enter-active {
+  opacity: 1;
+}
+
+.view-change-leave {
+  opacity: 1;
+  transition: opacity .5s ease-in;
+}
+
+.view-change-leave.view-change-leave-active {
+  opacity: 0.01;
+}

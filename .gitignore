@@ -18,4 +18,6 @@ man/
 .python-version
 misc/static
 misc/templates
+*backup*
 .cache
+migrations
