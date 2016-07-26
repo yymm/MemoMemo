@@ -14,7 +14,8 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 
 from memomemo.database import User, \
-                              varify_user, create_user, get_memos
+                              varify_user, create_user, get_memos, \
+                              create_tag, get_tags
 
 
 @app.before_request
@@ -151,3 +152,17 @@ def memo_api_create():
 def memo_api_update():
     json = request.json
     return jsonify(data=json)
+
+
+@app.route('/memo/api/tag/create', methods=['POST'])
+@requires_login
+def memo_api_tag_create():
+    tag = create_tag(request.json['name'])
+    return jsonify(data=tag.dump())
+
+
+@app.route('/memo/api/tag', methods=['POST'])
+@requires_login
+def memo_api_tag():
+    tags = get_tags()
+    return jsonify(data=tags)

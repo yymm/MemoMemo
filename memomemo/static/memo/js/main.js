@@ -53,7 +53,7 @@ let Container = React.createClass({
   getInitialState: function() {
     return {
       data: this.props.data,
-      view: <MemoListView data={this.props.data} edit={this.edit} memoview={this.memoview} new={this.new} />
+      view: <MemoListView data={this.props.data} edit={this.edit} memoview={this.memoview} new={this.new} />,
     };
   },
   componentDidMount: function() {
@@ -160,7 +160,7 @@ let MemoView = React.createClass({
     return (
       <React.addons.CSSTransitionGroup transitionName='view-change' transitionAppear={true}>
         <div>
-          <h2 onClick={this.props.back}>x</h2>
+          <div onClick={this.props.back} className='glyphicon glyphicon-remove'></div>
           Article
           <h3>{this.props.memo.title}</h3>
           <h3>{this.props.memo.tag}</h3>
@@ -185,17 +185,29 @@ let EditView = React.createClass({
       category: this.props.memo.category,
     };
   },
+  componentDidMount: function() {
+  },
+  getTag: function() {
+  },
+  getCategory: function() {
+  },
+  clickTagCreate: function(e) {
+    e.preventDefault();
+  },
+  clickCategoryCreate: function(e) {
+    e.preventDefault();
+  },
   handleTitleChange: function(e) {
     this.setState({title: e.target.value});
   },
   handleBaseChange: function(e) {
     this.setState({base: e.target.value});
   },
-  handleTagChange: function(e) {
-    this.setState({tag: e.target.value});
+  clickTagSelect: function(e) {
+    e.preventDefault();
   },
-  handleCategoryChange: function(e) {
-    this.setState({category: e.target.value});
+  clickCategorySelect: function(e) {
+    e.preventDefault();
   },
   handleSubmit: function(e) {
     e.preventDefault();
@@ -222,6 +234,18 @@ let EditView = React.createClass({
     console.log(send);
   },
   render() {
+    let tag_list = (
+      <ul className='dropdown-menu'>
+        <li><a href='#' onClick={this.clickTagSelect}>tag1</a></li>
+        <li><a href='#' onClick={this.clickTagSelect}>tag2</a></li>
+      </ul>
+    );
+    let category_list = (
+      <ul className='dropdown-menu'>
+        <li><a href='#' onClick={this.clickCategorySelect}>category1</a></li>
+        <li><a href='#' onClick={this.clickCategorySelect}>category2</a></li>
+      </ul>
+    );
     let form = (
       <form className='form-horizontal' onSubmit={this.handleSubmit}>
         <div className='form-group'>
@@ -233,12 +257,52 @@ let EditView = React.createClass({
             value={this.state.base} onChange={this.handleBaseChange} />
         </div>
         <div className='form-group'>
-          <input className='form-control' placeholder='Tag'
-            value={this.state.tag} onChange={this.handleTagChange} />
+          <div className='row'>
+            <div className='col-md-8'>
+              <div className='input-group'>
+                <div className='input-group-btn'>
+                  <button className='btn btn-default dropdown-toggle' data-toggle='dropdown'
+                    aria-haspopup='true' aria-expanded='false'>
+                    Tag <span className='caret'></span>
+                  </button>
+                  {tag_list}
+                </div>
+                <div className='form-control' />
+              </div>
+            </div>
+            <div className='col-md-4'>
+              <div className='input-group'>
+                <input className='form-control' placeholder='new tag...' />
+                <div className='input-group-btn'>
+                  <button className='btn btn-default' onClick={this.clickTagCreate}>Create</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div className='form-group'>
-          <input className='form-control' placeholder='Category'
-            value={this.state.category} onChange={this.handleCategoryChange} />
+          <div className='row'>
+            <div className='col-md-8'>
+              <div className='input-group'>
+                <div className='input-group-btn'>
+                  <button className='btn btn-default dropdown-toggle' data-toggle='dropdown'
+                    aria-haspopup='true' aria-expanded='false'>
+                    Category <span className='caret'></span>
+                  </button>
+                  {category_list}
+                </div>
+                <div className='form-control' />
+              </div>
+            </div>
+            <div className='col-md-4'>
+              <div className='input-group'>
+                <input className='form-control' placeholder='new category...' />
+                <div className='input-group-btn'>
+                  <button className='btn btn-default' onClick={this.clickCategoryCreate}>Create</button>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
         <div className='form-group'>
           <button type='submit' className='btn btn-default'>Submit</button>
@@ -248,7 +312,7 @@ let EditView = React.createClass({
     return (
       <React.addons.CSSTransitionGroup transitionName='view-change' transitionAppear={true}>
         <div>
-          <h2 onClick={this.props.back}>x</h2>
+          <div onClick={this.props.back} className='glyphicon glyphicon-remove'></div>
           {form}
         </div>
       </React.addons.CSSTransitionGroup>

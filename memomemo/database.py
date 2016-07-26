@@ -51,7 +51,7 @@ class Memo(db.Model):
         self.text = text
         self.date_time = datetime.datetime.today()
 
-    def dump_dic(self):
+    def dump(self):
         return {
             'id': self.id,
             'title': self.title,
@@ -64,9 +64,15 @@ class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(100), unique=True)
 
-    def __init__(self, memo_id, name):
-        self.memo_id = memo_id
+    def __init__(self, name):
         self.name = name
+
+
+    def dump(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
 
 
 class Category(db.Model):
@@ -154,4 +160,16 @@ def change_password(user_id, password):
 
 def get_memos(user, fromIndex, quantity=10):
     memos = user.memos[fromIndex:fromIndex+quantity]
-    return [x.dump_dic() for x in memos]
+    return [x.dump() for x in memos]
+
+
+def create_tag(name):
+    tag = Tag(name)
+    db.session.add(tag)
+    db.session.commit()
+    return tag
+
+
+def get_tags():
+    tags = Tag.query.all()
+    return [x.dump() for x in tags]
