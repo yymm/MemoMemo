@@ -13,9 +13,7 @@ app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
-from memomemo.database import User, \
-                              varify_user, create_user, get_memos, \
-                              create_tag, get_tags
+from memomemo.database import *
 
 
 @app.before_request
@@ -131,38 +129,62 @@ def memo():
     return render_template('memo.html')
 
 
-@app.route('/memo/api/get', methods=['POST'])
-@requires_login
-def memo_api_get():
-    json = request.json
-    data = get_memos(g.user, 0)
-    return jsonify(data=data)
+# Web API
+# 命名規則は/api/<CRUD>/<data>
 
-
-@app.route('/memo/api/create', methods=['POST'])
+@app.route('/api/create/memo', methods=['POST'])
 @requires_login
-def memo_api_create():
+def api_create_memo():
     json = request.json
     memo = g.user.create_memo(json)
     return jsonify(data=json)
 
 
-@app.route('/memo/api/update', methods=['POST'])
+@app.route('/api/read/memo', methods=['POST'])
 @requires_login
-def memo_api_update():
+def api_get_memo():
+    json = request.json
+    data = get_memos(g.user, 0)
+    return jsonify(data=data)
+
+
+@app.route('/api/update/memo', methods=['POST'])
+@requires_login
+def api_update_memo():
     json = request.json
     return jsonify(data=json)
 
 
-@app.route('/memo/api/tag/create', methods=['POST'])
+@app.route('/api/delete/memo', methods=['POST'])
 @requires_login
-def memo_api_tag_create():
+def api_delete_memo():
+    json = request.json
+    return jsonify(data=json)
+
+
+@app.route('/api/create/tag', methods=['POST'])
+@requires_login
+def api_create_tag():
     tag = create_tag(request.json['name'])
     return jsonify(data=tag.dump())
 
 
-@app.route('/memo/api/tag', methods=['POST'])
+@app.route('/api/read/tag', methods=['POST'])
 @requires_login
-def memo_api_tag():
+def api_get_tag():
     tags = get_tags()
     return jsonify(data=tags)
+
+
+@app.route('/api/create/category', methods=['POST'])
+@requires_login
+def api_create_category():
+    category = create_category(request.json['name'])
+    return jsonify(data=category.dump())
+
+
+@app.route('/api/read/category', methods=['POST'])
+@requires_login
+def api_get_category():
+    categories = get_categories()
+    return jsonify(data=categories)

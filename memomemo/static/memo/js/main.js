@@ -1,17 +1,17 @@
 class Memo {
-  constructor(id, title, text, base, tag, category) {
+  constructor(id, title, text, base, tags, category) {
     this._id = id; // Integer
     this._title = title; // String
     this._text = text; // String
     this._base = base; // String
-    this._tag = tag; // String
+    this._tags = tags; // String
     this._category = category; // String
   }
   get id() { return this._id; }
   get title() { return this._title; }
   get text() { return this._text; }
   get base() { return this._base; }
-  get tag() { return this._tag; }
+  get tags() { return this._tags; }
   get category() { return this._category; }
 }
 // Model
@@ -57,16 +57,16 @@ let Container = React.createClass({
     };
   },
   componentDidMount: function() {
-    let send = { fromIndex: 10, quantity: 10 };
-    request('/memo/api/get', send, function(err, res) {
-      if (err || !res.ok) {
-        alert('Oh no! error');
-      } else {
-        let json = res.body;
-        console.log(json);
-        console.log(json.data);
-      }
-    });
+    // let send = { fromIndex: 10, quantity: 10 };
+    // request('/memo/api/get', send, function(err, res) {
+    //   if (err || !res.ok) {
+    //     alert('Oh no! error');
+    //   } else {
+    //     let json = res.body;
+    //     console.log(json);
+    //     console.log(json.data);
+    //   }
+    // });
   },
   // Router(Viewを生成)
   new: function() {
@@ -141,7 +141,7 @@ let MemoBox = React.createClass({
         <div className='col-md-6'>
           <h2>{this.props.memo.title}</h2>
           <p>{this.props.memo.text}</p>
-          <h4>{this.props.memo.tag}</h4>
+          <h4>{this.props.memo.tags}</h4>
           <h4>{this.props.memo.category}</h4>
           <b onClick={this.open_edit}>edit</b>
           <b onClick={this.open_memoview}>view</b>
@@ -163,7 +163,7 @@ let MemoView = React.createClass({
           <div onClick={this.props.back} className='glyphicon glyphicon-remove'></div>
           Article
           <h3>{this.props.memo.title}</h3>
-          <h3>{this.props.memo.tag}</h3>
+          <h3>{this.props.memo.tags}</h3>
           <h3>{this.props.memo.text}</h3>
         </div>
       </React.addons.CSSTransitionGroup>
@@ -181,21 +181,69 @@ let EditView = React.createClass({
       title: this.props.memo.title,
       text: this.props.memo.text,
       base: this.props.memo.base,
-      tag: this.props.memo.tag,
+      tags: this.props.memo.tags,
+      tag_options: [],
+      tag_loading: true,
+      new_tag: '',
       category: this.props.memo.category,
+      new_category: '',
+      category_options: [],
+      category_loading: true
     };
   },
   componentDidMount: function() {
+    this.getTagOptions();
+    this.getCategoryOptions();
   },
-  getTag: function() {
+  getTagOptions: function() {
+    request('/api/read/tag', {}, function(err, res) {
+      if (err || !res.ok) {
+        alert('Oh no! error');
+      } else {
+        let tag_options = res.body.data.map(function(x) { return {label: x.name, value: x.name}; });
+        this.setState({
+          tag_options: tag_options,
+          tag_loading: false
+        });
+      }
+    }.bind(this));
   },
-  getCategory: function() {
+  getCategoryOptions: function() {
+    request('/api/read/category', {}, function(err, res) {
+      if (err || !res.ok) {
+        alert('Oh no! error');
+      } else {
+        let category_options = res.body.data.map(function(x) { return {label: x.name, value: x.name}; });
+        this.setState({
+          category_options: category_options,
+          category_loading: false
+        });
+      }
+    }.bind(this));
   },
   clickTagCreate: function(e) {
     e.preventDefault();
+    e.target.disabled = true;
+    request('/api/create/tag', {name: this.state.new_tag}, function(err, res) {
+      if (err || !res.ok) {
+        alert('Oh no! error');
+      } else {
+        this.getTagOptions();
+        this.setState({new_tag: ''});
+      }
+    }.bind(this));
   },
   clickCategoryCreate: function(e) {
     e.preventDefault();
+    e.target.disabled = true;
+    request('/api/create/category', {name: this.state.new_category}, function(err, res) {
+      if (err || !res.ok) {
+        alert('Oh no! error');
+      } else {
+        this.getCategoryOptions();
+        this.setState({new_category: ''});
+      }
+    }.bind(this));
   },
   handleTitleChange: function(e) {
     this.setState({title: e.target.value});
@@ -203,11 +251,17 @@ let EditView = React.createClass({
   handleBaseChange: function(e) {
     this.setState({base: e.target.value});
   },
-  clickTagSelect: function(e) {
-    e.preventDefault();
+  handleNewTagChange: function(e) {
+    this.setState({new_tag: e.target.value});
   },
-  clickCategorySelect: function(e) {
-    e.preventDefault();
+  handleNewCategoryChange: function(e) {
+    this.setState({new_category: e.target.value});
+  },
+  handleTagChange: function(value) {
+    this.setState({tags: value});
+  },
+  handleCategoryChange: function(value) {
+    this.setState({category: value});
   },
   handleSubmit: function(e) {
     e.preventDefault();
@@ -216,7 +270,7 @@ let EditView = React.createClass({
     let send = {
       title: this.state.title.trim(),
       base: this.state.base.trim(),
-      tag: this.state.tag.trim(),
+      tags: [],
       category: this.state.category.trim()
     };
     request(api, send, function(err, res) {
@@ -224,28 +278,11 @@ let EditView = React.createClass({
         alert('Oh no! error');
       } else {
         let json = res.body;
-        console.log(json);
-        console.log(json.data);
         this.props.back();
       }
     }.bind(this));
-    console.log(this.state.title);
-    console.log(api);
-    console.log(send);
   },
   render() {
-    let tag_list = (
-      <ul className='dropdown-menu'>
-        <li><a href='#' onClick={this.clickTagSelect}>tag1</a></li>
-        <li><a href='#' onClick={this.clickTagSelect}>tag2</a></li>
-      </ul>
-    );
-    let category_list = (
-      <ul className='dropdown-menu'>
-        <li><a href='#' onClick={this.clickCategorySelect}>category1</a></li>
-        <li><a href='#' onClick={this.clickCategorySelect}>category2</a></li>
-      </ul>
-    );
     let form = (
       <form className='form-horizontal' onSubmit={this.handleSubmit}>
         <div className='form-group'>
@@ -253,26 +290,24 @@ let EditView = React.createClass({
             value={this.state.title} onChange={this.handleTitleChange} />
         </div>
         <div className='form-group'>
+          <ul className='nav nav-pills'>
+            <li className='active'><a href='#'>Edit</a></li>
+            <li><a href='#'>Preview</a></li>
+          </ul>
           <textarea className='form-control' rows='10' placeholder='Text(Markdown)'
             value={this.state.base} onChange={this.handleBaseChange} />
         </div>
         <div className='form-group'>
           <div className='row'>
             <div className='col-md-8'>
-              <div className='input-group'>
-                <div className='input-group-btn'>
-                  <button className='btn btn-default dropdown-toggle' data-toggle='dropdown'
-                    aria-haspopup='true' aria-expanded='false'>
-                    Tag <span className='caret'></span>
-                  </button>
-                  {tag_list}
-                </div>
-                <div className='form-control' />
-              </div>
+              <Select multi simpleValue
+                value={this.state.tags} options={this.state.tag_options}
+                isLoading={this.state.tag_loading} onChange={this.handleTagChange} placeholder='Tags...' /> 
             </div>
             <div className='col-md-4'>
               <div className='input-group'>
-                <input className='form-control' placeholder='new tag...' />
+                <input className='form-control' placeholder='new tag...'
+                  value={this.state.new_tag} onChange={this.handleNewTagChange}/>
                 <div className='input-group-btn'>
                   <button className='btn btn-default' onClick={this.clickTagCreate}>Create</button>
                 </div>
@@ -283,20 +318,13 @@ let EditView = React.createClass({
         <div className='form-group'>
           <div className='row'>
             <div className='col-md-8'>
-              <div className='input-group'>
-                <div className='input-group-btn'>
-                  <button className='btn btn-default dropdown-toggle' data-toggle='dropdown'
-                    aria-haspopup='true' aria-expanded='false'>
-                    Category <span className='caret'></span>
-                  </button>
-                  {category_list}
-                </div>
-                <div className='form-control' />
-              </div>
+              <Select value={this.state.category} options={this.state.category_options}
+                isLoading={this.state.category_loading} onChange={this.handleCategoryChange} placeholder='Category...' /> 
             </div>
             <div className='col-md-4'>
               <div className='input-group'>
-                <input className='form-control' placeholder='new category...' />
+                <input className='form-control' placeholder='new category...'
+                  value={this.state.new_category} onChange={this.handleNewCategoryChange}/>
                 <div className='input-group-btn'>
                   <button className='btn btn-default' onClick={this.clickCategoryCreate}>Create</button>
                 </div>

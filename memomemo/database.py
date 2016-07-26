@@ -67,7 +67,6 @@ class Tag(db.Model):
     def __init__(self, name):
         self.name = name
 
-
     def dump(self):
         return {
             'id': self.id,
@@ -80,9 +79,14 @@ class Category(db.Model):
     name = db.Column(db.String(100), unique=True)
     memos = db.relationship('Memo', backref='category')
 
-    def __init__(self, memo_id, name):
-        self.memo_id = memo_id
+    def __init__(self, name):
         self.name = name
+
+    def dump(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
 
 
 class Config(db.Model):
@@ -152,12 +156,6 @@ def delete_user(user):
     db.session.commit()
 
 
-def change_password(user_id, password):
-    user = User.query.get(user_id)
-    user.password = password
-    db.session.commit()
-
-
 def get_memos(user, fromIndex, quantity=10):
     memos = user.memos[fromIndex:fromIndex+quantity]
     return [x.dump() for x in memos]
@@ -173,3 +171,33 @@ def create_tag(name):
 def get_tags():
     tags = Tag.query.all()
     return [x.dump() for x in tags]
+
+
+def delete_tag(name):
+    tag = Tag.query.filter_by(name=name).first()
+    if tag:
+        db.session.delete(tag)
+        db.session.commit()
+        return True
+    return False
+
+
+def create_category(name):
+    category = Category(name)
+    db.session.add(category)
+    db.session.commit()
+    return category
+
+
+def get_categories():
+    categories = Category.query.all()
+    return [x.dump() for x in categories]
+
+
+def delete_category(name):
+    category = Category.query.filter_by(name=name).first()
+    if category:
+        db.session.delete(category)
+        db.session.commit()
+        return True
+    return False
