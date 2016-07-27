@@ -53,14 +53,15 @@ let Container = React.createClass({
   getInitialState: function() {
     return {
       data: this.props.data,
-      view: <MemoListView data={this.props.data} edit={this.edit} memoview={this.memoview} new={this.new} />,
+      view: <MemoListView data={this.props.data} edit={this.edit} memoview={this.memoview} new={this.new} alert={this.alert} />,
+      alert: null
     };
   },
   componentDidMount: function() {
     // let send = { fromIndex: 10, quantity: 10 };
     // request('/memo/api/get', send, function(err, res) {
     //   if (err || !res.ok) {
-    //     alert('Oh no! error');
+    //     this.props.alert('warning', 'Oh no! error');
     //   } else {
     //     let json = res.body;
     //     console.log(json);
@@ -71,31 +72,40 @@ let Container = React.createClass({
   // Router(Viewを生成)
   new: function() {
     this.setState({view: (
-      <EditView back={this.back} memo={new Memo(-1,'','','','','')}>
+      <EditView back={this.back} memo={new Memo(-1,'','','','','')} alert={this.alert}>
       </EditView>
     )});
   },
   edit: function(memo) {
     this.setState({view: (
-      <EditView back={this.back} memo={memo}>
+      <EditView back={this.back} memo={memo} alert={this.alert}>
       </EditView>
     )});
   },
   memoview: function(memo) {
     this.setState({view: (
-      <MemoView back={this.back} memo={memo}>
+      <MemoView back={this.back} memo={memo} alert={this.alert}>
       </MemoView>
     )});
   },
   back: function() {
     this.setState({view: (
-      <MemoListView data={this.state.data} edit={this.edit} memoview={this.memoview} new={this.new} />
+      <MemoListView data={this.state.data} edit={this.edit} memoview={this.memoview} new={this.new} alert={this.alert} />
     )});
+  },
+  alert: function(type, message) {
+    let remove_alert = function() {
+      this.setState({alert: null});
+    }.bind(this);
+    this.setState({alert: <Alert type={type} message={message} remove_self={remove_alert} />});
   },
   render: function() {
     return (
       <div>
-        {this.state.view}
+        {this.state.alert}
+        <div className='container'>
+          {this.state.view}
+        </div>
       </div>
     );
   }
@@ -106,7 +116,8 @@ let MemoListView = React.createClass ({
     data: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Memo)).isRequired,
     edit: React.PropTypes.func.isRequired,
     memoview: React.PropTypes.func.isRequired,
-    new: React.PropTypes.func.isRequired
+    new: React.PropTypes.func.isRequired,
+    alert: React.PropTypes.func.isRequired
   },
   render() {
     let memoNodes = this.props.data.map(function(memo) {
@@ -154,7 +165,8 @@ let MemoBox = React.createClass({
 let MemoView = React.createClass({
   propTypes: {
     back: React.PropTypes.func.isRequired,
-    memo: React.PropTypes.instanceOf(Memo).isRequired
+    memo: React.PropTypes.instanceOf(Memo).isRequired,
+    alert: React.PropTypes.func.isRequired
   },
   render() {
     return (
@@ -174,7 +186,8 @@ let MemoView = React.createClass({
 let EditView = React.createClass({
   propTypes: {
     back: React.PropTypes.func.isRequired,
-    memo: React.PropTypes.instanceOf(Memo).isRequired
+    memo: React.PropTypes.instanceOf(Memo).isRequired,
+    alert: React.PropTypes.func.isRequired
   },
   getInitialState: function() {
     return {
@@ -198,7 +211,7 @@ let EditView = React.createClass({
   getTagOptions: function() {
     request('/api/read/tag', {}, function(err, res) {
       if (err || !res.ok) {
-        alert('Oh no! error');
+        this.props.alert('warning', 'Oh no! error');
       } else {
         let tag_options = res.body.data.map(function(x) { return {label: x.name, value: x.name}; });
         this.setState({
@@ -211,7 +224,7 @@ let EditView = React.createClass({
   getCategoryOptions: function() {
     request('/api/read/category', {}, function(err, res) {
       if (err || !res.ok) {
-        alert('Oh no! error');
+        this.props.alert('warning', 'Oh no! error');
       } else {
         let category_options = res.body.data.map(function(x) { return {label: x.name, value: x.name}; });
         this.setState({
@@ -226,8 +239,9 @@ let EditView = React.createClass({
     e.target.disabled = true;
     request('/api/create/tag', {name: this.state.new_tag}, function(err, res) {
       if (err || !res.ok) {
-        alert('Oh no! error');
+        this.props.alert('warning', 'Oh no! error');
       } else {
+        this.props.alert('success', 'Tag created!');
         this.getTagOptions();
         this.setState({new_tag: ''});
       }
@@ -240,6 +254,7 @@ let EditView = React.createClass({
       if (err || !res.ok) {
         alert('Oh no! error');
       } else {
+        this.props.alert('success', 'Category created!');
         this.getCategoryOptions();
         this.setState({new_category: ''});
       }
@@ -275,9 +290,8 @@ let EditView = React.createClass({
     };
     request(api, send, function(err, res) {
       if (err || !res.ok) {
-        alert('Oh no! error');
+        this.props.alert('warning', 'Oh no! error');
       } else {
-        let json = res.body;
         this.props.back();
       }
     }.bind(this));
@@ -342,6 +356,50 @@ let EditView = React.createClass({
         <div>
           <div onClick={this.props.back} className='glyphicon glyphicon-remove'></div>
           {form}
+        </div>
+      </React.addons.CSSTransitionGroup>
+    );
+  }
+});
+
+let Alert = React.createClass({
+  propTypes: {
+    type: React.PropTypes.oneOf(['success', 'info', 'warning', 'danger']),
+    message: React.PropTypes.string.isRequired,
+    remove_self: React.PropTypes.func.isRequired
+  },
+  componentDidMount: function() {
+    let delay = 5000;
+    if (this.props.type == 'success' ||
+        this.props.type == 'info') {
+      delay = 2500;
+    }
+    setTimeout(this.props.remove_self, delay);
+  },
+  render() {
+    let alertClass = 'text-center alert alert-float alert-' + this.props.type;
+    let glyphiconClass = 'glyphicon glyphicon-';
+    switch (this.props.type) {
+    case 'success':
+      glyphiconClass += 'thumbs-up';
+      break;
+    case 'info':
+      glyphiconClass += 'info-sign';
+      break;
+    case 'warning':
+      glyphiconClass += 'exclamation-sign';
+      break;
+    case 'danger':
+      glyphiconClass += 'fire';
+      break;
+    default:
+      glyphiconClass += 'question-sign';
+    }
+    let strong = this.props.type.charAt(0).toUpperCase() + this.props.type.slice(1);
+    return (
+      <React.addons.CSSTransitionGroup transitionName='view-change' transitionAppear={true}>
+        <div className={alertClass} onClick={this.props.remove_self}>
+          <strong>{strong} <span className={glyphiconClass} aria-hidden="true"></span></strong> {this.props.message}
         </div>
       </React.addons.CSSTransitionGroup>
     );
