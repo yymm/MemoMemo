@@ -54,14 +54,14 @@ let Container = React.createClass({
     return {
       data: this.props.data,
       view: <MemoListView data={this.props.data} edit={this.edit} memoview={this.memoview} new={this.new} alert={this.alert} />,
-      alert: null
+      alerts: []
     };
   },
   componentDidMount: function() {
     // let send = { fromIndex: 10, quantity: 10 };
     // request('/memo/api/get', send, function(err, res) {
     //   if (err || !res.ok) {
-    //     this.props.alert('warning', 'Oh no! error');
+    //     this.props.alerts('warning', 'Oh no! error');
     //   } else {
     //     let json = res.body;
     //     console.log(json);
@@ -94,15 +94,23 @@ let Container = React.createClass({
     )});
   },
   alert: function(type, message) {
-    let remove_alert = function() {
-      this.setState({alert: null});
-    }.bind(this);
-    this.setState({alert: <Alert type={type} message={message} remove_self={remove_alert} />});
+    let newAlerts = this.state.alerts.concat({type: type, message: message});
+    this.setState({alerts: newAlerts});
   },
   render: function() {
+    let alerts = this.state.alerts.map(function(x, i) { 
+      let alert_remove = function(i) {
+        let newAlerts = this.state.alerts.slice();
+        newAlerts.splice(i, 1);
+        this.setState({alerts: newAlerts});
+      };
+      return <Alert key={i} type={x.type} message={x.message} remove_self={alert_remove.bind(this, i)} />;
+    }.bind(this));
     return (
       <div>
-        {this.state.alert}
+        <React.addons.CSSTransitionGroup transitionName='view-change' transitionAppear={true}>
+          {alerts}
+        </React.addons.CSSTransitionGroup>
         <div className='container'>
           {this.state.view}
         </div>
@@ -236,28 +244,26 @@ let EditView = React.createClass({
   },
   clickTagCreate: function(e) {
     e.preventDefault();
-    e.target.disabled = true;
     request('/api/create/tag', {name: this.state.new_tag}, function(err, res) {
       if (err || !res.ok) {
         this.props.alert('warning', 'Oh no! error');
       } else {
         this.props.alert('success', 'Tag created!');
         this.getTagOptions();
-        this.setState({new_tag: ''});
       }
+      this.setState({new_tag: ''});
     }.bind(this));
   },
   clickCategoryCreate: function(e) {
     e.preventDefault();
-    e.target.disabled = true;
     request('/api/create/category', {name: this.state.new_category}, function(err, res) {
       if (err || !res.ok) {
-        alert('Oh no! error');
+        this.props.alert('warning', 'Oh no! error');
       } else {
         this.props.alert('success', 'Category created!');
         this.getCategoryOptions();
-        this.setState({new_category: ''});
       }
+      this.setState({new_category: ''});
     }.bind(this));
   },
   handleTitleChange: function(e) {
@@ -369,10 +375,10 @@ let Alert = React.createClass({
     remove_self: React.PropTypes.func.isRequired
   },
   componentDidMount: function() {
-    let delay = 5000;
+    let delay = 10000;
     if (this.props.type == 'success' ||
         this.props.type == 'info') {
-      delay = 2500;
+      delay = 5000;
     }
     setTimeout(this.props.remove_self, delay);
   },
@@ -397,11 +403,10 @@ let Alert = React.createClass({
     }
     let strong = this.props.type.charAt(0).toUpperCase() + this.props.type.slice(1);
     return (
-      <React.addons.CSSTransitionGroup transitionName='view-change' transitionAppear={true}>
-        <div className={alertClass} onClick={this.props.remove_self}>
-          <strong>{strong} <span className={glyphiconClass} aria-hidden="true"></span></strong> {this.props.message}
-        </div>
-      </React.addons.CSSTransitionGroup>
+      <div className={alertClass} onClick={this.props.remove_self}>
+        <button className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <strong>{strong} <span className={glyphiconClass} aria-hidden="true"></span></strong> {this.props.message}
+      </div>
     );
   }
 });
