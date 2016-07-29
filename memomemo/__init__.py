@@ -137,7 +137,7 @@ def memo():
 def api_create_memo():
     json = request.json
     memo = g.user.create_memo(json)
-    return jsonify(data=json)
+    return jsonify(ok=True, data=json)
 
 
 @app.route('/api/read/memo', methods=['POST'])
@@ -145,46 +145,52 @@ def api_create_memo():
 def api_get_memo():
     json = request.json
     data = get_memos(g.user, 0)
-    return jsonify(data=data)
+    return jsonify(ok=True, data=data)
 
 
 @app.route('/api/update/memo', methods=['POST'])
 @requires_login
 def api_update_memo():
     json = request.json
-    return jsonify(data=json)
+    return jsonify(ok=True, data=json)
 
 
 @app.route('/api/delete/memo', methods=['POST'])
 @requires_login
 def api_delete_memo():
     json = request.json
-    return jsonify(data=json)
+    return jsonify(ok=True, data=json)
 
 
 @app.route('/api/create/tag', methods=['POST'])
 @requires_login
 def api_create_tag():
-    tag = create_tag(request.json['name'])
-    return jsonify(data=tag.dump())
+    tag, err_msg = create_tag(request.json['name'])
+    if tag:
+        return jsonify(ok=True, data=tag.dump())
+    else:
+        return jsonify(ok=False, data=err_msg)
 
 
 @app.route('/api/read/tag', methods=['POST'])
 @requires_login
 def api_get_tag():
     tags = get_tags()
-    return jsonify(data=tags)
+    return jsonify(ok=True, data=tags)
 
 
 @app.route('/api/create/category', methods=['POST'])
 @requires_login
 def api_create_category():
-    category = create_category(request.json['name'])
-    return jsonify(data=category.dump())
+    category, err_msg = create_category(request.json['name'])
+    if category:
+        return jsonify(ok=True, data=category.dump())
+    else:
+        return jsonify(ok=False, data=err_msg)
 
 
 @app.route('/api/read/category', methods=['POST'])
 @requires_login
 def api_get_category():
     categories = get_categories()
-    return jsonify(data=categories)
+    return jsonify(ok=True, data=categories)

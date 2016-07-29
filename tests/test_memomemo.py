@@ -58,3 +58,11 @@ def test_login_logout(client):
     assert b'Failure to login.' in rv.data
     rv = logout(client)
     assert b'login' in rv.data
+
+
+def test_require_login_api(client):
+    rv = signup(client, 'test', 'test')
+    assert b'login' in rv.data
+    rv = login(client, 'test', 'test')
+    assert b'test' in rv.data # 変わる可能性
+    pass

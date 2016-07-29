@@ -6,9 +6,8 @@ Model with O/R mapper (Flask-SQLAlchemy)
 
 import json
 import datetime
+import sqlalchemy
 from memomemo import db
-from sqlalchemy import and_, exc, event, or_
-from sqlalchemy.pool import Pool
 from memomemo.utils import datetime2str, str2datetime, parse_md
 
 
@@ -62,7 +61,7 @@ class Memo(db.Model):
 
 class Tag(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
 
     def __init__(self, name):
         self.name = name
@@ -76,7 +75,7 @@ class Tag(db.Model):
 
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(100), unique=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
     memos = db.relationship('Memo', backref='category')
 
     def __init__(self, name):
@@ -162,10 +161,18 @@ def get_memos(user, fromIndex, quantity=10):
 
 
 def create_tag(name):
+    err_msg = ''
+    if len(name) == 0:
+        err_msg = 'Empty string is invalid.'
+        return None, err_msg
     tag = Tag(name)
-    db.session.add(tag)
-    db.session.commit()
-    return tag
+    try:
+        db.session.add(tag)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as ie:
+        err = ie.orig
+        return None, err_msg
+    return tag, err_msg
 
 
 def get_tags():
@@ -183,10 +190,18 @@ def delete_tag(name):
 
 
 def create_category(name):
+    err_msg = ''
+    if len(name) == 0:
+        err_msg = 'Empty string is invalid.'
+        return None, err_msg
     category = Category(name)
-    db.session.add(category)
-    db.session.commit()
-    return category
+    try:
+        db.session.add(category)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as ie:
+        err = ie.orig
+        return None, err_msg
+    return category, err_msg
 
 
 def get_categories():

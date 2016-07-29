@@ -41,8 +41,27 @@ let request = function(api, send, callback) {
     .post(api)
     .send(send)
     .set('Accept', 'application/json')
-    .end(callback);
-}
+    .end(function(err, res) {
+      let ok = true;
+      let type = '';
+      let message = '';
+      if (err || !res.ok) { // 500 Error
+        ok = false;
+        type = 'danger';
+        message = 'Internal Server Error (See server logs for more infomation)';
+      }
+      else if (!res.body.ok) { // Response Error (Types = { ok: <Boolean>, data: <String> })
+        ok = false;
+        type = 'warning';
+        message = res.body.data;
+      }
+      callback({
+        ok: ok,
+        type: type,
+        message: message
+      }, res);
+    });
+};
 
 // 基本的にContainerが親玉
 // ContainerのsetState処理を子のViewにpropsとして渡すことにより実行する
@@ -60,13 +79,12 @@ let Container = React.createClass({
   componentDidMount: function() {
     // let send = { fromIndex: 10, quantity: 10 };
     // request('/memo/api/get', send, function(err, res) {
-    //   if (err || !res.ok) {
-    //     this.props.alerts('warning', 'Oh no! error');
-    //   } else {
-    //     let json = res.body;
-    //     console.log(json);
-    //     console.log(json.data);
+    //   if (!err.ok) {
+    //     this.props.alert(err.type, err.message);
     //   }
+    //   let json = res.body;
+    //   console.log(json);
+    //   console.log(json.data);
     // });
   },
   // Router(Viewを生成)
@@ -205,11 +223,14 @@ let EditView = React.createClass({
       tags: this.props.memo.tags,
       tag_options: [],
       tag_loading: true,
+      tag_submit: false,
       new_tag: '',
       category: this.props.memo.category,
       new_category: '',
       category_options: [],
-      category_loading: true
+      category_loading: true,
+      category_submit: false,
+      submit: false
     };
   },
   componentDidMount: function() {
@@ -218,52 +239,56 @@ let EditView = React.createClass({
   },
   getTagOptions: function() {
     request('/api/read/tag', {}, function(err, res) {
-      if (err || !res.ok) {
-        this.props.alert('warning', 'Oh no! error');
-      } else {
-        let tag_options = res.body.data.map(function(x) { return {label: x.name, value: x.name}; });
-        this.setState({
-          tag_options: tag_options,
-          tag_loading: false
-        });
+      if (!err.ok) {
+        this.props.alert(err.type, err.message);
+        return;
       }
+      let tag_options = res.body.data.map(function(x) { return {label: x.name, value: x.name}; });
+      this.setState({
+        tag_options: tag_options,
+        tag_loading: false
+      });
     }.bind(this));
   },
   getCategoryOptions: function() {
     request('/api/read/category', {}, function(err, res) {
-      if (err || !res.ok) {
-        this.props.alert('warning', 'Oh no! error');
-      } else {
-        let category_options = res.body.data.map(function(x) { return {label: x.name, value: x.name}; });
-        this.setState({
-          category_options: category_options,
-          category_loading: false
-        });
+      if (!err.ok) {
+        this.props.alert(err.type, err.message);
+        return;
       }
+      let category_options = res.body.data.map(function(x) { return {label: x.name, value: x.name}; });
+      this.setState({
+        category_options: category_options,
+        category_loading: false
+      });
     }.bind(this));
   },
   clickTagCreate: function(e) {
     e.preventDefault();
-    request('/api/create/tag', {name: this.state.new_tag}, function(err, res) {
-      if (err || !res.ok) {
-        this.props.alert('warning', 'Oh no! error');
+    this.setState({tag_submit: true});
+    request('/api/create/tag', {name: this.state.new_tag}, function(err) {
+      this.setState({new_tag: '', tag_submit: false});
+      if (!err.ok) {
+        this.props.alert(err.type, err.message);
+        return;
       } else {
         this.props.alert('success', 'Tag created!');
         this.getTagOptions();
       }
-      this.setState({new_tag: ''});
     }.bind(this));
   },
   clickCategoryCreate: function(e) {
     e.preventDefault();
-    request('/api/create/category', {name: this.state.new_category}, function(err, res) {
-      if (err || !res.ok) {
-        this.props.alert('warning', 'Oh no! error');
+    this.setState({category_submit: true});
+    request('/api/create/category', {name: this.state.new_category}, function(err) {
+      this.setState({new_category: '', category_submit: false});
+      if (!err.ok) {
+        this.props.alert(err.type, err.message);
+        return;
       } else {
         this.props.alert('success', 'Category created!');
         this.getCategoryOptions();
       }
-      this.setState({new_category: ''});
     }.bind(this));
   },
   handleTitleChange: function(e) {
@@ -295,11 +320,10 @@ let EditView = React.createClass({
       category: this.state.category.trim()
     };
     request(api, send, function(err, res) {
-      if (err || !res.ok) {
-        this.props.alert('warning', 'Oh no! error');
-      } else {
-        this.props.back();
+      if (!err.ok) {
+        this.props.alert(err.type, err.message);
       }
+      this.props.back();
     }.bind(this));
   },
   render() {
@@ -329,7 +353,7 @@ let EditView = React.createClass({
                 <input className='form-control' placeholder='new tag...'
                   value={this.state.new_tag} onChange={this.handleNewTagChange}/>
                 <div className='input-group-btn'>
-                  <button className='btn btn-default' onClick={this.clickTagCreate}>Create</button>
+                  <button disabled={this.state.tag_submit} className='btn btn-default' onClick={this.clickTagCreate}>Create</button>
                 </div>
               </div>
             </div>
@@ -346,14 +370,14 @@ let EditView = React.createClass({
                 <input className='form-control' placeholder='new category...'
                   value={this.state.new_category} onChange={this.handleNewCategoryChange}/>
                 <div className='input-group-btn'>
-                  <button className='btn btn-default' onClick={this.clickCategoryCreate}>Create</button>
+                  <button disabled={this.state.category_submit} className='btn btn-default' onClick={this.clickCategoryCreate}>Create</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
         <div className='form-group'>
-          <button type='submit' className='btn btn-default'>Submit</button>
+          <button disabled={this.state.submit} type='submit' className='btn btn-default'>Submit</button>
         </div>
       </form>
     );
