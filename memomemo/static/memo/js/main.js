@@ -1,39 +1,26 @@
 class Memo {
-  constructor(id, title, text, base, tags, category) {
+  constructor(id, title, text, html, date_time, tags, category) {
     this._id = id; // Integer
     this._title = title; // String
     this._text = text; // String
-    this._base = base; // String
-    this._tags = tags; // String
-    this._category = category; // String
+    this._html = html; // String
+    this._date_time = date_time; // String
+    this._tags = tags; // List<{id: <Integer>, name: <String>}>
+    this._category = category; // {id: <Integer>, name: <String>}
   }
   get id() { return this._id; }
   get title() { return this._title; }
   get text() { return this._text; }
-  get base() { return this._base; }
+  get html() { return this._html; }
+  get date_time() { return this._date_time; }
   get tags() { return this._tags; }
   get category() { return this._category; }
+  update(title, text, html, date_time, tags, category) {
+  }
 }
-// Model
-// Memoクラスのリスト
-var data = [
-  new Memo(0, 'title0', 'text0', 'base-text0', 'tag0', 'category0'),
-  new Memo(1, 'title1', 'text1', 'base-text1', 'tag1', 'category1'),
-  new Memo(2, 'title2', 'text2', 'base-text2', 'tag2', 'category2'),
-  new Memo(3, 'title3', 'text3', 'base-text3', 'tag3', 'category3'),
-  new Memo(4, 'title4', 'text4', 'base-text4', 'tag4', 'category4'),
-  new Memo(5, 'title5', 'text5', 'base-text5', 'tag5', 'category5'),
-  new Memo(6, 'title4', 'text6', 'base-text6', 'tag6', 'category6'),
-  new Memo(7, 'title4', 'text7', 'base-text7', 'tag7', 'category7'),
-  new Memo(8, 'title4', 'text8', 'base-text8', 'tag8', 'category8'),
-  new Memo(9, 'title4', 'text9', 'base-text9', 'tag9', 'category9'),
-  new Memo(10, 'title10', 'text10', 'base-text10', 'tag10', 'category10'),
-  new Memo(11, 'title11', 'text11', 'base-text11', 'tag11', 'category11'),
-  new Memo(12, 'title12', 'text12', 'base-text12', 'tag12', 'category12'),
-  new Memo(13, 'title13', 'text13', 'base-text13', 'tag13', 'category13'),
-  new Memo(14, 'title14', 'text14', 'base-text14', 'tag14', 'category14'),
-  new Memo(15, 'title15', 'text15', 'base-text15', 'tag15', 'category15')
-];
+let empty_memo = function() {
+  return new Memo(-1, '', '', '', '', [], null);
+};
 
 let request = function(api, send, callback) {
   // handle single request(only POST) with superagent
@@ -66,31 +53,36 @@ let request = function(api, send, callback) {
 // 基本的にContainerが親玉
 // ContainerのsetState処理を子のViewにpropsとして渡すことにより実行する
 let Container = React.createClass({
-  propTypes: {
-    data: React.PropTypes.arrayOf(React.PropTypes.instanceOf(Memo)).isRequired
-  },
   getInitialState: function() {
     return {
-      data: this.props.data,
-      view: <MemoListView data={this.props.data} edit={this.edit} memoview={this.memoview} new={this.new} alert={this.alert} />,
+      data: [],
+      view: <div>loading...</div>,
       alerts: []
     };
   },
   componentDidMount: function() {
-    // let send = { fromIndex: 10, quantity: 10 };
-    // request('/memo/api/get', send, function(err, res) {
-    //   if (!err.ok) {
-    //     this.props.alert(err.type, err.message);
-    //   }
-    //   let json = res.body;
-    //   console.log(json);
-    //   console.log(json.data);
-    // });
+    request('/api/read/memo', {}, function(err, res) {
+      if (!err.ok) {
+        this.alert(err.type, err.message);
+        return;
+      } else {
+        let data = res.body.data.map(function(x) {
+          return new Memo(
+            x.id, x.title, x.text, x.html, x.date_time,
+            x.tags, x.category
+          );
+        });
+        this.setState({
+          data: data,
+          view: <MemoListView data={data} edit={this.edit} memoview={this.memoview} new={this.new} alert={this.alert} />
+        });
+      }
+    }.bind(this));
   },
   // Router(Viewを生成)
   new: function() {
     this.setState({view: (
-      <EditView back={this.back} memo={new Memo(-1,'','','','','')} alert={this.alert}>
+      <EditView back={this.back} memo={empty_memo()} alert={this.alert}>
       </EditView>
     )});
   },
@@ -106,10 +98,36 @@ let Container = React.createClass({
       </MemoView>
     )});
   },
-  back: function() {
-    this.setState({view: (
-      <MemoListView data={this.state.data} edit={this.edit} memoview={this.memoview} new={this.new} alert={this.alert} />
-    )});
+  back: function(e, is_update, memo) {
+    if (memo) {
+      console.log(e, memo);
+      let m = new Memo(
+          memo.id, memo.title, memo.text, memo.html, memo.date_time,
+          memo.tags, memo.category
+      );
+      let data = this.state.data;
+      if (is_update) {
+        // update
+        let index = data.findIndex(function(x) { return x.id === memo.id; });
+        // dataが見つからないときの処理は下記の理由により未実装
+        // edit中にdataを削除する動作はできない(他のユーザーからもできない)ため必ずfindIndexは成功する
+        // if (index < 0) {
+        //   return;
+        // }
+        data[index] = m;
+      } else {
+        // new
+        data.push(m);
+      }
+      this.setState({
+        data: data,
+        view: <MemoListView data={this.state.data} edit={this.edit} memoview={this.memoview} new={this.new} alert={this.alert} />
+      });
+    } else {
+      this.setState({
+        view: <MemoListView data={this.state.data} edit={this.edit} memoview={this.memoview} new={this.new} alert={this.alert} />
+      });
+    }
   },
   alert: function(type, message) {
     let newAlerts = this.state.alerts.concat({type: type, message: message});
@@ -153,7 +171,9 @@ let MemoListView = React.createClass ({
     }.bind(this));
     return (
       <div className='row'>
-        <div onClick={this.props.new}>new</div>
+        <div className='col-md-12 text-right'>
+          <button className='btn btn-default' onClick={this.props.new}>new</button>
+        </div>
         {memoNodes}
       </div>
     );
@@ -173,15 +193,28 @@ let MemoBox = React.createClass({
     this.props.memoview(this.props.memo);
   },
   render() {
+    let tags = this.props.memo.tags.map(function(x) {
+      return <button className='btn btn-success'>{x.name}</button>;
+    });
+    let category = null;
+    if (this.props.memo.category) {
+      category = <li className='btn btn-info'>{this.props.memo.category.name}</li>;
+    }
     return (
       <React.addons.CSSTransitionGroup transitionName='view-change' transitionAppear={true}>
         <div className='col-md-6'>
-          <h2>{this.props.memo.title}</h2>
-          <p>{this.props.memo.text}</p>
-          <h4>{this.props.memo.tags}</h4>
-          <h4>{this.props.memo.category}</h4>
-          <b onClick={this.open_edit}>edit</b>
-          <b onClick={this.open_memoview}>view</b>
+          <div className='panel panel-default'>
+            <div className='panel-heading'>
+              <h1>{this.props.memo.title} <small>{this.props.memo.date_time}</small></h1>
+              <div className='button-group'>
+                <button className='btn btn-default' onClick={this.open_edit}>edit</button>
+                <button className='btn btn-default' onClick={this.open_memoview}>view</button>
+                {tags}
+                {category}
+              </div>
+            </div>
+            <div className='panel-body' dangerouslySetInnerHTML={ {__html: this.props.memo.html} } />
+          </div>
         </div>
       </React.addons.CSSTransitionGroup>
     );
@@ -195,14 +228,25 @@ let MemoView = React.createClass({
     alert: React.PropTypes.func.isRequired
   },
   render() {
+    let tags = this.props.memo.tags.map(function(x) {
+      return <button className='btn btn-success'>{x.name}</button>;
+    });
+    let category = null;
+    if (this.props.memo.category) {
+      category = <li className='btn btn-info'>{this.props.memo.category.name}</li>;
+    }
     return (
       <React.addons.CSSTransitionGroup transitionName='view-change' transitionAppear={true}>
-        <div>
+        <div className='col-md-12'>
           <div onClick={this.props.back} className='glyphicon glyphicon-remove'></div>
-          Article
-          <h3>{this.props.memo.title}</h3>
-          <h3>{this.props.memo.tags}</h3>
-          <h3>{this.props.memo.text}</h3>
+          <div className='jumbotron'>
+            <h1>{this.props.memo.title} <small>{this.props.memo.date_time}</small></h1>
+            <div className='button-group'>
+              {tags}
+              {category}
+            </div>
+          </div>
+          <div dangerouslySetInnerHTML={ {__html: this.props.memo.html} } />
         </div>
       </React.addons.CSSTransitionGroup>
     );
@@ -219,7 +263,7 @@ let EditView = React.createClass({
     return {
       title: this.props.memo.title,
       text: this.props.memo.text,
-      base: this.props.memo.base,
+      html: this.props.memo.html,
       tags: this.props.memo.tags,
       tag_options: [],
       tag_loading: true,
@@ -243,7 +287,7 @@ let EditView = React.createClass({
         this.props.alert(err.type, err.message);
         return;
       }
-      let tag_options = res.body.data.map(function(x) { return {label: x.name, value: x.name}; });
+      let tag_options = res.body.data.map(function(x) { return {id: x.id, name: x.name}; });
       this.setState({
         tag_options: tag_options,
         tag_loading: false
@@ -256,7 +300,7 @@ let EditView = React.createClass({
         this.props.alert(err.type, err.message);
         return;
       }
-      let category_options = res.body.data.map(function(x) { return {label: x.name, value: x.name}; });
+      let category_options = res.body.data.map(function(x) { return {id: x.id, name: x.name}; });
       this.setState({
         category_options: category_options,
         category_loading: false
@@ -294,8 +338,8 @@ let EditView = React.createClass({
   handleTitleChange: function(e) {
     this.setState({title: e.target.value});
   },
-  handleBaseChange: function(e) {
-    this.setState({base: e.target.value});
+  handleTextChange: function(e) {
+    this.setState({text: e.target.value});
   },
   handleNewTagChange: function(e) {
     this.setState({new_tag: e.target.value});
@@ -312,18 +356,26 @@ let EditView = React.createClass({
   handleSubmit: function(e) {
     e.preventDefault();
     // TODO: 簡易バリデーション
-    let api = (this.props.memo.id < 0) ? '/memo/api/create' : '/memo/api/update';
+    if (this.state.title.trim().length == 0 ||
+        this.state.text.trim().length == 0) {
+      this.props.alert('warning', 'Empty Title or Text is invalid...');
+      return;
+    }
+    let api = (this.props.memo.id < 0) ? '/api/create/memo' : '/api/update/memo';
+    let is_update= (this.props.memo.id < 0) ? false : true;
     let send = {
+      id: this.props.memo.id,
       title: this.state.title.trim(),
-      base: this.state.base.trim(),
-      tags: [],
-      category: this.state.category.trim()
+      text: this.state.text.trim(),
+      tags: this.state.tags,
+      category: this.state.category
     };
     request(api, send, function(err, res) {
       if (!err.ok) {
         this.props.alert(err.type, err.message);
+        return;
       }
-      this.props.back();
+      this.props.back(e, is_update, res.body.data);
     }.bind(this));
   },
   render() {
@@ -339,12 +391,12 @@ let EditView = React.createClass({
             <li><a href='#'>Preview</a></li>
           </ul>
           <textarea className='form-control' rows='10' placeholder='Text(Markdown)'
-            value={this.state.base} onChange={this.handleBaseChange} />
+            value={this.state.text} onChange={this.handleTextChange} />
         </div>
         <div className='form-group'>
           <div className='row'>
             <div className='col-md-8'>
-              <Select multi simpleValue
+              <Select multi valueKey="id" labelKey="name"
                 value={this.state.tags} options={this.state.tag_options}
                 isLoading={this.state.tag_loading} onChange={this.handleTagChange} placeholder='Tags...' /> 
             </div>
@@ -362,7 +414,8 @@ let EditView = React.createClass({
         <div className='form-group'>
           <div className='row'>
             <div className='col-md-8'>
-              <Select value={this.state.category} options={this.state.category_options}
+              <Select valueKey="id" labelKey="name"
+                value={this.state.category} options={this.state.category_options}
                 isLoading={this.state.category_loading} onChange={this.handleCategoryChange} placeholder='Category...' /> 
             </div>
             <div className='col-md-4'>
@@ -436,5 +489,5 @@ let Alert = React.createClass({
 });
 
 ReactDOM.render(
-  <Container data={data} />, document.getElementById('content')
+  <Container />, document.getElementById('content')
 );

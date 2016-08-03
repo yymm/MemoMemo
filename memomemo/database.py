@@ -22,12 +22,6 @@ class User(db.Model):
         self.name = name
         self.password = password
 
-    def create_memo(self, title, text, tag, category):
-        memo = Memo(self.id, title, text, tag, category)
-        db.session.add(memo)
-        db.session.commit()
-        return memo.dump_dic()
-
 
 tag_identifer = db.Table('tag_identifer',
     db.Column('memo_id', db.Integer, db.ForeignKey('memo.id')),
@@ -38,25 +32,45 @@ tag_identifer = db.Table('tag_identifer',
 class Memo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
-    text = db.Column(db.Text)
+    text = db.Column(db.Text, nullable=False)
+    html = db.Column(db.Text, nullable=False)
     date_time = db.Column(db.DateTime, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
     tags = db.relationship('Tag', secondary=tag_identifer)
 
-    def __init__(self, user_id, title, text, tag, category):
-        self.user_id = user_id
+    def set_json(self, title, text, tags, category):
         self.title = title
         self.text = text
+        self.html = parse_md(text)
         self.date_time = datetime.datetime.today()
+        for tag in tags:
+            tag = Tag.query.get(tag['id'])
+            self.tags.append(tag)
+        if category:
+            self.category_id = category['id']
+
+
+    def __init__(self, user_id, title, text, tags, category):
+        self.user_id = user_id
+        self.set_json(title, text, tags, category)
 
     def dump(self):
+        category = None
+        if self.category_id:
+            category = Category.query.get(self.category_id).dump()
         return {
             'id': self.id,
             'title': self.title,
             'text': self.text,
-            'date_time': datetime2str(self.date_time)
+            'html': self.html,
+            'date_time': datetime2str(self.date_time),
+            'tags': [x.dump() for x in self.tags],
+            'category': category
         }
+
+    def update(self, title, text, tags, category):
+        self.set_json(title, text, tags, category)
 
 
 class Tag(db.Model):
@@ -155,9 +169,55 @@ def delete_user(user):
     db.session.commit()
 
 
-def get_memos(user, fromIndex, quantity=10):
-    memos = user.memos[fromIndex:fromIndex+quantity]
+def create_memo(user_id, memo):
+    err_msg = ''
+    if len(memo['title']) == 0:
+        err_msg = 'Empty title is invalid.'
+        return None, err_msg
+    if len(memo['text']) == 0:
+        err_msg = 'Empty text is invalid.'
+        return None, err_msg
+    memo = Memo(
+            user_id,
+            memo['title'],
+            memo['text'],
+            memo['tags'],
+            memo['category'])
+    try:
+        db.session.add(memo)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as ie:
+        err = ie.orig
+        return None, err_msg
+    return memo.dump(), err_msg
+
+
+def get_memos(user):
+    memos = user.memos
     return [x.dump() for x in memos]
+
+
+def update_memo(memo):
+    err_msg = ''
+    if len(memo['title']) == 0:
+        err_msg = 'Empty title is invalid.'
+        return None, err_msg
+    if len(memo['text']) == 0:
+        err_msg = 'Empty text is invalid.'
+        return None, err_msg
+    m = Memo.query.get(memo['id'])
+    m.update(
+            memo['title'],
+            memo['text'],
+            memo['tags'],
+            memo['category'])
+    try:
+        db.session.add(m)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as ie:
+        err = ie.orig
+        return None, err_msg
+    return m.dump(), err_msg
 
 
 def create_tag(name):

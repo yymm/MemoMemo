@@ -136,15 +136,19 @@ def memo():
 @requires_login
 def api_create_memo():
     json = request.json
-    memo = g.user.create_memo(json)
-    return jsonify(ok=True, data=json)
+    memo, err_msg = create_memo(g.user.id, json)
+    if memo:
+        return jsonify(ok=True, data=memo)
+    else:
+        return jsonify(ok=False, data=err_msg)
 
 
 @app.route('/api/read/memo', methods=['POST'])
 @requires_login
 def api_get_memo():
     json = request.json
-    data = get_memos(g.user, 0)
+    data = get_memos(g.user)
+    print(data)
     return jsonify(ok=True, data=data)
 
 
@@ -152,7 +156,11 @@ def api_get_memo():
 @requires_login
 def api_update_memo():
     json = request.json
-    return jsonify(ok=True, data=json)
+    memo, err_msg = update_memo(json)
+    if memo:
+        return jsonify(ok=True, data=memo)
+    else:
+        return jsonify(ok=False, data=err_msg)
 
 
 @app.route('/api/delete/memo', methods=['POST'])
