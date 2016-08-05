@@ -15,8 +15,6 @@ class Memo {
   get date_time() { return this._date_time; }
   get tags() { return this._tags; }
   get category() { return this._category; }
-  update(title, text, html, date_time, tags, category) {
-  }
 }
 let empty_memo = function() {
   return new Memo(-1, '', '', '', '', [], null);
@@ -53,14 +51,15 @@ let request = function(api, send, callback) {
 // 基本的にContainerが親玉
 // ContainerのsetState処理を子のViewにpropsとして渡すことにより実行する
 let Container = React.createClass({
-  getInitialState: function() {
+  getInitialState() {
     return {
       data: [],
       view: <div>loading...</div>,
-      alerts: []
+      isShowAlert: false,
+      isShowConfirm: false
     };
   },
-  componentDidMount: function() {
+  componentDidMount() {
     request('/api/read/memo', {}, function(err, res) {
       if (!err.ok) {
         this.alert(err.type, err.message);
@@ -74,40 +73,38 @@ let Container = React.createClass({
         });
         this.setState({
           data: data,
-          view: <MemoListView data={data} edit={this.edit} memoview={this.memoview} new={this.new} alert={this.alert} />
+          view: <MemoListView data={data} edit={this.edit} memoview={this.memoview} new={this.new} />
         });
       }
     }.bind(this));
   },
   // Router(Viewを生成)
-  new: function() {
+  new() {
     this.setState({view: (
       <EditView back={this.back} memo={empty_memo()} alert={this.alert}>
       </EditView>
     )});
   },
-  edit: function(memo) {
+  edit(memo) {
     this.setState({view: (
       <EditView back={this.back} memo={memo} alert={this.alert}>
       </EditView>
     )});
   },
-  memoview: function(memo) {
+  memoview(memo) {
     this.setState({view: (
-      <MemoView back={this.back} memo={memo} alert={this.alert}>
+      <MemoView back={this.back} memo={memo} edit={this.edit} alert={this.alert} confirm={this.confirm}>
       </MemoView>
     )});
   },
-  back: function(e, is_update, memo) {
+  back(e, operation, memo) {
     if (memo) {
-      console.log(e, memo);
       let m = new Memo(
           memo.id, memo.title, memo.text, memo.html, memo.date_time,
           memo.tags, memo.category
       );
       let data = this.state.data;
-      if (is_update) {
-        // update
+      if (operation === 'update') {
         let index = data.findIndex(function(x) { return x.id === memo.id; });
         // dataが見つからないときの処理は下記の理由により未実装
         // edit中にdataを削除する動作はできない(他のユーザーからもできない)ため必ずfindIndexは成功する
@@ -115,38 +112,61 @@ let Container = React.createClass({
         //   return;
         // }
         data[index] = m;
-      } else {
-        // new
+      } else if (operation === 'create') {
         data.push(m);
+      } else if (operation === 'delete') {
+        let index = data.findIndex(function(x) { return x.id === memo.id; });
+        data.splice(index, 1);
+      } else {
+        this.alert('warning', 'Invalod operation!');
       }
       this.setState({
         data: data,
-        view: <MemoListView data={this.state.data} edit={this.edit} memoview={this.memoview} new={this.new} alert={this.alert} />
+        view: <MemoListView data={this.state.data} edit={this.edit} memoview={this.memoview} new={this.new} />
       });
     } else {
       this.setState({
-        view: <MemoListView data={this.state.data} edit={this.edit} memoview={this.memoview} new={this.new} alert={this.alert} />
+        view: <MemoListView data={this.state.data} edit={this.edit} memoview={this.memoview} new={this.new} />
       });
     }
   },
-  alert: function(type, message) {
-    let newAlerts = this.state.alerts.concat({type: type, message: message});
-    this.setState({alerts: newAlerts});
+  // Notifications
+  alert(type, message) {
+    this.setState({
+      isShowAlert: true,
+      alertType: type,
+      alertMessage: message
+    });
   },
-  render: function() {
-    let alerts = this.state.alerts.map(function(x, i) { 
-      let alert_remove = function(i) {
-        let newAlerts = this.state.alerts.slice();
-        newAlerts.splice(i, 1);
-        this.setState({alerts: newAlerts});
-      };
-      return <Alert key={i} type={x.type} message={x.message} remove_self={alert_remove.bind(this, i)} />;
-    }.bind(this));
+  alert_out() {
+    this.setState({
+      isShowAlert: false
+    });
+  },
+  confirm(title, message, callback) {
+    this.setState({
+      isShowConfirm: true,
+      confirmTitle: title,
+      confirmMessage: message,
+      confirmCallback: callback
+    });
+  },
+  confirm_out() {
+    this.setState({
+      isShowConfirm: false
+    });
+  },
+  render() {
     return (
       <div>
-        <React.addons.CSSTransitionGroup transitionName='view-change' transitionAppear={true}>
-          {alerts}
-        </React.addons.CSSTransitionGroup>
+        {
+          this.state.isShowAlert &&
+            <Alert type={this.state.alertType} message={this.state.alertMessage} remove={this.alert_out} />
+        }
+        {
+          this.state.isShowConfirm &&
+            <Confirm title={this.state.confirmTitle} message={this.state.confirmMessage} callback={this.state.confirmCallback} remove={this.confirm_out} />
+        }
         <div className='container'>
           {this.state.view}
         </div>
@@ -161,7 +181,6 @@ let MemoListView = React.createClass ({
     edit: React.PropTypes.func.isRequired,
     memoview: React.PropTypes.func.isRequired,
     new: React.PropTypes.func.isRequired,
-    alert: React.PropTypes.func.isRequired
   },
   render() {
     let memoNodes = this.props.data.map(function(memo) {
@@ -203,7 +222,7 @@ let MemoBox = React.createClass({
     return (
       <React.addons.CSSTransitionGroup transitionName='view-change' transitionAppear={true}>
         <div className='col-md-6'>
-          <div className='panel panel-default'>
+          <div className='panel panel-default memobox'>
             <div className='panel-heading'>
               <h1>{this.props.memo.title} <small>{this.props.memo.date_time}</small></h1>
               <div className='button-group'>
@@ -225,7 +244,28 @@ let MemoView = React.createClass({
   propTypes: {
     back: React.PropTypes.func.isRequired,
     memo: React.PropTypes.instanceOf(Memo).isRequired,
-    alert: React.PropTypes.func.isRequired
+    edit: React.PropTypes.func.isRequired,
+    alert: React.PropTypes.func.isRequired,
+    confirm: React.PropTypes.func.isRequired
+  },
+  open_edit() {
+    this.props.edit(this.props.memo);
+  },
+  delete() {
+    this.props.confirm('Are you sure?', 'Do you delete this article?', function() {
+      // delete
+      request('/api/delete/memo', {id: this.props.memo.id}, function(err, res) {
+        if (!err.ok) {
+          this.props.alert(err.type, err.message);
+          return;
+        } else {
+          this.props.back(null, 'delete', res.body.data);
+          this.props.alert('success', 'Successfully deleted!');
+        }
+      }.bind(this));
+    }.bind(this));
+  },
+  slide() {
   },
   render() {
     let tags = this.props.memo.tags.map(function(x) {
@@ -242,8 +282,11 @@ let MemoView = React.createClass({
           <div className='jumbotron'>
             <h1>{this.props.memo.title} <small>{this.props.memo.date_time}</small></h1>
             <div className='button-group'>
+              <button className='btn btn-default' onClick={this.open_edit}>Edit</button>
+              <button className='btn btn-primary' onClick={this.slide}>Slide Show</button>
               {tags}
               {category}
+              <button className='btn btn-danger' onClick={this.delete}>Eelete</button>
             </div>
           </div>
           <div dangerouslySetInnerHTML={ {__html: this.props.memo.html} } />
@@ -259,7 +302,7 @@ let EditView = React.createClass({
     memo: React.PropTypes.instanceOf(Memo).isRequired,
     alert: React.PropTypes.func.isRequired
   },
-  getInitialState: function() {
+  getInitialState() {
     return {
       title: this.props.memo.title,
       text: this.props.memo.text,
@@ -274,40 +317,44 @@ let EditView = React.createClass({
       category_options: [],
       category_loading: true,
       category_submit: false,
-      submit: false
+      submit: false,
+      active: true,
+      preview: ''
     };
   },
-  componentDidMount: function() {
+  componentDidMount() {
     this.getTagOptions();
     this.getCategoryOptions();
   },
-  getTagOptions: function() {
+  getTagOptions() {
     request('/api/read/tag', {}, function(err, res) {
       if (!err.ok) {
         this.props.alert(err.type, err.message);
         return;
+      } else {
+        let tag_options = res.body.data.map(function(x) { return {id: x.id, name: x.name}; });
+        this.setState({
+          tag_options: tag_options,
+          tag_loading: false
+        });
       }
-      let tag_options = res.body.data.map(function(x) { return {id: x.id, name: x.name}; });
-      this.setState({
-        tag_options: tag_options,
-        tag_loading: false
-      });
     }.bind(this));
   },
-  getCategoryOptions: function() {
+  getCategoryOptions() {
     request('/api/read/category', {}, function(err, res) {
       if (!err.ok) {
         this.props.alert(err.type, err.message);
         return;
+      } else {
+        let category_options = res.body.data.map(function(x) { return {id: x.id, name: x.name}; });
+        this.setState({
+          category_options: category_options,
+          category_loading: false
+        });
       }
-      let category_options = res.body.data.map(function(x) { return {id: x.id, name: x.name}; });
-      this.setState({
-        category_options: category_options,
-        category_loading: false
-      });
     }.bind(this));
   },
-  clickTagCreate: function(e) {
+  clickTagCreate(e) {
     e.preventDefault();
     this.setState({tag_submit: true});
     request('/api/create/tag', {name: this.state.new_tag}, function(err) {
@@ -321,7 +368,7 @@ let EditView = React.createClass({
       }
     }.bind(this));
   },
-  clickCategoryCreate: function(e) {
+  clickCategoryCreate(e) {
     e.preventDefault();
     this.setState({category_submit: true});
     request('/api/create/category', {name: this.state.new_category}, function(err) {
@@ -335,34 +382,33 @@ let EditView = React.createClass({
       }
     }.bind(this));
   },
-  handleTitleChange: function(e) {
+  handleTitleChange(e) {
     this.setState({title: e.target.value});
   },
-  handleTextChange: function(e) {
+  handleTextChange(e) {
     this.setState({text: e.target.value});
   },
-  handleNewTagChange: function(e) {
+  handleNewTagChange(e) {
     this.setState({new_tag: e.target.value});
   },
-  handleNewCategoryChange: function(e) {
+  handleNewCategoryChange(e) {
     this.setState({new_category: e.target.value});
   },
-  handleTagChange: function(value) {
+  handleTagChange(value) {
     this.setState({tags: value});
   },
-  handleCategoryChange: function(value) {
+  handleCategoryChange(value) {
     this.setState({category: value});
   },
-  handleSubmit: function(e) {
+  handleSubmit(e) {
     e.preventDefault();
-    // TODO: 簡易バリデーション
     if (this.state.title.trim().length == 0 ||
         this.state.text.trim().length == 0) {
       this.props.alert('warning', 'Empty Title or Text is invalid...');
       return;
     }
     let api = (this.props.memo.id < 0) ? '/api/create/memo' : '/api/update/memo';
-    let is_update= (this.props.memo.id < 0) ? false : true;
+    let operation = (this.props.memo.id < 0) ? 'create': 'update';
     let send = {
       id: this.props.memo.id,
       title: this.state.title.trim(),
@@ -375,10 +421,34 @@ let EditView = React.createClass({
         this.props.alert(err.type, err.message);
         return;
       }
-      this.props.back(e, is_update, res.body.data);
+      let msg = (this.props.memo.id < 0) ? 'Memo created!' : 'Memo updated!';
+      this.props.back(e, operation, res.body.data);
+      this.props.alert('success', msg);
     }.bind(this));
   },
+  handlePreview(e) {
+    e.preventDefault();
+    request('/api/preview', {text: this.state.text}, (err, res) => {
+      if (!err.ok) {
+        this.props.alert(err.type, err.message);
+        return;
+      } else {
+        this.setState({preview: res.body.data});
+      }
+    });
+    this.setState({active: false});
+  },
+  handleEdit(e) {
+    e.preventDefault();
+    this.setState({active: true});
+  },
   render() {
+    let active_textarea = classNames(
+      {active: this.state.active}
+    );
+    let active_preview = classNames(
+      {active: !this.state.active}
+    );
     let form = (
       <form className='form-horizontal' onSubmit={this.handleSubmit}>
         <div className='form-group'>
@@ -387,11 +457,16 @@ let EditView = React.createClass({
         </div>
         <div className='form-group'>
           <ul className='nav nav-pills'>
-            <li className='active'><a href='#'>Edit</a></li>
-            <li><a href='#'>Preview</a></li>
+            <li className={active_textarea}><a href='#' onClick={this.handleEdit}>Edit</a></li>
+            <li className={active_preview}><a href='#' onClick={this.handlePreview}>Preview</a></li>
           </ul>
-          <textarea className='form-control' rows='10' placeholder='Text(Markdown)'
-            value={this.state.text} onChange={this.handleTextChange} />
+          {
+            (this.state.active) ?
+            <textarea className='form-control' rows='25' placeholder='Text(Markdown)'
+              value={this.state.text} onChange={this.handleTextChange} />
+            :
+            <div className='form-control preview' dangerouslySetInnerHTML={ {__html: this.state.preview} } />
+          }
         </div>
         <div className='form-group'>
           <div className='row'>
@@ -435,12 +510,10 @@ let EditView = React.createClass({
       </form>
     );
     return (
-      <React.addons.CSSTransitionGroup transitionName='view-change' transitionAppear={true}>
-        <div>
-          <div onClick={this.props.back} className='glyphicon glyphicon-remove'></div>
-          {form}
-        </div>
-      </React.addons.CSSTransitionGroup>
+      <div>
+        <div onClick={this.props.back} className='glyphicon glyphicon-remove'></div>
+        {form}
+      </div>
     );
   }
 });
@@ -448,39 +521,57 @@ let EditView = React.createClass({
 let Alert = React.createClass({
   propTypes: {
     type: React.PropTypes.oneOf(['success', 'info', 'warning', 'danger']),
-    message: React.PropTypes.string.isRequired,
-    remove_self: React.PropTypes.func.isRequired
+    message: React.PropTypes.string,
+    remove: React.PropTypes.func.isRequired
   },
-  componentDidMount: function() {
+  getInitialState() {
+    return {fadeout: false};
+  },
+  componentDidMount() {
     let delay = 10000;
     if (this.props.type == 'success' ||
         this.props.type == 'info') {
       delay = 5000;
     }
-    setTimeout(this.props.remove_self, delay);
+    setTimeout(this.remove, delay);
+  },
+  remove() {
+    this.setState({fadeout: true});
+    setTimeout(this.props.remove, 500);
   },
   render() {
-    let alertClass = 'text-center alert alert-float alert-' + this.props.type;
-    let glyphiconClass = 'glyphicon glyphicon-';
+    let alertClass = classNames(
+      'alert-float',
+      'notification-fadein',
+      {'notification-fadeout': this.state.fadeout},
+      'text-center',
+      'alert',
+      'alert-' + this.props.type
+    );
+    let icon = '';
     switch (this.props.type) {
     case 'success':
-      glyphiconClass += 'thumbs-up';
+      icon = 'thumbs-up';
       break;
     case 'info':
-      glyphiconClass += 'info-sign';
+      icon = 'info-sign';
       break;
     case 'warning':
-      glyphiconClass += 'exclamation-sign';
+      icon = 'exclamation-sign';
       break;
     case 'danger':
-      glyphiconClass += 'fire';
+      icon = 'fire';
       break;
     default:
-      glyphiconClass += 'question-sign';
+      icon = 'question-sign';
     }
+    let glyphiconClass = classNames(
+      'glyphicon',
+      'glyphicon-' + icon
+    );
     let strong = this.props.type.charAt(0).toUpperCase() + this.props.type.slice(1);
     return (
-      <div className={alertClass} onClick={this.props.remove_self}>
+      <div className={alertClass} style={ {zIndex: 100} } onClick={this.remove}>
         <button className="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
         <strong>{strong} <span className={glyphiconClass} aria-hidden="true"></span></strong> {this.props.message}
       </div>
@@ -488,6 +579,76 @@ let Alert = React.createClass({
   }
 });
 
+let Confirm = React.createClass({
+  propTypes: {
+    title: React.PropTypes.string,
+    message: React.PropTypes.string,
+    callback: React.PropTypes.func.isRequired,
+    remove: React.PropTypes.func.isRequired
+  },
+  getInitialState() {
+    return {fadeout: false};
+  },
+  remove() {
+    this.setState({fadeout: true});
+    setTimeout(this.props.remove, 500);
+  },
+  ok() {
+    this.props.callback();
+    this.setState({fadeout: true});
+    setTimeout(this.props.remove, 500);
+  },
+  render() {
+    const style = {
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      zIndex: 200
+    };
+    const overlayStyle = {
+      position: 'fixed',
+      backgroundColor: '#182738',
+      opacity: 0.8,
+      top: 0,
+      left: 0,
+      height: '100%',
+      width: '100%'
+    };
+    const overlayClass = classNames(
+      'notification-fadein',
+      {'notification-fadeout': this.state.fadeout}
+    );
+    const dialogClass = classNames(
+      'modal-dialog',
+      'notification-fadein',
+      {'notification-fadeout': this.state.fadeout}
+    );
+    return (
+      <div style={style}>
+        <div style={overlayStyle} className={overlayClass} onClick={this.remove} />
+        <div className={dialogClass} role="document">
+          <div className="modal-content">
+            <div className="modal-header">
+              <button type="button" className="close" data-dismiss="modal" aria-label="Close" onClick={this.remove}><span aria-hidden="true">&times;</span></button>
+              <h4 className="modal-title">{this.props.title}</h4>
+            </div>
+            <div className="modal-body">
+              <p>{this.props.message}</p>
+            </div>
+            <div className="modal-footer">
+              <button type="button" className="btn btn-default" data-dismiss="modal" onClick={this.remove}>Cancel</button>
+              <button type="button" className="btn btn-primary" onClick={this.ok}>Ok</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+});
+
 ReactDOM.render(
-  <Container />, document.getElementById('content')
+  <Container />,
+  document.getElementById('content')
 );

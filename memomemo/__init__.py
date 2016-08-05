@@ -148,7 +148,6 @@ def api_create_memo():
 def api_get_memo():
     json = request.json
     data = get_memos(g.user)
-    print(data)
     return jsonify(ok=True, data=data)
 
 
@@ -166,8 +165,11 @@ def api_update_memo():
 @app.route('/api/delete/memo', methods=['POST'])
 @requires_login
 def api_delete_memo():
-    json = request.json
-    return jsonify(ok=True, data=json)
+    memo, err_msg = delete_memo(request.json['id'])
+    if memo:
+        return jsonify(ok=True, data=memo)
+    else:
+        return jsonify(ok=False, data=err_msg)
 
 
 @app.route('/api/create/tag', methods=['POST'])
@@ -202,3 +204,10 @@ def api_create_category():
 def api_get_category():
     categories = get_categories()
     return jsonify(ok=True, data=categories)
+
+
+@app.route('/api/preview', methods=['POST'])
+@requires_login
+def api_preview():
+    html = parse_md(request.json['text'])
+    return jsonify(ok=True, data=html)

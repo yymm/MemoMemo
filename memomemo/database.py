@@ -187,7 +187,7 @@ def create_memo(user_id, memo):
         db.session.add(memo)
         db.session.commit()
     except sqlalchemy.exc.IntegrityError as ie:
-        err = ie.orig
+        err_msg = "{}".format(ie.orig)
         return None, err_msg
     return memo.dump(), err_msg
 
@@ -215,9 +215,18 @@ def update_memo(memo):
         db.session.add(m)
         db.session.commit()
     except sqlalchemy.exc.IntegrityError as ie:
-        err = ie.orig
+        err_msg = "{}".format(ie.orig)
         return None, err_msg
     return m.dump(), err_msg
+
+
+def delete_memo(memo_id):
+    memo = Memo.query.get(memo_id)
+    if memo:
+        db.session.delete(memo)
+        db.session.commit()
+        return memo.dump(), '' 
+    return None, 'Falure to delete this memo.'
 
 
 def create_tag(name):
@@ -230,7 +239,7 @@ def create_tag(name):
         db.session.add(tag)
         db.session.commit()
     except sqlalchemy.exc.IntegrityError as ie:
-        err = ie.orig
+        err_msg = '{}'.format(ie.orig)
         return None, err_msg
     return tag, err_msg
 
@@ -259,7 +268,7 @@ def create_category(name):
         db.session.add(category)
         db.session.commit()
     except sqlalchemy.exc.IntegrityError as ie:
-        err = ie.orig
+        err_msg = "{}".format(ie.orig)
         return None, err_msg
     return category, err_msg
 
