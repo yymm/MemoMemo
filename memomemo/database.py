@@ -1,36 +1,14 @@
 # -*- encoding:utf-8 -*-
 
+"""
+Model with O/R mapper (Flask-SQLAlchemy)
+"""
+
 import json
-import zlib
 import datetime
-from colour import Color
-from flask_sqlalchemy import SQLAlchemy
-from memomemo import app
-from sqlalchemy import and_, exc, event, or_
-from sqlalchemy.pool import Pool
-from memomemo.utils import datetime2str, str2datetime, parse_rst, parse_md
-
-
-db = SQLAlchemy(app)
-db_session = db.session
-
-@event.listens_for(Pool, "checkout")
-def ping_connection(dbapi_connection, connection_record, connection_proxy):
-    '''
-    MySQL Connection forced wake up, before connect to mysql server.
-    '''
-    cursor = dbapi_connection.cursor()
-    try:
-        cursor.execute("SELECT 1")
-    except:
-        # optional - dispose the whole pool
-        # instead of invalidating one at a time
-        # connection_proxy._pool.dispose()
-
-        # raise DisconnectionError - pool will try
-        # connecting again up to three times before raising.
-        raise exc.DisconnectionError()
-    cursor.close()
+import sqlalchemy
+from memomemo import db
+from memomemo.utils import datetime2str, str2datetime, parse_md
 
 
 class User(db.Model):
@@ -44,130 +22,84 @@ class User(db.Model):
         self.name = name
         self.password = password
 
-    def add_memo(self, json_data):
-        memo = Memo(self.id,
-                    json_data['title'],
-                    json_data['text'],
-                    json_data['tag'],
-                    json_data['paser'],
-                    publish=json_data['publish'])
-        db_session.add(memo)
-        db_session.commit()
-        return memo
 
-    def update_memo(self, json_data):
-        date_time = str2datetime(json_data['date'])
-        memo = Memo.query.filter(and_(Memo.user_id == self.id,
-                                      Memo.date_time == date_time)).first()
-        if memo:
-            memo.title = json_data['title']
-            memo.text = json_data['text']
-            memo.tag = json_data['tag']
-            memo.paser = json_data['paser']
-            memo.publish = json_data['publish']
-            memo.date_time = datetime.datetime.today()
-            db_session.commit()
-            return memo
-
-        return None
-
-    def delete_memo(self, json_data):
-        date_time = str2datetime(json_data['date_time'])
-        memo = Memo.query.filter(and_(Memo.user_id == self.id,
-                                      Memo.date_time == date_time)).first()
-        if memo:
-            db_session.delete(memo)
-            db_session.commit()
-            return True
-
-        return False
-
-    def generate_tag_list(self):
-        memos = self.memos
-        if len(memos) <= 0:
-            return []
-        countHash = {}
-        for memo in memos:
-            tags = memo.tag.split(',')
-            for tag in tags:
-                s = tag.strip()
-                if countHash.has_key(s):
-                    countHash[s] += 1
-                else:
-                    countHash[s] = 1
-        tag_list = []
-        s = Color('#d16b16')
-        e = Color('#87ceed')
-        l = len(countHash) if len(countHash) > 1 else 2
-        color_list = list(s.range_to(e, l))
-        color_cnt = 0
-        max_val = max(countHash.values())
-        for key, val in sorted(countHash.items(),
-                               key=lambda x:x[1],
-                               reverse=True):
-            tag_dic = {}
-            tag_dic['name'] = key
-            tag_dic['size'] = (val / max_val) * 100
-            tag_dic['num'] = val
-            tag_dic['color'] = color_list[color_cnt]
-            color_cnt += 1
-            tag_list.append(tag_dic)
-
-        return tag_list
-
-
-    def generate_memo_list(self):
-        memo_list = []
-        year_list = []
-        memos = Memo.query.filter_by(user_id=self.id) \
-                .order_by(Memo.date_time.desc()).all()
-        for memo in memos:
-            dic = {}
-            dic["title"] = memo.title
-            dic["date"] = memo.date_time
-            dic["tag"] = memo.tag
-            dic["publish"] = memo.publish
-            memo_list.append(dic)
-            year_list.append(memo.date_time.year)
-        return memo_list, list(set(year_list))
+tag_identifer = db.Table('tag_identifer',
+    db.Column('memo_id', db.Integer, db.ForeignKey('memo.id')),
+    db.Column('tag_id', db.Integer, db.ForeignKey('tag.id'))
+)
 
 
 class Memo(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
-    text = db.Column(db.Text)
-    tag = db.Column(db.String(100))
-    date_time = db.Column(db.DateTime(), unique=True)
-    publish = db.Column(db.Integer)
-    paser = db.Column(db.String(20))
+    text = db.Column(db.Text, nullable=False)
+    html = db.Column(db.Text, nullable=False)
+    date_time = db.Column(db.DateTime, unique=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'))
+    tags = db.relationship('Tag', secondary=tag_identifer)
 
-    def __init__(self, user_id, title, text, tag, paser, date_time=None,
-            publish=0):
-        self.user_id = user_id
+    def set_json(self, title, text, tags, category):
         self.title = title
         self.text = text
-        self.tag = tag
-        self.date_time = str2datetime(date_time) \
-            if date_time else datetime.datetime.today()
-        self.publish = publish
-        self.paser = paser
+        self.html = parse_md(text)
+        self.date_time = datetime.datetime.today()
+        for tag in tags:
+            tag = Tag.query.get(tag['id'])
+            self.tags.append(tag)
+        if category:
+            self.category_id = category['id']
 
-    def dump_dic(self):
-        dic = {}
-        dic['id'] = self.id
-        dic['title'] = self.title
-        dic['basetext'] = self.text
-        if self.paser == "Markdown":
-            dic['text'] = parse_md(self.text)
-        else:
-            dic['text'] = parse_rst(self.text)
-        dic['tag'] = self.tag
-        dic['paser'] = self.paser
-        dic['date_time'] = datetime2str(self.date_time)
-        dic['publish'] = self.publish
-        #return json.dumps(dic)
-        return dic
+
+    def __init__(self, user_id, title, text, tags, category):
+        self.user_id = user_id
+        self.set_json(title, text, tags, category)
+
+    def dump(self):
+        category = None
+        if self.category_id:
+            category = Category.query.get(self.category_id).dump()
+        return {
+            'id': self.id,
+            'title': self.title,
+            'text': self.text,
+            'html': self.html,
+            'date_time': datetime2str(self.date_time),
+            'tags': [x.dump() for x in self.tags],
+            'category': category
+        }
+
+    def update(self, title, text, tags, category):
+        self.set_json(title, text, tags, category)
+
+
+class Tag(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+
+    def __init__(self, name):
+        self.name = name
+
+    def dump(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
+
+
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), unique=True, nullable=False)
+    memos = db.relationship('Memo', backref='category')
+
+    def __init__(self, name):
+        self.name = name
+
+    def dump(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
 
 
 class Config(db.Model):
@@ -188,94 +120,48 @@ class Config(db.Model):
     def __init__(self, user_id):
         self.user_id = user_id
 
-    def get_config_obj(self):
+    def get(self):
         return json.loads(self.json)
 
-    def get_config_element(self, key):
+    def get_element(self, key):
         obj = json.loads(self.json)
         if not key in obj:
             return None
         return obj[key]
 
-    def set_config_obj(self, obj):
+    def set(self, obj):
         self.json = json.dumps(obj)
         db.session.add(self)
         db.session.commit()
         return self.json
 
-    def set_config_element(self, key, elem):
-        obj = self.get_config_obj()
+    def set_element(self, key, elem):
+        obj = self.get()
         obj[key] = elem
-        self.set_config_obj(obj)
+        self.set(obj)
 
 
 def init_db():
     db.create_all()
-    name = app.config["MEMOMEMO_USER"]
-    password = app.config["MEMOMEMO_PASSWORD"]
-    if name and password:
-        if len(User.query.all()) == 0:
-            user = add_user(name, password, False)
 
 
-def add_user(name, password, signin=True):
+def create_user(name, password):
     user = User.query.filter_by(name=name).first()
-
-    if not user:
-        user = User(name, password)
-        db.session.add(user)
-        db.session.commit()
-        if user.id:
-            config = Config(user.id)
-            config.json = json.dumps({"signin": signin})
-            memo = create_first_memo(user.id)
-            db.session.add(config)
-            db.session.add(memo)
-            db.session.commit()
-
+    if user:
+        return None
+    user = User(name, password)
+    db.session.add(user)
+    db.session.commit()
     return user
 
 
-def create_first_memo(id):
-    text = '''# Simple Markdown Example
-
-GFM = GitHub Flavored Markdown
-
-## list
-
-* list1
-* list2
-
-## code
-
-```python
-from Flask import flask
-app = Flase(__name__)
-
-@route.app('/')
-def hello():
-    return "Hello Flask"
-```
-
-## table
-
-foo  | bar
----- | ----
-FOO  | BAR
-    '''
-    return Memo(id, "Hello MemoMemo!",
-                text,
-                "Sample", "Markdown")
-
 def varify_user(name, password):
     user = User.query.filter_by(name=name).first()
-    if user:
-        if user.password == password:
-            return user
-        else:
-            return None
-    else:
-        return None
+    if user == None:
+        return None # User not found
+    if user.password != password:
+        return None # Password is incorrect
+    return user
 
 
 def delete_user(user):
@@ -283,69 +169,119 @@ def delete_user(user):
     db.session.commit()
 
 
-def change_password(user_id, password):
-    user = User.query.get(user_id)
-    user.password = password
-    db.session.commit()
+def create_memo(user_id, memo):
+    err_msg = ''
+    if len(memo['title']) == 0:
+        err_msg = 'Empty title is invalid.'
+        return None, err_msg
+    if len(memo['text']) == 0:
+        err_msg = 'Empty text is invalid.'
+        return None, err_msg
+    memo = Memo(
+            user_id,
+            memo['title'],
+            memo['text'],
+            memo['tags'],
+            memo['category'])
+    try:
+        db.session.add(memo)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as ie:
+        err_msg = "{}".format(ie.orig)
+        return None, err_msg
+    return memo.dump(), err_msg
 
 
-def query_memo(user_id, data):
-    '''
-    data = {
-        query: {
-            title: string,
-            text: string,
-            tag: string
-            publish: int
-        },
-        offset: int,
-        limit: int
-    }
-    '''
-    title = data['query']['title']
-    text = data['query']['text']
-    tag = data['query']['tag']
-    publish = int(data['query']['publish'])
-    offset = data['offset']
-    limit = data['limit']
+def get_memos(user):
+    memos = user.memos
+    return [x.dump() for x in memos]
 
-    q = Memo.query.filter_by(user_id=user_id)
 
-    user = User.query.get(user_id)
-    pelicanconf = user.config.get_config_element("pelicanconf")
-    if pelicanconf:
-        categories = pelicanconf["categories"]
-        if publish != 0:
-            if publish > len(categories):
-                q = q.filter(Memo.publish > 0)
-            else:
-                q = q.filter_by(publish=publish)
+def update_memo(memo):
+    err_msg = ''
+    if len(memo['title']) == 0:
+        err_msg = 'Empty title is invalid.'
+        return None, err_msg
+    if len(memo['text']) == 0:
+        err_msg = 'Empty text is invalid.'
+        return None, err_msg
+    m = Memo.query.get(memo['id'])
+    m.update(
+            memo['title'],
+            memo['text'],
+            memo['tags'],
+            memo['category'])
+    try:
+        db.session.add(m)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as ie:
+        err_msg = "{}".format(ie.orig)
+        return None, err_msg
+    return m.dump(), err_msg
 
-    if len(title) != 0:
-        q = q.filter(Memo.title.like('%'+title+'%'))
 
-    if len(text) != 0:
-        q = q.filter(Memo.text.like('%'+text+'%'))
+def delete_memo(memo_id):
+    memo = Memo.query.get(memo_id)
+    if memo:
+        db.session.delete(memo)
+        db.session.commit()
+        return memo.dump(), '' 
+    return None, 'Falure to delete this memo.'
 
-    if len(tag) != 0:
-        if tag.find(',') >= 0:
-            tags = tag.split(',')
-            for t in tags:
-                q = q.filter(or_(Memo.tag.like(t.strip()+',%'),
-                                 Memo.tag.like('%, '+t.strip()),
-                                 Memo.tag.like('%, '+t.strip()+',%'),
-                                 Memo.tag == t.strip()))
-        else:
-            q = q.filter(or_(Memo.tag.like(tag.strip()+',%'),
-                             Memo.tag.like('%, '+tag.strip()),
-                             Memo.tag.like('%, '+tag.strip()+',%'),
-                             Memo.tag == tag.strip()))
 
-    #print(q.count())
-    memos = q.order_by(Memo.date_time.desc()).slice(offset, limit).all()
+def create_tag(name):
+    err_msg = ''
+    if len(name) == 0:
+        err_msg = 'Empty string is invalid.'
+        return None, err_msg
+    tag = Tag(name)
+    try:
+        db.session.add(tag)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as ie:
+        err_msg = '{}'.format(ie.orig)
+        return None, err_msg
+    return tag, err_msg
 
-    l = []
-    for memo in memos:
-        l.append(memo.dump_dic())
 
-    return json.dumps(l)
+def get_tags():
+    tags = Tag.query.all()
+    return [x.dump() for x in tags]
+
+
+def delete_tag(name):
+    tag = Tag.query.filter_by(name=name).first()
+    if tag:
+        db.session.delete(tag)
+        db.session.commit()
+        return True
+    return False
+
+
+def create_category(name):
+    err_msg = ''
+    if len(name) == 0:
+        err_msg = 'Empty string is invalid.'
+        return None, err_msg
+    category = Category(name)
+    try:
+        db.session.add(category)
+        db.session.commit()
+    except sqlalchemy.exc.IntegrityError as ie:
+        err_msg = "{}".format(ie.orig)
+        return None, err_msg
+    return category, err_msg
+
+
+def get_categories():
+    categories = Category.query.all()
+    return [x.dump() for x in categories]
+
+
+def delete_category(name):
+    category = Category.query.filter_by(name=name).first()
+    if category:
+        db.session.delete(category)
+        db.session.commit()
+        return True
+    return False
